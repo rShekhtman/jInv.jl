@@ -36,3 +36,4 @@ Pkg.test("jInv")
 # Packages using jInv
 
 1. [`DivSigGrad.jl`](https://github.com/JuliaInv/DivSigGrad.jl) - Inverse conductivity problems
+2. [`FWI.jl`](https://github.com/JuliaInv/FWI.jl) - Full Waveform Inversion
