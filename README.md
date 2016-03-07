@@ -35,4 +35,4 @@ Pkg.test("jInv")
 
 # Packages using jInv
 
-The goal of `jInv`
+1. [`DivSigGrad.jl`](https://github.com/JuliaInv/DivSigGrad.jl) - Inverse conductivity problems
