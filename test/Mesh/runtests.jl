@@ -1,0 +1,6 @@
+println("==== compare regular and tensor mesh ====")
+include("regularVStensor.jl")
+println("==== test differential operators ====")
+include("testDiffOps.jl")
+include("testInterpolationMatrix.jl")
+println(" Mesh: All tests passed!")

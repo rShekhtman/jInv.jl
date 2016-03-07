@@ -1,0 +1,349 @@
+export RegularMesh, getRegularMesh
+export getCellCenteredGrid, getNodalGrid, getEdgeGrids, getFaceGrids
+export getCellCenteredAxes, getNodalAxes
+export getVolume, getVolumeInv, getFaceArea, getFaceAreaInv, getLength, getLengthInv
+export getEdgeMassMatrix
+
+
+type RegularMesh <: AbstractTensorMesh
+	domain::Vector{Float64} 
+	h::Vector{Float64} 
+	x0::Vector{Float64}
+	dim::Int
+	n::Vector{Int64}
+	nc::Int
+	nf::Vector{Int64}
+	ne::Vector{Int64}
+	Div::SparseMatrixCSC
+	Grad::SparseMatrixCSC
+	Curl::SparseMatrixCSC
+	Af::SparseMatrixCSC
+	Ae::SparseMatrixCSC
+	An::SparseMatrixCSC
+	V::SparseMatrixCSC
+	F::SparseMatrixCSC
+	L::SparseMatrixCSC
+	Vi::SparseMatrixCSC
+	Fi::SparseMatrixCSC
+	Li::SparseMatrixCSC
+	nLap::SparseMatrixCSC
+end
+
+function getRegularMesh(domain,n)
+	domain = vec(float(domain))
+	n     = vec(n)
+	nc    = prod(n)
+	h     = vec((domain[2:2:end]-domain[1:2:end])./n)
+	dim   = round(Int64,length(domain)/2)
+	if dim==1
+		nf = (n[1]+1)
+		ne = (n[1]+1)
+	elseif dim==2
+		nf = [(n[1]+1)*n[2]; n[1]*(n[2]+1);]
+		ne = [n[1]*(n[2]+1); (n[1]+1)*n[2];  ]
+	elseif dim==3
+		nf = [(n[1]+1)*n[2]*n[3]; n[1]*(n[2]+1)*n[3]; n[1]*n[2]*(n[3]+1); ]
+		ne = [n[1]*(n[2]+1)*(n[3]+1); (n[1]+1)*n[2]*(n[3]+1); (n[1]+1)*(n[2]+1)*n[3]; ]
+	end
+	x0 = domain[1:2:end]
+	empt = spzeros(0,0);
+return RegularMesh(domain,h,x0,dim,n,nc,nf,ne,empt,empt,empt,empt,empt,empt,empt,empt,empt,empt,empt,empt,empt)
+end
+
+
+import Base.==
+function ==(M1::RegularMesh,M2::RegularMesh)
+	isEqual = fill(true,20)
+	
+	# check mandatory fields
+	isEqual[1] =  (M1.domain == M2.domain)
+	isEqual[2] =  (M1.h     == M2.h)
+	isEqual[3] =  (M1.x0    == M2.x0)
+	isEqual[4] =  (M1.dim   == M2.dim)
+	isEqual[5] =  (M1.n     == M2.n)
+	isEqual[6] =  (M1.nc    == M2.nc)
+	isEqual[7] =  (M1.nf    == M2.nf)
+	isEqual[8] =  (M1.ne    == M2.ne)
+	
+	# check fields that might be empty
+	if !(isempty(M1.Div)) && !(isempty(M2.Div))
+		isEqual[9] = (M1.Div == M2.Div)
+	end
+	if !(isempty(M1.Grad)) && !(isempty(M2.Grad))
+		isEqual[10] = (M1.Grad == M2.Grad)
+	end
+	if !(isempty(M1.Curl)) && !(isempty(M2.Curl))
+		isEqual[11] = (M1.Curl == M2.Curl)
+	end
+	if !(isempty(M1.Af)) && !(isempty(M2.Af))
+		isEqual[12] = (M1.Af == M2.Af)
+	end
+	if !(isempty(M1.Ae)) && !(isempty(M2.Ae))
+		isEqual[13] = (M1.Ae == M2.Ae)
+	end
+	if !(isempty(M1.An)) && !(isempty(M2.An))
+		isEqual[14] = (M1.An == M2.An)
+	end
+	if !(isempty(M1.V)) && !(isempty(M2.V))
+		isEqual[15] = (M1.V == M2.V)
+	end
+	if !(isempty(M1.F)) && !(isempty(M2.F))
+		isEqual[16] = (M1.F == M2.F)
+	end
+	if !(isempty(M1.L)) && !(isempty(M2.L))
+		isEqual[17] = (M1.L == M2.L)
+	end
+	if !(isempty(M1.Vi)) && !(isempty(M2.Vi))
+		isEqual[18] = (M1.Vi == M2.Vi)
+	end
+	if !(isempty(M1.Fi)) && !(isempty(M2.Fi))
+		isEqual[19] = (M1.Fi == M2.Fi)
+	end
+	if !(isempty(M1.Li)) && !(isempty(M2.Li))
+		isEqual[20] = (M1.Li == M2.Li)
+	end
+	return all(isEqual)
+end
+
+
+# --- grid constructor
+function getCellCenteredGrid(Mesh::RegularMesh)
+# X = getCellCenteredGrid(Mesh::RegularMesh)
+	return getCellCenteredGrid(Mesh.domain,Mesh.n)
+end
+
+function getNodalGrid(Mesh::RegularMesh)
+# X = getNodalGrid(Mesh::RegularMesh)
+	return getNodalGrid(Mesh.domain,Mesh.n)
+end
+
+function getEdgeGrids(Mesh::RegularMesh)
+	return getEdgeGrids(Mesh.domain,Mesh.n)
+end
+
+function getFaceGrids(Mesh::RegularMesh)
+	return getFaceGrids(Mesh.domain,Mesh.n)
+end
+
+function getCellCenteredGrid(domain,n)
+# X = getCellCenteredGrid(domain,n)
+	dim = round(Int64,length(domain)/2)
+	if dim==1
+		xc = getCellCenteredAxes(domain,n)
+	elseif dim==2
+		x1,x2 = getCellCenteredAxes(domain,n)
+		X1,X2 = ndgrid(x1,x2)
+		xc = [vec(X1) vec(X2)]
+	elseif dim==3
+		x1,x2,x3 = getCellCenteredAxes(domain,n)
+		X1,X2,X3 = ndgrid(x1,x2,x3)
+		xc = [vec(X1) vec(X2) vec(X3)]
+	end
+	return xc
+end
+
+function getNodalGrid(domain,n)
+# X = getNodalGrid(domain,nc)
+	dim = round(Int64,length(domain)/2)
+	if dim==1
+		xc = getNodalAxes(domain,n)
+	elseif dim==2
+		x1,x2 = getNodalAxes(domain,n)
+		X1,X2 = ndgrid(x1,x2)
+		xc = [vec(X1) vec(X2)]
+	elseif dim==3
+		x1,x2,x3 = getNodalAxes(domain,n)
+		X1,X2,X3 = ndgrid(x1,x2,x3)
+		xc = [vec(X1) vec(X2) vec(X3)]
+	end
+	return xc
+end
+
+function getEdgeGrids(domain,nc)
+# X = getEdgeGrids(domain,nc)
+	dim = round(Int64,length(domain)/2)
+	h   = (domain[2:2:end]-domain[1:2:end])./nc
+	if dim==2
+		x1n,x2n = getNodalAxes(domain,nc)
+		x1c,x2c = getCellCenteredAxes(domain,nc)
+		# edge-1 grid
+		X1t,X2t = ndgrid(x1c,x2n)
+		x1 = [vec(X1t) vec(X2t)]
+		# edge-2 grid
+		X1t,X2t = ndgrid(x1n,x2c)
+		x2 = [vec(X1t) vec(X2t)]
+		return (x1,x2)
+	elseif dim==3
+		x1n,x2n,x3n = getNodalAxes(domain,nc)
+		x1c,x2c,x3c = getCellCenteredAxes(domain,nc)
+		# edge-1 grid
+		X1,X2,X3 = ndgrid(x1c,x2n,x3n)
+		x1 = [vec(X1) vec(X2) vec(X3)]
+		# edge-2 grid
+		X1,X2,X3 = ndgrid(x1n,x2c,x3n)
+		x2 = [vec(X1) vec(X2) vec(X3)]
+		# edge-3 grid
+		X1,X2,X3 = ndgrid(x1n,x2n,x3c)
+		x3 = [vec(X1) vec(X2) vec(X3)]
+		return (x1,x2,x3)
+	end
+end
+
+function getFaceGrids(domain,nc)
+# X = getFaceGrids(domain,nc)
+	dim = round(Int64,length(domain)/2)
+	h   = (domain[2:2:end]-domain[1:2:end])./nc
+	if dim==2
+		x1n,x2n = getNodalAxes(domain,nc)
+		x1c,x2c = getCellCenteredAxes(domain,nc)
+		# face-1 grid
+		X1t,X2t = ndgrid(x1n,x2c)
+		x1 = [vec(X1t) vec(X2t)]
+		# face-2 grid
+		X1t,X2t = ndgrid(x1c,x2n)
+		x2 = [vec(X1t) vec(X2t)]
+		return (x1,x2)
+	elseif dim==3
+		x1n,x2n,x3n = getNodalAxes(domain,nc)
+		x1c,x2c,x3c = getCellCenteredAxes(domain,nc)
+		# face-1 grid
+		X1,X2,X3 = ndgrid(x1n,x2c,x3c)
+		x1 = [vec(X1) vec(X2) vec(X3)]
+		# face-2 grid
+		X1,X2,X3 = ndgrid(x1c,x2n,x3c)
+		x2 = [vec(X1) vec(X2) vec(X3)]
+		# face-3 grid
+		X1,X2,X3 = ndgrid(x1c,x2c,x3n)
+		x3 = [vec(X1) vec(X2) vec(X3)]
+		return (x1,x2,x3)
+	end
+end
+
+function getNodalAxes(Mesh::RegularMesh)
+	return getNodalAxes(Mesh.domain,Mesh.n)
+end
+
+function getNodalAxes(domain,nc)
+	dim = round(Int64,length(domain)/2)
+	
+	if dim==1
+		x1 = collect(linspace(domain[1], domain[2],nc+1))
+		return x1
+	elseif dim==2
+		x1 = collect(linspace(domain[1], domain[2],nc[1]+1))
+		x2 = collect(linspace(domain[3], domain[4],nc[2]+1))
+		return (x1,x2)
+	elseif dim==3
+		x1 = collect(linspace(domain[1], domain[2],nc[1]+1))
+		x2 = collect(linspace(domain[3], domain[4],nc[2]+1))
+		x3 = collect(linspace(domain[5], domain[6],nc[3]+1))
+		return (x1,x2,x3)
+	end
+end
+
+function getCellCenteredAxes(Mesh::RegularMesh)
+	return getCellCenteredAxes(Mesh.domain,Mesh.n)
+end
+
+function getCellCenteredAxes(domain,nc)
+	dim = round(Int64,length(domain)/2)
+	h   = vec(domain[2:2:end]-domain[1:2:end])./vec(nc)
+	if dim==1
+		x1 = collect(linspace(domain[1]+h[1]/2, domain[2]-h[1]/2, nc[1]))
+		return x1
+	elseif dim==2
+		x1 = collect(linspace(domain[1]+h[1]/2, domain[2]-h[1]/2, nc[1]))
+		x2 = collect(linspace(domain[3]+h[2]/2, domain[4]-h[2]/2, nc[2]))
+		return (x1,x2)
+	elseif dim==3
+		x1 = collect(linspace(domain[1]+h[1]/2, domain[2]-h[1]/2, nc[1]))
+		x2 = collect(linspace(domain[3]+h[2]/2, domain[4]-h[2]/2, nc[2]))
+		x3 = collect(linspace(domain[5]+h[3]/2, domain[6]-h[3]/2, nc[3]))
+		return (x1,x2,x3)
+	end
+end
+
+# --- linear operators for tensor mesh
+function getVolume(Mesh::RegularMesh)
+# Mesh.V = getVolume(Mesh::RegularMesh) computes volumes v, returns diag(v)
+	if isempty(Mesh.V)
+		Mesh.V = prod(Mesh.h)*speye(prod(Mesh.n))
+	end
+	return Mesh.V
+end
+function getVolumeInv(Mesh::RegularMesh)
+# Mesh.Vi = getVolumeInv(Mesh::RegularMesh) returns sdiag(1./v)
+	if isempty(Mesh.Vi)
+		Mesh.Vi = (1/prod(Mesh.h))*speye(prod(Mesh.n))
+	end
+	return Mesh.Vi
+end
+
+function getFaceArea(Mesh::RegularMesh)
+# Mesh.F = getFaceArea(Mesh::RegularMesh) computes face areas a, returns  sdiag(a)
+	if isempty(Mesh.F)
+		if Mesh.dim==2
+			f1  = Mesh.h[2]*speye(Mesh.nf[1])
+			f2  = Mesh.h[1]*speye(Mesh.nf[2])
+			Mesh.F = blkdiag(f1,f2)
+		elseif Mesh.dim==3
+			f1  = (Mesh.h[3]*Mesh.h[2])*speye(Mesh.nf[1])
+			f2  = (Mesh.h[3]*Mesh.h[1])*speye(Mesh.nf[2])
+			f3  = (Mesh.h[2]*Mesh.h[1])*speye(Mesh.nf[3])
+			Mesh.F = blkdiag(blkdiag(f1,f2),f3)
+		end
+	end
+	return Mesh.F
+end
+function getFaceAreaInv(Mesh::RegularMesh)
+# Mesh.Fi = getFaceAreaInv(Mesh::RegularMesh) computes inverse of face areas, returns sdiag(1./a)
+	if isempty(Mesh.Fi)
+		if Mesh.dim==2
+			f1i  = (1/Mesh.h[2])*speye(Mesh.nf[1])
+			f2i  = (1/Mesh.h[1])*speye(Mesh.nf[2])
+			Mesh.Fi = blkdiag(f1i,f2i)
+		elseif Mesh.dim==3
+			f1i  = (1/(Mesh.h[3]*Mesh.h[2]))*speye(Mesh.nf[1])
+			f2i  = (1/(Mesh.h[3]*Mesh.h[1]))*speye(Mesh.nf[2])
+			f3i  = (1/(Mesh.h[2]*Mesh.h[1]))*speye(Mesh.nf[3])
+			Mesh.Fi = blkdiag(blkdiag(f1i,f2i),f3i)
+		end
+	end
+	return Mesh.Fi
+end
+
+function getLength(Mesh::RegularMesh)
+# Mesh.L = getLength(Mesh::RegularMesh) computes edge lengths l, returns sdiag(l)
+	if isempty(Mesh.L)
+		if Mesh.dim==2
+			l1  = Mesh.h[1]*speye(Mesh.ne[1])
+			l2  = Mesh.h[2]*speye(Mesh.ne[2])
+			Mesh.L   = blkdiag(l1,l2)
+		elseif Mesh.dim==3
+			l1  = Mesh.h[1]*speye(Mesh.ne[1])
+			l2  = Mesh.h[2]*speye(Mesh.ne[2])
+			l3  = Mesh.h[3]*speye(Mesh.ne[3])
+			Mesh.L   = blkdiag(blkdiag(l1,l2),l3)
+		end
+	end
+	return Mesh.L
+end
+
+function getLengthInv(Mesh::RegularMesh)
+# Mesh.L = getLength(Mesh::RegularMesh) computes inverse of edge lengths l, returns sdiag(1./l)
+	if isempty(Mesh.Li)
+		if Mesh.dim==2
+			l1i  = (1/Mesh.h[1])*speye(Mesh.ne[1])
+			l2i  = (1/Mesh.h[2])*speye(Mesh.ne[2])
+			Mesh.Li   = blkdiag(l1i,l2i)
+		elseif Mesh.dim==3
+			l1i  = (1/Mesh.h[1])*speye(Mesh.ne[1])
+			l2i  = (1/Mesh.h[2])*speye(Mesh.ne[2])
+			l3i  = (1/Mesh.h[3])*speye(Mesh.ne[3])
+			Mesh.Li  = blkdiag(blkdiag(l1i,l2i),l3i)
+		end
+	end
+	return Mesh.Li
+end
+
+
