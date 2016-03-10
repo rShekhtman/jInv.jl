@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/JuliaInv/jInv.jl.svg?branch=master)](https://travis-ci.org/JuliaInv/jInv.jl) 
 [![Coverage Status](https://coveralls.io/repos/github/JuliaInv/jInv.jl/badge.svg?branch=master)](https://coveralls.io/github/JuliaInv/jInv.jl?branch=master)
+[![Build status](https://ci.appveyor.com/api/projects/status/rb9x0wpn2kme80v9?svg=true)](https://ci.appveyor.com/project/lruthotto/jinv-jl)
+
 
 # jInv
 
@@ -16,6 +18,8 @@ jInv consists of five submodules:
 5. `Utils` - utility functions
 
 # Requirements
+
+jInv is inteded for use with Julia versions 0.4.x.
 
 1. [`KrylovMethods.jl`](https://github.com/lruthotto/KrylovMethods.jl)  - iterative methods for solving (sparse) linear systems. 
 
