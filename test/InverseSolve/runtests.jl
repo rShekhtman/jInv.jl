@@ -3,6 +3,6 @@ include("testModels.jl")
 include("testMisfit.jl")
 include("testRegularizers.jl")
 println(" InverseSolve: All tests passed!")
-
+include("testLeastSquares.jl")
 # include("FWI/runtests.jl")
 # include("DivSigGrad/runtests.jl")

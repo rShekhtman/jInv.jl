@@ -13,7 +13,7 @@ Iact  = speye(Bool,M.nc)
 Iact  = Iact[:,vec(idx).==1] 
 mc    = randn(size(Iact,2))
 
-regFuns = [diffusionReg, wdiffusionReg, wTVReg]
+regFuns = [diffusionReg, wdiffusionReg, smallnessReg, wTVReg]
 for k=1:length(regFuns)
 	println("checkDerivative of $(regFuns[k])")
 	

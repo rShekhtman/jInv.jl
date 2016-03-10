@@ -1,4 +1,32 @@
-export diffusionReg, wdiffusionReg, wTVReg, wdiffusionRegNodal
+export diffusionReg, wdiffusionReg, wTVReg, wdiffusionRegNodal,computeRegularizer,smallnessReg
+
+function computeRegularizer(regFun::Function,mc::Vector,mref::Vector,MInv::AbstractMesh,Iact,alpha,C)
+	R,dR,d2R = regFun(mc,mref,MInv,Iact=Iact,C=C)
+	return alpha*R, alpha*dR, alpha*d2R
+end
+	
+function computeRegularizer(regFun::Array{Function},mc::Vector,mref::Array,MInv::AbstractMesh,Iact,alpha::Array{Float64},C=[])
+	numReg = length(regFun)
+	if size(mref,2)!=numReg; 
+		error("computeRegularizer: number of regularizer (=$numReg) does not match number of reference models (=$(size(mref,2))).")
+	end
+	if length(alpha)!=numReg; 
+		error("computeRegularizer: number of regularizer (=$numReg) does not match number of alphas (=$(length(alpha))).")
+	end
+	# if length(C)!=numReg; 
+	# 	error("computeRegularizer: number of regularizer (=$numReg) does not match number of regparams (=$(length(C))).")
+	# end
+	
+	R = 0.0; dR = zeros(length(mc)); d2R = spzeros(length(mc),length(mc))
+	for k=1:numReg
+		Rt,dRt,d2Rt = regFun[k](mc,mref[:,k],MInv,Iact=Iact)
+		R   += alpha[k]*Rt
+		dR  += alpha[k]*dRt 
+		d2R += alpha[k]*d2Rt
+	end
+	return R, dR, d2R
+end
+
 
 """
 	Rc,dR,d2R = diffusionReg(m,mref,M,Iact,C=[])
@@ -31,6 +59,32 @@ function diffusionReg(m::Vector,mref,M::AbstractMesh;Iact=1.0, C=[])
 	return Rc,dR,d2R
 end
 
+"""
+	Rc,dR,d2R = smallnessReg(m,mref,M,Iact,C=[])
+	
+	Compute smallness regularizer (L2 difference to reference model)
+		
+		R(m) = 0.5*||Iact*(m-mref)||_V^2
+		
+	Input:
+		m     - model
+		mref  - reference model
+		M     - Mesh
+		Iact  - regularization operator
+	
+	Output
+		Rc    - value of regularizer
+		dR    - gradient w.r.t. m
+		d2R   - Hessian
+"""
+function smallnessReg(m::Vector,mref,M::AbstractMesh;Iact=1.0,C=[])
+	# Rc = .5* || Grad*m ||^2
+	dm   = m .- mref
+	d2R  = Iact'*getVolume(M)*Iact
+	dR   = d2R*dm
+	Rc   = 0.5*dot(dm,dR)
+	return Rc,dR,d2R
+end
 
 function wdiffusionReg(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
    # Rc = a1*\\Dx(m-mref)||^2 + .. + a3*\\Dz(m-mref)||^2 + a4*|| m -mref ||^2

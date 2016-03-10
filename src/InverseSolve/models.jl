@@ -1,10 +1,12 @@
-export expMod, boundMod
+export expMod, boundMod, idMod
 
 
 """
 	sigma,dsigma = expMod(model)
 	
-	maps model parameter to conductivity
+	maps model parameter to conductivity via
+	
+	sigma(m) = exp(m)
 	
 """
 function expMod(m)
@@ -13,6 +15,17 @@ function expMod(m)
     return sigma, dsigmadm
 end
 
+"""
+	sigma,dsigma = idMod(model)
+	
+	maps model parameter to conductivity via
+
+	sigma(m) = m
+	
+"""
+function idMod(m)
+	return m,speye(length(m))
+end
 
 export boundMod
 """

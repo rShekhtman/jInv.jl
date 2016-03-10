@@ -1,3 +1,4 @@
+include("display.jl")
 println("==== compare regular and tensor mesh ====")
 include("regularVStensor.jl")
 println("==== test differential operators ====")

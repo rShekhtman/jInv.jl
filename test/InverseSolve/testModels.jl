@@ -8,7 +8,7 @@ domain = [0;5;0;5; 0;3]
 n     = [12;13;10]
 Minv  = getRegularMesh(domain,n)
 
-modFun = (expMod,boundMod)
+modFun = (expMod,boundMod,idMod)
 for k=1:length(modFun)
 	println("\t\tcheckDerivative of $(modFun[k])")
 	function testModFun(m,v=[])
