@@ -1,5 +1,4 @@
 @everywhere begin
-	using DivSigGrad
 	using jInv.InverseSolve
 	using jInv.Mesh
 	using jInv.LinearSolvers
