@@ -12,22 +12,21 @@ h3  = h[3]*ones(nc[3])
 
 Mt = getTensorMesh3D(h1,h2,h3,x0)
 Mr = getRegularMesh(domain,nc)
+M2D = getRegularMesh(domain[1:4],nc[1:2])
 Mt2 = getTensorMesh3D(h1+rand(nc[1]),h2+rand(nc[2]),h3+rand(nc[3]),x0)
 
-Meshes = (Mt,Mr,Mt2)
+Meshes = (Mt,Mr,Mt2,M2D)
 
 for k=1:length(Meshes)
 	M = Meshes[k]
-	print("\ttesting differential operators for $(typeof(M))...")
-	Dr = getDivergenceMatrix(M)
-	Cr = getCurlMatrix(M)
-	@test norm(Dr*Cr,Inf)<1e-12
+	print("\ttesting nodal averaging for $(typeof(M))...")
+	Av = getNodalAverageMatrix(M)
+	xn = getNodalGrid(M)
+	xc = getCellCenteredGrid(M)
+	@test norm(Av*xn-xc,Inf)<1e-12
 	
-	Lap = getNodalLaplacianMatrix(M)
-	G   = getNodalGradientMatrix(M)
-	@test norm(Lap*ones(size(Lap,2))/M.nc) < 1e-10
-	@test norm(G'*G- Lap,Inf) <1e-12	
 	print("passed!\n")
 end
+
 
 

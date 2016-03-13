@@ -51,6 +51,6 @@ module Utils
 	end
 	
 	function clear{T}(A::SparseMatrixCSC{T})
-		return spzeros(T,size(A,1),size(A,2));
+		return spzeros(0,0);
 	end	
 end
