@@ -1,6 +1,6 @@
 println(" Testing module Utils" )
 include("testSparseUtils.jl")
 include("testSortpermFast.jl")
-include("testUniqueidx.jl")
+include("testUniqueIdx.jl")
 include("testTests.jl")
 println(" Utils: All tests passed" )
