@@ -1,6 +1,19 @@
 export interpLocalToGlobal, interpGlobalToLocal
 # Interpolate a vector x from the local mesh to the global mesh
+
+function interpLocalToGlobal(x::Vector{Float64}, P::AbstractFloat)
+	return P * x
+end
+
+function interpGlobalToLocal(x::Vector{Float64}, P::AbstractFloat)
+	return P * x
+end
+
+
+
+
 function interpLocalToGlobal(x::Vector{Float64}, P::SparseMatrixCSC)
+
 	if (eltype(P.nzval) == Int16) || (eltype(P.nzval) == Int8)
    		nzv = P.nzval
     	rv  = P.rowval
@@ -18,7 +31,7 @@ function interpLocalToGlobal(x::Vector{Float64}, P::SparseMatrixCSC)
 end
 
 # Interpolate a vector x from the global mesh to the local mesh
-function interpGlobalToLocal(x::Vector{Float64}, P::SparseMatrixCSC, y0::Vector{Float64})
+function interpGlobalToLocal(x::Vector{Float64}, P, y0::Vector{Float64})
 	return y0 + interpGlobalToLocal(x, P)
 end
 

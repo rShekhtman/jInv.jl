@@ -31,24 +31,25 @@ Example:
 	sigLocalFast = interpGlobalToLocal(sigGlobal,gloc.PForInv,gloc.sigmaBack)
 """
 type GlobalToLocal <: AbstractModel
-	PForInv::SparseMatrixCSC # interpolation matrix from fwd mesh to inv mesh
+	PForInv::Union{SparseMatrixCSC,AbstractFloat} # interpolation matrix from fwd mesh to inv mesh
 	sigmaBackground::Vector{Float64} #  (# of cells fwd mesh)
 end # type GlobalToLocal
 
 # Constructors
-getGlobalToLocal(P::SparseMatrixCSC) = GlobalToLocal(P,1e-8*ones(P.n))
-getGlobalToLocal(P::SparseMatrixCSC,sigBack::Vector{Float64}) = GlobalToLocal(P,sigBack)
-getGlobalToLocal(P::SparseMatrixCSC,sigBack::Vector{Float64},fname) = GlobalToLocal(P,sigBack)
+getGlobalToLocal(P) = GlobalToLocal(P,1e-8*ones(P.n))
+getGlobalToLocal(P,sigBack::Vector{Float64}) = GlobalToLocal(P,sigBack)
+getGlobalToLocal(P,sigBack::Vector{Float64},fname) = GlobalToLocal(P,sigBack)
 
 
 
-function prepareGlobalToLocal(Mesh2Mesh::SparseMatrixCSC,Iact,sigmaBackground,fname)
+function prepareGlobalToLocal(Mesh2Mesh,Iact,sigmaBackground,fname)
 	return getGlobalToLocal(Iact'*Mesh2Mesh,interpGlobalToLocal(sigmaBackground,Mesh2Mesh),fname)
 end
 
+
 function prepareGlobalToLocal(Mesh2Mesh::RemoteRef{Channel{Any}},Iact,sigmaBackground,fname)
 
-	M2M = take!(Mesh2Mesh)
+	M2M= take!(Mesh2Mesh)
 	
 	G2L = prepareGlobalToLocal(M2M,Iact,sigmaBackground,fname)
    
