@@ -72,13 +72,13 @@ Wds[2] = fetch(Wd2)
 Wdp          = [Wd1;Wd2]
 
 #  solve with automatic distribution
-pInv         = getInverseParam(gloc,Minv,Iact,idMod,diffusionReg,alpha,x0,
+pInv         = getInverseParam(gloc,Minv,Iact,fMod,diffusionReg,alpha,x0,
                                     [],SSDFun,dobs,Wds,[],boundsLow,boundsHigh)
 pInv.maxIter = 5
 x1, = projGNCG(x0,pInv,pFor)
 
 # solve with pre-distribution
-pInv         = getInverseParam(glocp,Minv,Iact,idMod,diffusionReg,alpha,x0,
+pInv         = getInverseParam(glocp,Minv,Iact,fMod,diffusionReg,alpha,x0,
                                     [],SSDFun,dobp,Wdp,[],boundsLow,boundsHigh)
 pInv.maxIter = 5
 x2, = projGNCG(x0,pInv,pForp)

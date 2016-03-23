@@ -1,4 +1,4 @@
-export expMod, boundMod, idMod
+export expMod, boundMod, fMod
 
 
 """
@@ -10,21 +10,19 @@ export expMod, boundMod, idMod
 	
 """
 function expMod(m)
-    sigma    = exp(m)
-	dsigmadm = sdiag(sigma)
-    return sigma, dsigmadm
+	return exp(m), sdiag(exp(m))
 end
 
 """
-	sigma,dsigma = idMod(model)
+	sigma,dsigma = fMod(model;f::Function=identity,df::Function=m->speye(length(m)))
 	
 	maps model parameter to conductivity via
 
-	sigma(m) = m
+	sigma(m) = f(m) and dsigma(m) = sdiag(df(m))
 	
 """
-function idMod(m)
-	return m,speye(length(m))
+function fMod(m;f::Function=identity,df::Function=m->ones(length(m)))
+	return f(m),sdiag(df(m))
 end
 
 export boundMod

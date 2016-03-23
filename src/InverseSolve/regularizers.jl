@@ -80,7 +80,7 @@ end
 function smallnessReg(m::Vector,mref,M::AbstractMesh;Iact=1.0,C=[])
 	# Rc = .5* || Grad*m ||^2
 	dm   = m .- mref
-	d2R  = Iact'*getVolume(M)*Iact
+	d2R  = Iact'*Iact
 	dR   = d2R*dm
 	Rc   = 0.5*dot(dm,dR)
 	return Rc,dR,d2R
@@ -126,6 +126,7 @@ function wdiffusionReg(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 
    dR   = d2R*dm
    Rc   = 0.5*dot(dm,dR)
+
    return Rc,dR,d2R
 end # function wdiffusionReg
 
@@ -171,7 +172,7 @@ end
 
 
 """
-	Rc,dR,d2R = wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh, Iact=1.0, C=[])
+	Rc,dR,d2R = wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 	
 	Computes weighted diffusion regularizer for nodal model
 	
@@ -203,6 +204,9 @@ function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, 
 	d2R += C[4]*speye(length(m));
 	dR  = d2R*dm;
 	Rc  = 0.5*dot(dm,dR);
+	if isnan(Rc)
+		dump(m)
+	end
    return Rc,dR,d2R
 end	 
 

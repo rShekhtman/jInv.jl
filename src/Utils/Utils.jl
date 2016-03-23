@@ -13,13 +13,13 @@ module Utils
 	function clear!(T)
 	end
 
-	function Base.sub2ind(n::Array{Int64,1},ii::Array{Int64,1},jj::Array{Int64,1},kk::Array{Int64,1})	
-		return Base.sub2ind((n[1],n[2],n[3]),ii,jj,kk)
-	end
-
-	function Base.sub2ind(n::Array{Int64,1},ii::Int64,jj::Int64,kk::Int64)	
-		return Base.sub2ind((n[1],n[2],n[3]),ii,jj,kk)
-	end
+	# function Base.sub2ind(n::Array{Int64,1},ii::Array{Int64,1},jj::Array{Int64,1},kk::Array{Int64,1})	
+	# 	return Base.sub2ind((n[1],n[2],n[3]),ii,jj,kk)
+	# end
+	# 
+	# function Base.sub2ind(n::Array{Int64,1},ii::Int64,jj::Int64,kk::Int64)	
+	# 	return Base.sub2ind((n[1],n[2],n[3]),ii,jj,kk)
+	# end
 	  		
 	function clear!(R::RemoteRef{Channel{Any}})
 		p = take!(R)

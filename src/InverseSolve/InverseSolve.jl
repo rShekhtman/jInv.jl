@@ -54,10 +54,10 @@ module InverseSolve
 		MInv::AbstractMesh
 		Iact  # active cells
 		modelfun::Function  # function that goes from model to conductivity
-		regularizer::Function  # function to calculate WTW
-		alpha::Real  # tradeoff parameter
-		mref::Vector  # reference model
-		regparam::Vector  # alpha values and/or weights for regularization
+		regularizer::Union{Function,Array{Function}}  # function to calculate WTW
+		alpha::Union{Float64,Array{Float64}}  # tradeoff parameter
+		mref::Array  # reference model
+		regparam::Array  # alpha values and/or weights for regularization
 		misfit::Function  # calculate data misfit and derivarives
 		dobs  # observed data
 		Wd    # 1/standard deviation

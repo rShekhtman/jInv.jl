@@ -19,6 +19,7 @@ export projPCG
 function projPCG(H::Function,gc::Vector,Active::BitArray,Precond::Function,cgTol::Real,maxIter::Int)
 #  PCG over active cells
     his        = zeros(maxIter,3)
+	if norm(gc)==0; return zeros(eltype(gc),length(gc)),his[1,:]; end
 
 	delm       = zeros(size(gc))
 	cgiter     = 0

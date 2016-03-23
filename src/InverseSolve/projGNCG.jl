@@ -7,7 +7,7 @@ type projGNCGhis
 	Rc::Array
 	alphas::Array
 	Active::Array
-	stepnorm::Array
+	stepNorm::Array
 	timeMisfit::Array
 	timeReg::Array
 	timePCG::Array
@@ -22,24 +22,24 @@ function getProjGNCGhis(maxIter,maxIterCG)
 	Rc = zeros(maxIter+1)
 	alphas = zeros(maxIter+1)
 	Active = zeros(maxIter+1)
-	stepnorm = zeros(maxIter+1)
+	stepNorm = zeros(maxIter+1)
 	timeMisfit = zeros(maxIter+1,4)
 	timeReg = zeros(maxIter+1)
 	timePCG = zeros(maxIter+1,1)
 	hisPCG = []
 	timeGradMisfit = zeros(maxIter+1,2)
 
-	return projGNCGhis(Jc,F,Dc,Rc,alphas,Active,stepnorm,timeMisfit,timeReg,timePCG,hisPCG,timeGradMisfit)
+	return projGNCGhis(Jc,F,Dc,Rc,alphas,Active,stepNorm,timeMisfit,timeReg,timePCG,hisPCG,timeGradMisfit)
 end
 
-function updateHis!(iter::Int64,His::projGNCGhis,Jc::Real,Fc,Dc,Rc::Real,alpha::Real,nActive::Int64,stepnorm::Real,timeMisfit::Vector,timeReg::Real)
+function updateHis!(iter::Int64,His::projGNCGhis,Jc::Real,Fc,Dc,Rc::Real,alpha::Real,nActive::Int64,stepNorm::Real,timeMisfit::Vector,timeReg::Real)
 	His.Jc[iter+1] = Jc
 	His.F[iter+1] = Fc
 	push!(His.Dc,Dc)
 	His.Rc[iter+1] = Rc
 	His.alphas[iter+1] = alpha
 	His.Active[iter+1] = nActive
-	His.stepnorm[iter+1] = stepnorm
+	His.stepNorm[iter+1] = stepNorm
 	His.timeMisfit[iter+1,:]+=timeMisfit'
 	His.timeReg[iter+1] += timeReg
 end
@@ -65,6 +65,7 @@ end;
 							- We assume that dumpResults is dumpResults(mc,Dc,iter,pInv,PF), 
 							- where mc is the recovered model, Dc is the predicted data. 
 							- If dumpResults is not given, nothing is done (dummy() is called).
+		out::Int            - flag for output (-1: no output, 1: final status, 2: residual norm at each iteration)
 							
 	Output:
 		mc                  - final model
@@ -72,7 +73,7 @@ end;
 		outerFlag           - flag for convergence
 	
 """
-function  projGNCG(mc,pInv::InverseParam,PF,indCredit=[],dumpResults::Function = dummy)
+function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function = dummy,out::Int=2)
 
 	maxIter     = pInv.maxIter      #  Max. no. iterations.
 	pcgMaxIter  = pInv.pcgMaxIter   #  Max cg iters.
@@ -105,36 +106,35 @@ function  projGNCG(mc,pInv::InverseParam,PF,indCredit=[],dumpResults::Function =
 	
 	# compute regularizer
 	tic()
-	R,dR,d2R = pInv.regularizer(mc,pInv.mref,pInv.MInv,Iact=pInv.Iact,C=pInv.regparam)
+	R,dR,d2R = computeRegularizer(pInv.regularizer,mc,pInv.mref,pInv.MInv,pInv.Iact,alpha,pInv.regparam) 
 	tReg = toq()    
 	
 	# objective function
-	Jc  = F  + alpha*R
-	gc  = dF + alpha*dR
+	Jc  = F  + R
+	gc  = dF + dR
 	
 	F0 = F; J0 = Jc
 	############################################################################
 	##  Outer iteration.                                                        #
 	############################################################################
 	iter = 0
-	outerFlag = 0
+	outerFlag = -1; stepNorm=0.0
 
-	
 	outStr = @sprintf("%4s\t%08s\t%08s\t%08s\t%08s\t%08s\n", 
-					  "i.LS", "F", "R","alpha","Jc/J0","#Active")
-	updateHis!(0,His,Jc,F,Dc,R,alpha,countnz(Active),0.0,tMis,tReg)
+					  	"i.LS", "F", "R","alpha[1]","Jc/J0","#Active")
+	updateHis!(0,His,Jc,F,Dc,R,alpha[1],countnz(Active),0.0,tMis,tReg)
 	
-	print(outStr)
+	if out>=2; print(outStr); end
 	f = open("jInv.out", "w")
 	write(f, outStr)
 	close(f)
-
-	while outerFlag == 0
+	
+	while outerFlag == -1
 		
 		iter += 1
 		outStr = @sprintf("%3d.0\t%3.2e\t%3.2e\t%3.2e\t%3.2e\t%3d\n", 
-		         iter, F, R,alpha,Jc/J0,countnz(Active))
-		print(outStr)
+		         iter, F, R,alpha[1],Jc/J0,countnz(Active))
+		if out>=2; print(outStr); end
 		f = open("jInv.out", "a")
 		write(f, outStr)
 		close(f)
@@ -142,9 +142,9 @@ function  projGNCG(mc,pInv::InverseParam,PF,indCredit=[],dumpResults::Function =
 		
 		#  Set up Hessian and preconditioner.
 		if isempty(indCredit)
-			Hs(x) = dsig'*HessMatVec(dsig*x,PF,sig,pInv.model,d2F) + alpha*(d2R*x); 
+			Hs(x) = dsig'*HessMatVec(dsig*x,PF,sig,pInv.model,d2F) + d2R*x; 
 		else
-			Hs(x) = dsig'*HessMatVec(dsig*x,PF,sig,pInv.model,d2F,indDebit) + alpha*(d2R*x);
+			Hs(x) = dsig'*HessMatVec(dsig*x,PF,sig,pInv.model,d2F,indDebit) + d2R*x;
 		end
 		
 		
@@ -190,26 +190,28 @@ function  projGNCG(mc,pInv::InverseParam,PF,indCredit=[],dumpResults::Function =
 			
 			# compute regularizer(m0,mref,pInv.model.MInv,pInv.model.Iact);
 			tic()
-			R,dR,d2R = pInv.regularizer(mt,pInv.mref,pInv.MInv,Iact=pInv.Iact,C=pInv.regparam)
+			R,dR,d2R = computeRegularizer(pInv.regularizer,mt,pInv.mref,pInv.MInv,pInv.Iact,alpha,pInv.regparam) 
 			His.timeReg[iter+1] += toq()
 			# objective function
-			Jt  = F  + alpha*R
-			println(@sprintf( "   .%d\t%3.2e\t%3.2e\t\t\t%3.2e",
+			Jt  = F  + R
+			if out>=2;
+				println(@sprintf( "   .%d\t%3.2e\t%3.2e\t\t\t%3.2e",
 			           lsIter, F,       R,       Jt/J0))
+			end
 			
 			if Jt < Jc
 			    break
 			end
 			muLS /=2; lsIter += 1
 			if lsIter > 6
-			    warn("Line search failed!")
-			    return mc,Dc,outerFlag
+			    outerFlag = -2
+				return mc,Dc,outerFlag
 			end
 		end
 		## End Line search
 		
 		## Check for termination 
-		stepnorm = norm(mt-mc,Inf)
+		stepNorm = norm(mt-mc,Inf)
 		mc = mt
 		Jc = Jt
 		
@@ -218,15 +220,12 @@ function  projGNCG(mc,pInv::InverseParam,PF,indCredit=[],dumpResults::Function =
 		Active = (mc .<=low) | (mc.>=high)  # Compute active set
 		  
 		#  Check stopping criteria for outer iteration. 
-		updateHis!(iter,His,Jc,F,Dc,R,alpha,countnz(Active),stepnorm,tMis,tReg)
+		updateHis!(iter,His,Jc,F,Dc,R,alpha[1],countnz(Active),stepNorm,tMis,tReg)
 	
 		if iter >= maxIter
-			outerFlag = 1
-			println(" \n\n\n  *** Max iterations exceeded ***\n\n\n\n")
 			break
-		elseif stepnorm < stepTol
-			outerFlag = 2
-			println("  \n\n\n    *** Step norm tolerance met ***\n")
+		elseif stepNorm < stepTol
+			outerFlag = 1
 			break
 		end
 		# Evaluate gradient
@@ -239,11 +238,21 @@ function  projGNCG(mc,pInv::InverseParam,PF,indCredit=[],dumpResults::Function =
 		His.timeGradMisfit[iter+1]+=toq()
 		
 		dF = dsig'*dF
-		gc = dF + alpha*dR
+		gc = dF + dR
 		
 		dumpResults(mc,Dc,iter,pInv,PF);
 		
 	end # while outer_flag == 0
+	
+	if out>=1
+		if outerFlag==-1
+			println("projGNCG iterated maxIter=$maxIter times but reached only stepNorm of $(stepNorm) instead $(stepTol)." )
+		elseif outerFlag==-2
+			println("projGNCG stopped at iteration $iter with a line search fail.")
+		elseif outerFlag==1
+			println("projGNCG reached desired accuracy at iteration $iter.")
+		end
+	end
 	
 	return mc,Dc,outerFlag,His
 end  # Optimization code
