@@ -33,15 +33,15 @@ function getProjGNCGhis(maxIter,maxIterCG)
 end
 
 function updateHis!(iter::Int64,His::projGNCGhis,Jc::Real,Fc,Dc,Rc::Real,alpha::Real,nActive::Int64,stepNorm::Real,timeMisfit::Vector,timeReg::Real)
-	His.Jc[iter+1] = Jc
-	His.F[iter+1] = Fc
+	His.Jc[iter+1]            = Jc
+	His.F[iter+1]             = Fc
 	push!(His.Dc,Dc)
-	His.Rc[iter+1] = Rc
-	His.alphas[iter+1] = alpha
-	His.Active[iter+1] = nActive
-	His.stepNorm[iter+1] = stepNorm
-	His.timeMisfit[iter+1,:]+=timeMisfit'
-	His.timeReg[iter+1] += timeReg
+	His.Rc[iter+1]            = Rc
+	His.alphas[iter+1]        = alpha
+	His.Active[iter+1]        = nActive
+	His.stepNorm[iter+1]      = stepNorm
+	His.timeMisfit[iter+1,:] += timeMisfit'
+	His.timeReg[iter+1]      += timeReg
 end
 
 function dummy(mc,Dc,iter,pInv,PF) 
@@ -71,6 +71,7 @@ end;
 		mc                  - final model
 		Dc                  - data
 		outerFlag           - flag for convergence
+		His                 - iteration history
 	
 """
 function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function = dummy,out::Int=2)
@@ -205,7 +206,7 @@ function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function =
 			muLS /=2; lsIter += 1
 			if lsIter > 6
 			    outerFlag = -2
-				return mc,Dc,outerFlag
+				break
 			end
 		end
 		## End Line search
@@ -253,6 +254,7 @@ function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function =
 			println("projGNCG reached desired accuracy at iteration $iter.")
 		end
 	end
+	
 	
 	return mc,Dc,outerFlag,His
 end  # Optimization code
