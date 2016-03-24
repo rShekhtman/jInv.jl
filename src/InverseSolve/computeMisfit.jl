@@ -8,12 +8,8 @@ export computeMisfit
 	
 	computeMisfit has several options.
 """
-function computeMisfit(sigma,     # conductivity on inv mesh (active cells only)
-                       gloc::GlobalToLocal,
-                       misfit::Function,
-                       pFor::ForwardProbType,
-                       Dobs, Wd,  # observed data, 1/standard deviation
-                       doDerivative::Bool=true, doClear::Bool=false)
+function computeMisfit(sig,     # conductivity on inv mesh (active cells only)
+                       pMis::MisfitParam,doDerivative::Bool=true, doClear::Bool=false)
 	#
 	#	computeMisfit for a single forward problem
 	#
@@ -23,37 +19,35 @@ function computeMisfit(sigma,     # conductivity on inv mesh (active cells only)
 	# try
 	times = zeros(4)
 	
+	sigma,dsigma = pMis.modelfun(sig)
+	
 	tic(); 
-		sigmaloc = interpGlobalToLocal(sigma,gloc.PForInv,gloc.sigmaBackground); 
+		sigmaloc = interpGlobalToLocal(sigma,pMis.gloc.PForInv,pMis.gloc.sigmaBackground); 
 	times[1]=toq()
 	tic()
-		Dc,pFor  = getData(sigmaloc,pFor)      # fwd model to get predicted data
+		Dc,pMis.pFor  = getData(sigmaloc,pMis.pFor)      # fwd model to get predicted data
 	times[2]=toq()
 	tic()
-		F,dF,d2F = misfit(Dc,Dobs,Wd)
+		F,dF,d2F = pMis.misfit(Dc,pMis.dobs,pMis.Wd)
 	times[3]=toq()
 		
 	if doDerivative
 		tic()
-		dF = interpLocalToGlobal(getSensTMatVec(dF,sigmaloc,pFor),gloc.PForInv)
+		dF = dsigma'*interpLocalToGlobal(getSensTMatVec(dF,sigmaloc,pMis.pFor),pMis.gloc.PForInv)
 		times[4]=toq()
 	end
 
 	# free memory
 	if doClear
-		clear!(pFor.Ainv)
+		clear!(pMis.pFor.Ainv)
 	end
 
-	return Dc,F,dF,d2F,pFor,times
+	return Dc,F,dF,d2F,pMis,times
 end # function computeMisfit
 
 
 function computeMisfit(sigmaRef::RemoteRef{Channel{Any}},
-                        glocRef::RemoteRef{Channel{Any}},
-                         misfit::Function,
-                        pForRef::RemoteRef{Channel{Any}},
-                        DobsRef::RemoteRef{Channel{Any}},
-				      WdRef::RemoteRef{Channel{Any}},
+                        pMisRef::RemoteRef{Channel{Any}},
 				      dFRef::RemoteRef{Channel{Any}},
                   doDerivative,doClear::Bool=false)
 	#
@@ -61,20 +55,17 @@ function computeMisfit(sigmaRef::RemoteRef{Channel{Any}},
 	#
 	#	Note: model (including interpolation matrix) and forward problems are RemoteRefs
 	#
-	rrlocs = [glocRef.where pForRef.where DobsRef.where WdRef.where dFRef.where]
+	rrlocs = [ pMisRef.where  dFRef.where]
 	if !all(rrlocs .== myid())
 		warn("computeMisfit: Problem on worker $(myid()) not all remote refs are stored here, but rrlocs=$rrlocs")
 	end
 	
 	sigma = fetch(sigmaRef)
-	gloc  = fetch(glocRef)
-	pFor  = take!(pForRef)
-	Dobs  = fetch(DobsRef)
-	Wd    = fetch(WdRef)
+	pMis  = take!(pMisRef)
 	
-	Dc,F,dFi,d2F,pFor,times = computeMisfit(sigma,gloc,misfit,pFor,Dobs,Wd,doDerivative,doClear)
+	Dc,F,dFi,d2F,pMis,times = computeMisfit(sigma,pMis,doDerivative,doClear)
 	
-	put!(pForRef,pFor)
+	put!(pMisRef,pMis)
 	# add to gradient
 	if doDerivative
 		dF = take!(dFRef)
@@ -89,13 +80,9 @@ end
 
 
 function computeMisfit(sigma,
-	glocRef::Array{RemoteRef{Channel{Any}},1},
-	misfit::Function,
-	pForRef::Array{RemoteRef{Channel{Any}},1},
-	DobsRef::Array{RemoteRef{Channel{Any}},1},
-	WdRef::Array{RemoteRef{Channel{Any}},1},
+	pMisRefs::Array{RemoteRef{Channel{Any}},1},
 	doDerivative::Bool=true,
-	indCredit=collect(1:length(pForRef)))
+	indCredit=collect(1:length(pMisRefs)))
 	#
 	#	computeMisfit for multiple forward problems
 	#
@@ -107,8 +94,8 @@ function computeMisfit(sigma,
 	
 	F   = 0.0
 	dF  = (doDerivative) ? zeros(length(sigma)) : []
-	d2F = cell(length(pForRef));
-	Dc  = Array(RemoteRef{Channel{Any}}, size(DobsRef))
+	d2F = cell(length(pMisRefs));
+	Dc  = Array(RemoteRef{Channel{Any}}, size(pMisRefs))
 
 	indDebit = []
 	updateRes(Fi,idx) = (F+=Fi;push!(indDebit,idx))
@@ -117,7 +104,7 @@ function computeMisfit(sigma,
 	# find out which workers are involved
 	workerList = []
 	for k=indCredit
-		push!(workerList,pForRef[k].where)
+		push!(workerList,pMisRefs[k].where)
 	end
 	workerList = unique(workerList)
 	
@@ -135,9 +122,9 @@ function computeMisfit(sigma,
 				sigRef[p] = remotecall(p,identity,sigma)   # send conductivity to workers
 				dFiRef[p] = remotecall(p,identity,0.0) # get remote Ref to part of gradient
 				# solve forward problems
-				for idx=1:length(pForRef)
-					if pForRef[idx].where==p
-						Dc[idx],Fi,d2F[idx],tt =	remotecall_fetch(p,computeMisfit,sigRef[p],glocRef[idx],misfit,pForRef[idx],DobsRef[idx],WdRef[idx],dFiRef[p],doDerivative)
+				for idx=1:length(pMisRefs)
+					if pMisRefs[idx].where==p
+						Dc[idx],Fi,d2F[idx],tt =	remotecall_fetch(p,computeMisfit,sigRef[p],pMisRefs[idx],dFiRef[p],doDerivative)
 						updateRes(Fi,idx)
 						updateTimes(tt)
 					end
@@ -150,11 +137,11 @@ function computeMisfit(sigma,
 			end
 		end
 	end
-	return Dc,F,dF,d2F,pForRef,times,indDebit
+	return Dc,F,dF,d2F,pMisRefs,times,indDebit
 end
 
 
-function computeMisfit(sigma,GLoc::Array,misfit::Function,PF::Array,Dobs::Array,Wd::Array,doDerivative::Bool=true,indCredit=collect(1:length(PF)))
+function computeMisfit(sigma,pMis::Array,doDerivative::Bool=true,indCredit=collect(1:length(pMis)))
 	#
 	#	computeMisfit for multiple forward problems
 	#
@@ -163,7 +150,7 @@ function computeMisfit(sigma,GLoc::Array,misfit::Function,PF::Array,Dobs::Array,
 	#	Note: ForwardProblems and Mesh-2-Mesh Interpolation are stored on the main processor
 	#		  and then sent to a particular worker, which returns an updated pFor.
 	#
-	numFor   = length(PF)
+	numFor   = length(pMis)
  	F        = 0.0
     dF       = (doDerivative) ? zeros(length(sigma)) : []
  	d2F      = cell(numFor)
@@ -186,8 +173,8 @@ function computeMisfit(sigma,GLoc::Array,misfit::Function,PF::Array,Dobs::Array,
  						if idx == -1
  							break
  						end
- 							Dc[idx],Fi,dFi,d2F[idx],PF[idx],tt = 
- remotecall_fetch(p,computeMisfit,sigma,GLoc[idx],misfit,PF[idx],Dobs[idx],Wd[idx],doDerivative)
+ 							Dc[idx],Fi,dFi,d2F[idx],pMis[idx],tt = 
+ remotecall_fetch(p,computeMisfit,sigma,pMis[idx],doDerivative)
  							updateRes(Fi,dFi,idx)
 							updateTimes(tt)
  					end
@@ -195,5 +182,5 @@ function computeMisfit(sigma,GLoc::Array,misfit::Function,PF::Array,Dobs::Array,
  		end
  	end
  	
- 	return Dc,F,dF,d2F,PF,times,indDebit
+ 	return Dc,F,dF,d2F,pMis,times,indDebit
  end

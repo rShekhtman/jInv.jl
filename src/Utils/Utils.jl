@@ -11,6 +11,8 @@ module Utils
 	export clear,clear!
 	
 	function clear!(T)
+		T = clear(T)
+		return T
 	end
 
 	# function Base.sub2ind(n::Array{Int64,1},ii::Array{Int64,1},jj::Array{Int64,1},kk::Array{Int64,1})	
@@ -23,8 +25,8 @@ module Utils
 	  		
 	function clear!(R::RemoteRef{Channel{Any}})
 		p = take!(R)
-		clear!(p)
-		put(p,1.0)
+		p = clear!(p)
+		put!(R,p)
 	end
 
 	function clear!(PF::Array{RemoteRef{Channel{Any}}})

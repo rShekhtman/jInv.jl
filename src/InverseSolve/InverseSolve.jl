@@ -16,6 +16,39 @@ module InverseSolve
 	abstract AbstractRegularizer
 	
 	include("HessianPreconditioners.jl")
+	
+	export MisfitParam
+	"""
+	type MisfitParam
+		
+	Type storing information about one term in the misfit
+	
+	F(m) = sum_i^n phi_i(pFor(model(m)),dobs,Wd)
+	
+	Fields:
+		pFor::ForwardProbType  - forward problem
+		Wd                     - inverse standard deviation
+		dobs                   - observed data
+		misfit::Function       - misfit function
+		modelfun::Function        - model function (evaluated locally)
+		gloc	               - mapping from inverse to forward mesh
+	   
+	Constructors:
+		getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=identity)
+	"""
+	type MisfitParam
+		pFor::ForwardProbType
+		Wd
+		dobs
+		misfit::Function
+		modelfun::Function
+		gloc	
+	end
+	
+	export getMisfitParam
+	function getMisfitParam(pFor::ForwardProbType, Wd, dobs, misfit::Function, modelfun::Function=fMod, gloc=identity)
+		return MisfitParam(pFor,Wd,dobs,misfit,modelfun,gloc)
+	end
 
 	"""
 	InverseParam
@@ -23,22 +56,16 @@ module InverseSolve
 	Type storing parameters for Inversion. 
 	
 	Fields:
-	
-		model
 		Minv::AbstractMesh
 		Iact                  - active cells
-		modelfun::Function    - model for conductivities, see models.jl
+		modelfun::Function    - model function (evaluated by main worker), see models.jl
 		regularizer::Function - regularizer, see regularizer.jl
 		alpha::Real           - regularization parameter
 		regparam::Vector      - additional parameters for regularizer
-		misfit::Function      - misfit function
-		dobs                  - observed data
-		Wd                    - 1./standardDev of noise
-		misparam              - additional parameters for misfit
 		boundsLow::Vector     - lower bounds for model
 		boundsHigh::Vector    - upper bounds for model
 		maxStep::Real         - maximum step in optimization
-    	pcgMaxIter::Int          - maximum number of PCG iterations
+    	pcgMaxIter::Int       - maximum number of PCG iterations
 		pcgTol::Real          - tolerance for PCG
 		minUpdate::Real       - stopping criteria
     	maxIter::Int          - maximum number of iterations
@@ -50,18 +77,13 @@ module InverseSolve
 		pInv = getInverseParam(model,Minv,Iact,modelfun,regularizer,alpha,mref,regparam,misfit,dobs,Wd,misparam)
 	"""
 	type InverseParam
-		model
 		MInv::AbstractMesh
-		Iact  # active cells
+		Iact
 		modelfun::Function  # function that goes from model to conductivity
 		regularizer::Union{Function,Array{Function}}  # function to calculate WTW
 		alpha::Union{Float64,Array{Float64}}  # tradeoff parameter
 		mref::Array  # reference model
 		regparam::Array  # alpha values and/or weights for regularization
-		misfit::Function  # calculate data misfit and derivarives
-		dobs  # observed data
-		Wd    # 1/standard deviation
-		misparam
 		boundsLow::Vector
 		boundsHigh::Vector
 		maxStep::Real  # maximum step size for delta m
@@ -79,17 +101,11 @@ module InverseSolve
 	
 	Required Input:
 	
-		model
 		Minv::AbstractMesh
 		Iact                  - active cells
-		modelfun::Function    - model for conductivities, see models.jl
 		regularizer::Function - regularizer, see regularizer.jl
 		alpha::Real           - regularization parameter
 		regparam::Vector      - additional parameters for regularizer
-		misfit::Function      - misfit function
-		dobs                  - observed data
-		Wd                    - 1./standardDev of noise
-		misparam              - additional parameters for misfit
 		boundsLow::Vector     - lower bounds for model
 		boundsHigh::Vector    - upper bounds for model
 		
@@ -101,16 +117,14 @@ module InverseSolve
 		minUpdate::Real=1e-4  - stopping criteria
 	    maxIter::Int=10       - maximum number of iterations
 	"""
-	function getInverseParam(model,MInv,Iact,modelfun,
+	function getInverseParam(MInv,Iact,modFun,
 							 regularizer,alpha,mref,regparam,
-		                     misfit,dobs,Wd,misparam,
 							 boundsLow::Vector,boundsHigh::Vector;
 							 maxStep=1.0,pcgMaxIter=10,pcgTol=1e-1,minUpdate=1e-4,maxIter=10,HesPrec=getSSORRegularizationPreconditioner(1.0,1e-15,10))
 							 
-		return 	InverseParam(model,MInv,Iact,modelfun,
+		return 	InverseParam(MInv,Iact,modFun,
 							 regularizer,alpha,mref,regparam,
-		                     misfit,dobs,Wd,misparam,
-							 boundsLow,boundsHigh,
+		                     boundsLow,boundsHigh,
 							 maxStep,pcgMaxIter,pcgTol,minUpdate,maxIter,HesPrec)
 	end
 

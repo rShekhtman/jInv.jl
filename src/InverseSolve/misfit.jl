@@ -1,14 +1,13 @@
 export SSDFun, HuberFun, MVFun, MVFunTotal
 
 """
-	mis,dmis,d2mis = SSDFun(dc,dobs,Wd,misparam=[])
+	mis,dmis,d2mis = SSDFun(dc,dobs,Wd)
 	
 	Input:
 	
 		dc::Array   -  simulated data
 		dobs::Array -  measured data
 		Wd::Array   -  diagonal weighting
-		misparam    -  optional input (not used here)
 		
 	Output:
 	
@@ -17,7 +16,7 @@ export SSDFun, HuberFun, MVFun, MVFunTotal
 		d2mis       -  diagonal of Hessian
 
 """
-function SSDFun(dc::Array{Float64},dobs::Array{Float64},Wd::Array{Float64};misparam=[])
+function SSDFun(dc::Array{Float64},dobs::Array{Float64},Wd::Array{Float64})
 	res   = vec(dc)-vec(dobs) # predicted - observed data
 	Wd    = vec(Wd)
 	mis   = .5*real(dot(Wd.*res,Wd.*res))  # data misfit
@@ -29,7 +28,7 @@ end # function SSDFun
 """
 	For complex data misfit is computed as 0.5*|real(dc)-(dobs)|_Wd^2 +  0.5*|complex(dc)-complex(dobs)|_W^2
 """
-function SSDFun(dc::Array{Complex128},dobs::Array{Complex128},Wd::Array{Complex128};misparam=[])
+function SSDFun(dc::Array{Complex128},dobs::Array{Complex128},Wd::Array{Complex128})
 	
 	wdr   = vec(real(Wd)); wdi = vec(imag(Wd))
 	# wdr.*dRe + im*wdi.*dIm
@@ -47,13 +46,13 @@ end
 	
 	Computes misfit via
 	
-		misfit(dc,dobs) = sqrt(abs(Wd*res).^2 + C[1])
+		misfit(dc,dobs) = sqrt(abs(Wd*res).^2 + eps)
 
 	Input:
 		dc::Array   -  simulated data
 		dobs::Array -  measured data
 		Wd::Array   -  diagional weighting
-		C           -  optional input
+		eps         -  conditioning parameter (default=1e-3)
 		
 	Output:
 		mis::Real   -  misfit
@@ -61,9 +60,8 @@ end
 		d2mis       -  diagonal of Hessian
 
 """
-function HuberFun(dc::Array{Float64},dobs::Array{Float64},Wd::Array{Float64},C=[1e-3])
+function HuberFun(dc::Array{Float64},dobs::Array{Float64},Wd::Array{Float64},eps=1e-3)
 	# compute Huber distance
-	eps   = C[1]
 	res   = dc-dobs
 	G     = sqrt( abs(Wd.*res).^2 .+ eps)
 	mis   = sum(G)

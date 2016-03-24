@@ -44,14 +44,14 @@ function updateHis!(iter::Int64,His::projGNCGhis,Jc::Real,Fc,Dc,Rc::Real,alpha::
 	His.timeReg[iter+1]      += timeReg
 end
 
-function dummy(mc,Dc,iter,pInv,PF) 
+function dummy(mc,Dc,iter,pInv,pMis) 
 # this function does nothing and is used as a default for dumpResults(). 
 end;
 
 
 
 """
-	mc,Dc,outerFlag = projGNCG(mc,pInv::InverseParam,PF, indFor = [], dumpResults::Function = dummy)
+	mc,Dc,outerFlag = projGNCG(mc,pInv::InverseParam,pMis, indFor = [], dumpResults::Function = dummy)
 	
 	(Projected) Gauss-NewtonCG
 	
@@ -59,10 +59,10 @@ end;
 	
 		mc::Vector          - intial guess for model
 		pInv::InverseParam  - parameter for inversion
-		PF                  - forward problem(s)
+		pMis                - misfit terms
 		indCredit           - indices of forward problems to work on
 		dumpResults			- A function pointer for saving the results throughout the iterations.
-							- We assume that dumpResults is dumpResults(mc,Dc,iter,pInv,PF), 
+							- We assume that dumpResults is dumpResults(mc,Dc,iter,pInv,pMis), 
 							- where mc is the recovered model, Dc is the predicted data. 
 							- If dumpResults is not given, nothing is done (dummy() is called).
 		out::Int            - flag for output (-1: no output, 1: final status, 2: residual norm at each iteration)
@@ -74,7 +74,7 @@ end;
 		His                 - iteration history
 	
 """
-function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function = dummy,out::Int=2)
+function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function = dummy,out::Int=2)
 
 	maxIter     = pInv.maxIter      #  Max. no. iterations.
 	pcgMaxIter  = pInv.pcgMaxIter   #  Max cg iters.
@@ -84,9 +84,7 @@ function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function =
 	low         = pInv.boundsLow
 	high        = pInv.boundsHigh
 	alpha       = pInv.alpha
-	Dobs        = pInv.dobs
-	Wd          = pInv.Wd
-
+	
 	His = getProjGNCGhis(maxIter,pcgMaxIter)
 	#---------------------------------------------------------------------------
 	#  Initialization.
@@ -98,9 +96,9 @@ function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function =
 	## evaluate function and derivatives
 	sig,dsig = pInv.modelfun(mc)
 	if isempty(indCredit)
-		Dc,F,dF,d2F,PF,tMis = computeMisfit(sig,pInv.model,pInv.misfit,PF,Dobs,Wd,true)
+		Dc,F,dF,d2F,pMis,tMis = computeMisfit(sig,pMis,true)
 	else
-		Dc,F,dF,d2F,PF,tMis,indDebit = computeMisfit(sig,pInv.model,pInv.misfit,PF,Dobs,Wd,true,indCredit)
+		Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sig,pMis,true,indCredit)
 	end
 	dF = dsig'*dF
 	
@@ -143,9 +141,9 @@ function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function =
 		
 		#  Set up Hessian and preconditioner.
 		if isempty(indCredit)
-			Hs(x) = dsig'*HessMatVec(dsig*x,PF,sig,pInv.model,d2F) + d2R*x; 
+			Hs(x) = dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x; 
 		else
-			Hs(x) = dsig'*HessMatVec(dsig*x,PF,sig,pInv.model,d2F,indDebit) + d2R*x;
+			Hs(x) = dsig'*HessMatVec(dsig*x,pMis,sig,d2F,indDebit) + d2R*x;
 		end
 		
 		
@@ -183,9 +181,9 @@ function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function =
 			## evaluate function 
 			sigt, = pInv.modelfun(mt)
 			if isempty(indCredit)
-				Dc,F,dF,d2F,PF,tMis = computeMisfit(sigt,pInv.model,pInv.misfit,PF,Dobs,Wd,false)
+				Dc,F,dF,d2F,pMis,tMis = computeMisfit(sigt,pMis,false)
 			else
-				Dc,F,dF,d2F,PF,tMis,indDebit = computeMisfit(sigt,pInv.model,pInv.misfit,PF,Dobs,Wd,false,indCredit)
+				Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sigt,false,indCredit)
 			end
 			His.timeMisfit[iter+1,:]+=tMis'
 			
@@ -232,16 +230,16 @@ function  projGNCG(mc,pInv::InverseParam,PF;indCredit=[],dumpResults::Function =
 		# Evaluate gradient
 		tic()
 		if isempty(indCredit)
-			dF = computeGradMisfit(sig,pInv.model,Dc,Dobs,Wd,pInv.misfit,PF)
+			dF = computeGradMisfit(sig,Dc,pMis)
 		else
-			dF = computeGradMisfit(sig,pInv.model,Dc,Dobs,Wd,pInv.misfit,PF,indDebit)
+			dF = computeGradMisfit(sig,Dcp,pMis,indDebit)
 		end
 		His.timeGradMisfit[iter+1]+=toq()
 		
 		dF = dsig'*dF
 		gc = dF + dR
 		
-		dumpResults(mc,Dc,iter,pInv,PF);
+		dumpResults(mc,Dc,iter,pInv,pMis);
 		
 	end # while outer_flag == 0
 	

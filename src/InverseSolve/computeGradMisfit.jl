@@ -1,6 +1,6 @@
 export computeGradMisfit
 
-function computeGradMisfit(sigma,gloc::GlobalToLocal,Dc,Dobs,Wd,misfit::Function,pFor)
+function computeGradMisfit(sig,Dc::Array,pMis::MisfitParam)
 	#
 	#	gc = computeGradMisfit(mc,model,Dc,Dobs,Wd,misfit,pFor)
 	#
@@ -9,9 +9,10 @@ function computeGradMisfit(sigma,gloc::GlobalToLocal,Dc,Dobs,Wd,misfit::Function
 	#	Note: all variables have to be in memory of the worker executing this method
 	#
 	try
-		sigmaloc = interpGlobalToLocal(sigma,gloc.PForInv,gloc.sigmaBackground)
-		F,dF,d2F = misfit(Dc,Dobs,Wd)
-		return interpLocalToGlobal(getSensTMatVec(dF,sigmaloc,pFor),gloc.PForInv)
+		sigma,dsigma = pMis.modelfun(sig)
+		sigmaloc = interpGlobalToLocal(sigma,pMis.gloc.PForInv,pMis.gloc.sigmaBackground)
+		F,dF,d2F = pMis.misfit(Dc,pMis.dobs,pMis.Wd)
+		return dsigma'*interpLocalToGlobal(getSensTMatVec(dF,sigmaloc,pMis.pFor),pMis.gloc.PForInv)
 	catch err
 		if isa(err,InterruptException)
 			return -1
@@ -21,7 +22,7 @@ function computeGradMisfit(sigma,gloc::GlobalToLocal,Dc,Dobs,Wd,misfit::Function
 	end
 end
 
-function computeGradMisfit(sigmaRef::RemoteRef,glocRef::RemoteRef,DcRef::RemoteRef,DobsRef::RemoteRef,WdRef::RemoteRef,misfit::Function,pForRef::RemoteRef,dFiRef::RemoteRef)
+function computeGradMisfit(sigmaRef::RemoteRef,DcRef::RemoteRef,pMisRef::RemoteRef,dFiRef::RemoteRef)
 	#
 	#	gc = computeGradMisfit(mc,model,Dc,Dobs,Wd,misfit,pFor)
 	#
@@ -31,28 +32,25 @@ function computeGradMisfit(sigmaRef::RemoteRef,glocRef::RemoteRef,DcRef::RemoteR
 	#	 	  
 	#	!! make sure that everything is stored on this worker to avoid communication !!
 	#
-	rrlocs = [sigmaRef.where glocRef.where DcRef.where DobsRef.where WdRef.where pForRef.where dFiRef.where]
+	rrlocs = [sigmaRef.where pMisRef.where DcRef.where]
 	if !all(rrlocs .== myid())
 		warn("computeGradMisfit: Problem on worker $(myid()) not all remote refs are stored here, but rrlocs=$rrlocs")
 	end
 	
 	tic()
-	pFor  = take!(pForRef) # this is a no-op if pFor is stored on this worker
-	gloc  = fetch(glocRef)
+	pMis  = take!(pMisRef) # this is a no-op if pFor is stored on this worker
 	sigma = fetch(sigmaRef)
 	Dc    = fetch(DcRef)
-	Dobs  = fetch(DobsRef)
-	Wd    = fetch(WdRef)
 	commTime = toq()
 	
 	tic()
-	dFt  = computeGradMisfit(sigma,gloc,Dc,Dobs,Wd,misfit,pFor)
+	dFt  = computeGradMisfit(sigma,Dc,pMis)
 	compTime = toq()
 	
 	tic()
 	dFi  = take!(dFiRef)
 	put!(dFiRef,dFi+dFt)
-	put!(pForRef,pFor)    # does not require communication if PF lives on this worker
+	put!(pMisRef,pMis)    # does not require communication if PF lives on this worker
 	commTime += toq()
 	
 #	if commTime/compTime > 1.0
@@ -61,33 +59,11 @@ function computeGradMisfit(sigmaRef::RemoteRef,glocRef::RemoteRef,DcRef::RemoteR
 	return true,commTime,compTime
 end
 
-function computeGradMisfit(sigma,gloc,Dc,Dobs,Wd,misfit::Function,pForRef::RemoteRef,M2MRef::RemoteRef)
-	#
-	#	gc = computeGradMisfit(mc,model,Dc,Dobs,Wd,misfit,pFor)
-	#
-	#	compute gradient of misfit for single forward problem
-	#	
-	#	Note: forward problem and interpolation matrix are represented as RemoteReferences.
-	#		  model does not have an interpolation matrix! (has to be plugged in)
-	#	 	  
-	#	!! make sure that everything is stored on this worker to avoid communication !!
-	#
-
-	pFor = fetch(pForRef)
-	model.PForInv = fetch(M2MRef)
-	dF  = computeGradMisfit(sigma,gloc,Dc,Dobs,Wd,misfit,pFor)
-	return dF
-end
-
 
 function computeGradMisfit(sigma,
-	gloc::Array{RemoteRef{Channel{Any}},1},
-	Dc::Array{RemoteRef{Channel{Any}},1},
-	Dobs::Array{RemoteRef{Channel{Any}},1},
-	Wd::Array{RemoteRef{Channel{Any}},1},
-	misfit::Function,
-	PF::Array{RemoteRef{Channel{Any}},1},
-	indFors=1:length(PF))
+	DcRef::Array{RemoteRef{Channel{Any}},1},
+	pMisRefs::Array{RemoteRef{Channel{Any}},1},
+	indFors=1:length(pMisRefs))
 	#
 	#	gc = computeGradMisfit(mc,model,Dc,Dobs,Wd,misfit,pFor)
 	#
@@ -99,8 +75,8 @@ function computeGradMisfit(sigma,
 	tic()
 	# find out which workers are involved
 	workerList = []
-	for k=1:length(PF)
-		push!(workerList,PF[k].where)
+	for k=1:length(pMisRefs)
+		push!(workerList,pMisRefs[k].where)
 	end
 	workerList = unique(workerList)
 	# send sigma to all workers
@@ -127,8 +103,8 @@ function computeGradMisfit(sigma,
 					
 					# the actual computation
 					for idx=indFors
-						if PF[idx].where==p
-							isDone,c1,c2 = remotecall_fetch(p, computeGradMisfit,sigmaRef[p],gloc[idx],Dc[idx],Dobs[idx],Wd[idx],misfit,PF[idx],dFiRef[p])
+						if pMisRefs[idx].where==p
+							isDone,c1,c2 = remotecall_fetch(p, computeGradMisfit,sigmaRef[p],DcRef[idx],pMisRefs[idx],dFiRef[p])
 							updateTimes(c1,c2)
 						end
 					end	
@@ -147,74 +123,74 @@ function computeGradMisfit(sigma,
 	return dF
 end
 
-function computeGradMisfit(mc,mfun::Function,gloc::GlobalToLocal,Dc::Array,Dobs::Array,Wd::Array,misfit::Function,PF::Array{RemoteRef},M2M::Array{RemoteRef},indFors=1:length(PF))
-	#
-	#	gc = computeGradMisfit(mc,model,Dc,Dobs,Wd,misfit,pFor)
-	#
-	#	compute gradient of misfit for multiple forward problems
-	#	
-	#	Note: forward problems and interpolation matrices are represented as RemoteReferences.
-	#	
-	#	!! there is only one(!) model. Interpolation matrix has to be entered for each problem !!
-	#
-	#	NEW: First worker that finishes takes the time and interrupt hanging workers.
-	#
-	
-	dF     = zeros(length(mc))
-	times  = fill(-1.0,length(PF))
-	
-	updateRes(dFi,tm,idx) = (dF+=dFi; times[idx]=tm)
-	
-	fwid = 0; tmStop = 0.0
-	stopTime() = tmStop
-	function isFirstWorker(p)
-		if fwid ==0 # p is first worker that finished
-			fwid = p # store p's id
-			tmStop = time() + 3 * mean(times[times.>-1])  # set stop time
-			return true
-		else
-			return false
-		end	
-	end
-	
-	sigma,dsigmadm = mfun(mc)
-	
-	@sync begin
-		for p = workers()
-			@async begin
-				for idx=indFors
-					if PF[idx].where==p
-						tic()
-						dFi = remotecall_fetch(p, computeGradMisfit,sigma,gloc,Dc[idx],Dobs[idx],Wd[idx],misfit,PF[idx],M2M[idx])
-						tm = toq()
-						if dFi != -1; updateRes(dFi,tm,idx); else; break; end
-					end
-				end
-								
-				if isFirstWorker(p)
-					while true
-					  wt = remotecall_fetch(p,sleep,.01)
-					  if minimum(times[indFors])>0.0 # all workers are done
-						  break
-					  elseif time()  > stopTime() # time to stop
-							for pw=workers(); 
-								if p!=pw; interrupt(pw) end;
-							end
-						  break
-					  end
-				  	end
-				end
-			end
-		end 
-	end
-	dF = (dsigmadm' * dF) / length(times[times.>-1])
-	if length(times[times.>-1]) != length(indFors)
-		println("computeGradMisfit was interrupted after computing ", length(times[times.>-1]) ," of ", length(indFors), " gradients")
-	end
-	return dF
-end
+# function computeGradMisfit(mc,Dc::Array,pMis::Array{RemoteRef},M2M::Array{RemoteRef},indFors=1:length(PF))
+# 	#
+# 	#	gc = computeGradMisfit(mc,model,Dc,Dobs,Wd,misfit,pFor)
+# 	#
+# 	#	compute gradient of misfit for multiple forward problems
+# 	#	
+# 	#	Note: forward problems and interpolation matrices are represented as RemoteReferences.
+# 	#	
+# 	#	!! there is only one(!) model. Interpolation matrix has to be entered for each problem !!
+# 	#
+# 	#	NEW: First worker that finishes takes the time and interrupt hanging workers.
+# 	#
+# 	
+# 	dF     = zeros(length(mc))
+# 	times  = fill(-1.0,length(PF))
+# 	
+# 	updateRes(dFi,tm,idx) = (dF+=dFi; times[idx]=tm)
+# 	
+# 	fwid = 0; tmStop = 0.0
+# 	stopTime() = tmStop
+# 	function isFirstWorker(p)
+# 		if fwid ==0 # p is first worker that finished
+# 			fwid = p # store p's id
+# 			tmStop = time() + 3 * mean(times[times.>-1])  # set stop time
+# 			return true
+# 		else
+# 			return false
+# 		end	
+# 	end
+# 	
+# 	sigma,dsigmadm = mfun(mc)
+# 	
+# 	@sync begin
+# 		for p = workers()
+# 			@async begin
+# 				for idx=indFors
+# 					if PF[idx].where==p
+# 						tic()
+# 						dFi = remotecall_fetch(p, computeGradMisfit,sigma,gloc,Dc[idx],Dobs[idx],Wd[idx],misfit,PF[idx],M2M[idx])
+# 						tm = toq()
+# 						if dFi != -1; updateRes(dFi,tm,idx); else; break; end
+# 					end
+# 				end
+# 								
+# 				if isFirstWorker(p)
+# 					while true
+# 					  wt = remotecall_fetch(p,sleep,.01)
+# 					  if minimum(times[indFors])>0.0 # all workers are done
+# 						  break
+# 					  elseif time()  > stopTime() # time to stop
+# 							for pw=workers(); 
+# 								if p!=pw; interrupt(pw) end;
+# 							end
+# 						  break
+# 					  end
+# 				  	end
+# 				end
+# 			end
+# 		end 
+# 	end
+# 	dF = (dsigmadm' * dF) / length(times[times.>-1])
+# 	if length(times[times.>-1]) != length(indFors)
+# 		println("computeGradMisfit was interrupted after computing ", length(times[times.>-1]) ," of ", length(indFors), " gradients")
+# 	end
+# 	return dF
+# end
 
-function computeGradMisfit(sigma,gloc::Array,Dc::Array,Dobs::Array,Wd::Array,misfit::Function,PF::Array,indFors=1:length(PF))
+function computeGradMisfit(sigma,Dc::Array,pMis::Array{MisfitParam},indFors=1:length(pMis))
 	#
 	#	gc = computeGradMisfit(mc,model,Dc,Dobs,Wd,misfit,pFor)
 	#
@@ -225,15 +201,15 @@ function computeGradMisfit(sigma,gloc::Array,Dc::Array,Dobs::Array,Wd::Array,mis
 	#	!! this method may lead to more communication than the ones above !!
 	#
 	#
-	numFor = length(PF);
+	numFor = length(pMis);
 	
 	# get process map
 	i      = 1; nextidx(p) = i
 	procMap = zeros(Int64,numFor)
-	if isa(PF[1].Ainv,MUMPSsolver) &&  (PF[1].Ainv.Ainv.ptr !=-1)
+	if isa(pMis[1].pFor.Ainv,MUMPSsolver) &&  (pMis[1].pFor.Ainv.Ainv.ptr !=-1)
 		for ii=1:numFor
 			if any(ii.==indFors)
-				procMap[ii] = PF[ii].Ainv.Ainv.worker
+				procMap[ii] = pMis[ii].pFor.Ainv.Ainv.worker
 			end
 		end
 		function nextidx(p)
@@ -259,7 +235,7 @@ function computeGradMisfit(sigma,gloc::Array,Dc::Array,Dobs::Array,Wd::Array,mis
 							break
 						end
 						if any(idx.==indFors)
-							dFi = remotecall_fetch(p,computeGradMisfit,sigma,gloc[idx],Dc[idx],Dobs[idx],Wd[idx],misfit,PF[idx])
+							dFi = remotecall_fetch(p,computeGradMisfit,sigma,Dc[idx],pMis[idx])
 							updateRes(dFi)
 						end
 					end
