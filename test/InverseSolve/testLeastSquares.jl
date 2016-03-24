@@ -68,7 +68,7 @@ boundsHigh   = maximum(xtrue)*ones(Minv.nc)
 sigmaBack    = zeros(Minv.nc)
 
 #  solve with automatic distribution
-pInv         = getInverseParam(Minv,Iact,fMod,diffusionReg,alpha,x0,[],boundsLow,boundsHigh)
+pInv         = getInverseParam(Minv,Iact,fMod,diffusionReg,alpha,x0,boundsLow,boundsHigh)
 pInv.maxIter = 5
 x1, = projGNCG(x0,pInv,pMis)
 pInv.maxIter = 5

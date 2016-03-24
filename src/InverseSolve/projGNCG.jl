@@ -105,7 +105,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 	
 	# compute regularizer
 	tic()
-	R,dR,d2R = computeRegularizer(pInv.regularizer,mc,pInv.mref,pInv.MInv,pInv.Iact,alpha,pInv.regparam) 
+	R,dR,d2R = computeRegularizer(pInv.regularizer,mc,pInv.mref,pInv.MInv,pInv.Iact,alpha) 
 	tReg = toq()    
 	
 	# objective function
@@ -189,7 +189,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 			
 			# compute regularizer(m0,mref,pInv.model.MInv,pInv.model.Iact);
 			tic()
-			R,dR,d2R = computeRegularizer(pInv.regularizer,mt,pInv.mref,pInv.MInv,pInv.Iact,alpha,pInv.regparam) 
+			R,dR,d2R = computeRegularizer(pInv.regularizer,mt,pInv.mref,pInv.MInv,pInv.Iact,alpha) 
 			His.timeReg[iter+1] += toq()
 			# objective function
 			Jt  = F  + R

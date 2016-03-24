@@ -9,11 +9,10 @@ module InverseSolve
 	
 	# import jInv.ForwardShare.ForwardProbType
 	
-	export getName,AbstractModel, AbstractMisfit, AbstractRegularizer
+	export getName,AbstractModel, AbstractMisfit
 
 	abstract AbstractModel
 	abstract AbstractMisfit
-	abstract AbstractRegularizer
 	
 	include("HessianPreconditioners.jl")
 	
@@ -83,7 +82,6 @@ module InverseSolve
 		regularizer::Union{Function,Array{Function}}  # function to calculate WTW
 		alpha::Union{Float64,Array{Float64}}  # tradeoff parameter
 		mref::Array  # reference model
-		regparam::Array  # alpha values and/or weights for regularization
 		boundsLow::Vector
 		boundsHigh::Vector
 		maxStep::Real  # maximum step size for delta m
@@ -105,7 +103,6 @@ module InverseSolve
 		Iact                  - active cells
 		regularizer::Function - regularizer, see regularizer.jl
 		alpha::Real           - regularization parameter
-		regparam::Vector      - additional parameters for regularizer
 		boundsLow::Vector     - lower bounds for model
 		boundsHigh::Vector    - upper bounds for model
 		
@@ -118,12 +115,12 @@ module InverseSolve
 	    maxIter::Int=10       - maximum number of iterations
 	"""
 	function getInverseParam(MInv,Iact,modFun,
-							 regularizer,alpha,mref,regparam,
+							 regularizer,alpha,mref,
 							 boundsLow::Vector,boundsHigh::Vector;
 							 maxStep=1.0,pcgMaxIter=10,pcgTol=1e-1,minUpdate=1e-4,maxIter=10,HesPrec=getSSORRegularizationPreconditioner(1.0,1e-15,10))
 							 
 		return 	InverseParam(MInv,Iact,modFun,
-							 regularizer,alpha,mref,regparam,
+							 regularizer,alpha,mref,
 		                     boundsLow,boundsHigh,
 							 maxStep,pcgMaxIter,pcgTol,minUpdate,maxIter,HesPrec)
 	end
