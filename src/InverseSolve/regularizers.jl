@@ -1,11 +1,11 @@
 export diffusionReg, wdiffusionReg, wTVReg, wdiffusionRegNodal,computeRegularizer,smallnessReg
 
-function computeRegularizer(regFun::Function,mc::Vector,mref::Vector,MInv::AbstractMesh,Iact,alpha)
-	R,dR,d2R = regFun(mc,mref,MInv,Iact=Iact)
+function computeRegularizer(regFun::Function,mc::Vector,mref::Vector,MInv::AbstractMesh,alpha)
+	R,dR,d2R = regFun(mc,mref,MInv)
 	return alpha*R, alpha*dR, alpha*d2R
-end
+end	
 	
-function computeRegularizer(regFun::Array{Function},mc::Vector,mref::Array,MInv::AbstractMesh,Iact,alpha::Array{Float64})
+function computeRegularizer(regFun::Array{Function},mc::Vector,mref::Array,MInv::AbstractMesh,alpha::Array{Float64})
 	numReg = length(regFun)
 	if size(mref,2)!=numReg; 
 		error("computeRegularizer: number of regularizer (=$numReg) does not match number of reference models (=$(size(mref,2))).")
@@ -16,7 +16,7 @@ function computeRegularizer(regFun::Array{Function},mc::Vector,mref::Array,MInv:
 	
 	R = 0.0; dR = zeros(length(mc)); d2R = spzeros(length(mc),length(mc))
 	for k=1:numReg
-		Rt,dRt,d2Rt = regFun[k](mc,mref[:,k],MInv,Iact=Iact)
+		Rt,dRt,d2Rt = regFun[k](mc,mref[:,k],MInv)
 		R   += alpha[k]*Rt
 		dR  += alpha[k]*dRt 
 		d2R += alpha[k]*d2Rt
@@ -26,7 +26,7 @@ end
 
 
 """
-	Rc,dR,d2R = diffusionReg(m,mref,M,Iact)
+	Rc,dR,d2R = diffusionReg(m,mref,M,Iact=1.0)
 	
 	Compute diffusion regularizer
 		0.5*||GRAD*(m-mref)||_V^2
@@ -56,7 +56,7 @@ function diffusionReg(m::Vector,mref,M::AbstractMesh;Iact=1.0)
 end
 
 """
-	Rc,dR,d2R = smallnessReg(m,mref,M,Iact)
+	Rc,dR,d2R = smallnessReg(m,mref,M,Iact=1.0)
 	
 	Compute smallness regularizer (L2 difference to reference model)
 		

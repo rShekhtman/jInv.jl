@@ -56,7 +56,6 @@ module InverseSolve
 	
 	Fields:
 		Minv::AbstractMesh
-		Iact                  - active cells
 		modelfun::Function    - model function (evaluated by main worker), see models.jl
 		regularizer::Function - regularizer, see regularizer.jl
 		alpha::Real           - regularization parameter
@@ -77,7 +76,6 @@ module InverseSolve
 	"""
 	type InverseParam
 		MInv::AbstractMesh
-		Iact
 		modelfun::Function  # function that goes from model to conductivity
 		regularizer::Union{Function,Array{Function}}  # function to calculate WTW
 		alpha::Union{Float64,Array{Float64}}  # tradeoff parameter
@@ -99,8 +97,7 @@ module InverseSolve
 	
 	Required Input:
 	
-		Minv::AbstractMesh
-		Iact                  - active cells
+		Minv::AbstractMesh    - mesh of model
 		regularizer::Function - regularizer, see regularizer.jl
 		alpha::Real           - regularization parameter
 		boundsLow::Vector     - lower bounds for model
@@ -114,12 +111,12 @@ module InverseSolve
 		minUpdate::Real=1e-4  - stopping criteria
 	    maxIter::Int=10       - maximum number of iterations
 	"""
-	function getInverseParam(MInv,Iact,modFun,
+	function getInverseParam(MInv,modFun,
 							 regularizer,alpha,mref,
-							 boundsLow::Vector,boundsHigh::Vector;
-							 maxStep=1.0,pcgMaxIter=10,pcgTol=1e-1,minUpdate=1e-4,maxIter=10,HesPrec=getSSORRegularizationPreconditioner(1.0,1e-15,10))
+							 boundsLow::Vector,boundsHigh::Vector; maxStep=1.0,pcgMaxIter=10,pcgTol=1e-1,
+							 minUpdate=1e-4,maxIter=10,HesPrec=getSSORRegularizationPreconditioner(1.0,1e-15,10))
 							 
-		return 	InverseParam(MInv,Iact,modFun,
+		return 	InverseParam(MInv,modFun,
 							 regularizer,alpha,mref,
 		                     boundsLow,boundsHigh,
 							 maxStep,pcgMaxIter,pcgTol,minUpdate,maxIter,HesPrec)

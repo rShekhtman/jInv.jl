@@ -45,7 +45,7 @@ pFor1  = LSparam(A[i1,:],[])
 pFor2  = LSparam(A[i2,:],[])
 sigmaBack = zeros(length(xtrue))
 Iact         = speye(Minv.nc)
-gl1          = getGlobalToLocal(Iact,sigmaBack)
+gl1          = getGlobalToLocal(1.0,sigmaBack)
 gl2          = getGlobalToLocal(Iact,sigmaBack)
 bd1          = bdata[i1]
 bd2          = bdata[i2]
@@ -68,7 +68,7 @@ boundsHigh   = maximum(xtrue)*ones(Minv.nc)
 sigmaBack    = zeros(Minv.nc)
 
 #  solve with automatic distribution
-pInv         = getInverseParam(Minv,Iact,fMod,diffusionReg,alpha,x0,boundsLow,boundsHigh)
+pInv         = getInverseParam(Minv,fMod,diffusionReg,alpha,x0,boundsLow,boundsHigh)
 pInv.maxIter = 5
 x1, = projGNCG(x0,pInv,pMis)
 pInv.maxIter = 5
