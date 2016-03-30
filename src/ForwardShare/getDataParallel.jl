@@ -1,7 +1,8 @@
 export getData
 
 
-function getData(sigma::RemoteRef{Channel{Any}},pFor::RemoteRef{Channel{Any}},Mesh2Mesh::RemoteRef{Channel{Any}},doClear::Bool=false)
+
+function getData(sigma::RemoteRef{Channel{Any}},pFor::RemoteRef{Channel{Any}},Mesh2Mesh,doClear::Bool=false)
 	#= 
 		load a forward problem from RemoteRef
 	=#
@@ -46,7 +47,7 @@ function getData(sigma::Vector,pFor::Array{ForwardProbType},Mesh2Mesh::Array{Spa
 	return Dobs,pFor
 end
 
-function getData(sigma::Vector,pFor::Array{RemoteRef{Channel{Any}}},Mesh2Mesh::Array{RemoteRef{Channel{Any}}},doClear::Bool=false)
+function getData(sigma::Vector,pFor::Array{RemoteRef{Channel{Any}}},Mesh2Mesh::Array=ones(length(pFor)),doClear::Bool=false)
 	#= 
 		load and solve forward problems in parallel
 	=#

@@ -76,7 +76,7 @@ end
 function smallnessReg(m::Vector,mref,M::AbstractMesh;Iact=1.0)
 	# Rc = .5* || Grad*m ||^2
 	dm   = m .- mref
-	d2R  = Iact'*Iact
+	d2R  = Iact'*speye(length(m))*Iact
 	dR   = d2R*dm
 	Rc   = 0.5*dot(dm,dR)
 	return Rc,dR,d2R

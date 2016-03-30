@@ -45,6 +45,22 @@ module InverseSolve
 	end
 	
 	export getMisfitParam
+	"""
+		function getMisfitParam
+			
+		Required Input:
+		
+		pFor::ForwardProbType  - forward problem
+		Wd                     - inverse standard deviation of data
+		dobs                   - observed data
+		mifit::Function        - misfit function
+		
+		Optional Input:
+		
+		modelfun::Function     - model function (if all misfits have
+								 same model function, put modelfun for efficiency)
+		gloc                   - mapping from inverse to forward mesh (default: identity)
+	"""
 	function getMisfitParam(pFor::ForwardProbType, Wd, dobs, misfit::Function, modelfun::Function=fMod, gloc=identity)
 		return MisfitParam(pFor,Wd,dobs,misfit,modelfun,gloc)
 	end
@@ -59,7 +75,7 @@ module InverseSolve
 		modelfun::Function    - model function (evaluated by main worker), see models.jl
 		regularizer::Function - regularizer, see regularizer.jl
 		alpha::Real           - regularization parameter
-		regparam::Vector      - additional parameters for regularizer
+		mref::Array           - reference model
 		boundsLow::Vector     - lower bounds for model
 		boundsHigh::Vector    - upper bounds for model
 		maxStep::Real         - maximum step in optimization
@@ -72,7 +88,12 @@ module InverseSolve
 		getInverseParam
 	
 	Example: 
-		pInv = getInverseParam(model,Minv,Iact,modelfun,regularizer,alpha,mref,regparam,misfit,dobs,Wd,misparam)
+	    Minv = getRegularMesh(domain,n)
+	    modelfun = expMod
+	    regularizer(m,mref,Minv) = wdiffusionReg(m,mref,Minv)
+	    alpha   = 1e-3
+		mref    = zeros(Minv.nc)
+		pInv = getInverseParam(Minv,modelfun,regularizer,alpha,mref)
 	"""
 	type InverseParam
 		MInv::AbstractMesh
@@ -98,8 +119,10 @@ module InverseSolve
 	Required Input:
 	
 		Minv::AbstractMesh    - mesh of model
+		modFun::Function      - model
 		regularizer::Function - regularizer, see regularizer.jl
 		alpha::Real           - regularization parameter
+		mref                  - reference model
 		boundsLow::Vector     - lower bounds for model
 		boundsHigh::Vector    - upper bounds for model
 		
