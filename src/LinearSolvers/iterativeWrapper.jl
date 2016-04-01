@@ -1,18 +1,21 @@
 export IterativeSolver,getIterativeSolver,solveLinearSystem
 
 """ 
-type getIterativeSolver <: AbstractSolver
+type jInv.LinearSolvers.IterativeSolver <: AbstractSolver
 	
 Fields:
-PC      - symbol, (:ssor, :jac,...)
-maxIter - maximum number of iterations
-tol     - tolerance
-Ainv    - preconditioner
-out     - flag for output
-doClear - flag for deleting preconditioner
 
-Example
-getIterativeSolver()
+	PC      - symbol, (:ssor, :jac,...)
+	maxIter - maximum number of iterations
+	tol     - tolerance
+	Ainv    - preconditioner
+	out     - flag for output
+	doClear - flag for deleting preconditioner
+
+Example:
+
+	getIterativeSolver(cg)
+
 """
 type IterativeSolver<: AbstractSolver
 	IterMethod::Function
@@ -30,7 +33,28 @@ type IterativeSolver<: AbstractSolver
 	timeMV::Real
 end
 
-function getIterativeSolver(IterMethod;PC=:ssor,maxIter=500,tol=1e-5,Ainv=identity,out=-1,doClear::Bool=true,nthreads::Int=4)
+"""
+function jInv.LinearSolvers.getIterativeSolver
+	
+constructs IterativeSolver
+
+Required Input:
+
+	IterMethod::Function   - function handle for linear solvers 
+		Inputs are: (A,b,M), A is matrix, b is right hand side, M is preconditioner
+		Outputs are: (x,flag,err,iter), x is approximate solution
+
+Optional Inputs
+	PC::Symbol     - specifies preconditioner, default:ssor
+	maxIter        - maximum number of iterations, default:500
+	tol            - tolerance on relative residual, default=1e-5
+	Ainv           - preconditioner, default=identity
+	out            - flag for output, default=-1 (no output)
+	doClear        - flag for clearing the preconditioner, default=true
+	nthreads       - number of threads to use for matvecs (requires ParSpMatVec.jl), default=4
+           
+"""
+function getIterativeSolver(IterMethod::Function;PC=:ssor,maxIter=500,tol=1e-5,Ainv=identity,out=-1,doClear::Bool=true,nthreads::Int=4)
  	return IterativeSolver(IterMethod,PC,maxIter,tol,Ainv,out,doClear,nthreads,0,0,.0,.0,.0)
  end
 

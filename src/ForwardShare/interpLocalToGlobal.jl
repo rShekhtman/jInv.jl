@@ -1,12 +1,12 @@
 export interpLocalToGlobal, interpGlobalToLocal
 # Interpolate a vector x from the local mesh to the global mesh
 
-function interpLocalToGlobal(x::Vector{Float64}, P::AbstractFloat)
-	return P * x
+function interpLocalToGlobal(x::Vector{Float64}, P::AbstractFloat,y0::AbstractFloat=0.0)
+	return P * x + y0
 end
 
-function interpGlobalToLocal(x::Vector{Float64}, P::AbstractFloat)
-	return P * x
+function interpGlobalToLocal(x::Vector{Float64}, P::AbstractFloat,y0::AbstractFloat=0.0)
+	return P * x + y0 
 end
 
 

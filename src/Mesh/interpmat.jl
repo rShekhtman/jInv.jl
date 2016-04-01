@@ -1,5 +1,28 @@
 export interpmat, getInterpolationMatrix
 export getNodalInterpolationMatrix, getEdgeInterpolationMatrix, getFaceInterpolationMatrix, getCellCenteredInterpolationMatrix
+
+"""
+function jInv.Mesh.getInterpolationMatrix
+
+computes bi/trilinear interpolation matrix P for cell-centered data
+from Mesh1 to Mesh2. If I1 is a cell-centerd discretization of some function 
+on Mesh1 then, its interpolant on Mesh2 is given by
+
+I2 = P*I1
+
+Required Input:
+
+	M1::AbstractTensorMesh 
+	M2::AbstractTensorMesh
+	
+Example:
+
+	In mesh-decoupling, we use different meshes for the inverse solution
+	and the different forward problems. 
+	
+	Mesh2Mesh = getInterpolationMatrix(Minv,Mfor)
+
+"""
 getInterpolationMatrix(M1::AbstractTensorMesh,M2::AbstractTensorMesh) = 
 							getCellCenteredInterpolationMatrix(M1, getCellCenteredGrid(M2))
 

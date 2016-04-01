@@ -18,13 +18,14 @@ module InverseSolve
 	
 	export MisfitParam
 	"""
-	type MisfitParam
+	type jInv.InverseSolve.MisfitParam
 		
 	Type storing information about one term in the misfit
 	
 	F(m) = sum_i^n phi_i(pFor(model(m)),dobs,Wd)
 	
 	Fields:
+	
 		pFor::ForwardProbType  - forward problem
 		Wd                     - inverse standard deviation
 		dobs                   - observed data
@@ -33,6 +34,7 @@ module InverseSolve
 		gloc	               - mapping from inverse to forward mesh
 	   
 	Constructors:
+	
 		getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=identity)
 	"""
 	type MisfitParam
@@ -46,27 +48,27 @@ module InverseSolve
 	
 	export getMisfitParam
 	"""
-		function getMisfitParam
-			
-		Required Input:
+	function jInv.InverseSolve.getMisfitParam
 		
+	Required Input:	
+	
 		pFor::ForwardProbType  - forward problem
 		Wd                     - inverse standard deviation of data
 		dobs                   - observed data
-		mifit::Function        - misfit function
-		
-		Optional Input:
-		
+		misfit::Function        - misfit function
+	
+	Optional Input:
+	
 		modelfun::Function     - model function (if all misfits have
 								 same model function, put modelfun for efficiency)
 		gloc                   - mapping from inverse to forward mesh (default: identity)
 	"""
-	function getMisfitParam(pFor::ForwardProbType, Wd, dobs, misfit::Function, modelfun::Function=fMod, gloc=identity)
+	function getMisfitParam(pFor::ForwardProbType, Wd, dobs, misfit::Function, modelfun::Function=fMod, gloc=getGlobalToLocal(1.0))
 		return MisfitParam(pFor,Wd,dobs,misfit,modelfun,gloc)
 	end
 
 	"""
-	InverseParam
+	type jInv.InverseSolve.InverseParam
 	
 	Type storing parameters for Inversion. 
 	
@@ -112,7 +114,7 @@ module InverseSolve
 	end  # type InverseParam
 	
 	"""
-	getInverseParam(...)
+	function jInv.InverseSolve.getInverseParam(...)
 	
 	Constructs an InverseParam
 	

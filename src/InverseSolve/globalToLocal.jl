@@ -32,11 +32,11 @@ Example:
 """
 type GlobalToLocal <: AbstractModel
 	PForInv::Union{SparseMatrixCSC,AbstractFloat} # interpolation matrix from fwd mesh to inv mesh
-	sigmaBackground::Vector{Float64} #  (# of cells fwd mesh)
+	sigmaBackground::Union{Vector{Float64},AbstractFloat} #  (# of cells fwd mesh)
 end # type GlobalToLocal
 
 # Constructors
-getGlobalToLocal(P) = GlobalToLocal(P,1e-8*ones(P.n))
+getGlobalToLocal(P) = GlobalToLocal(P,1e-8)
 getGlobalToLocal(P,sigBack::Vector{Float64}) = GlobalToLocal(P,sigBack)
 getGlobalToLocal(P,sigBack::Vector{Float64},fname) = GlobalToLocal(P,sigBack)
 
