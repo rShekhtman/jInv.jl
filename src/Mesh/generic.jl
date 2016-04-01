@@ -3,7 +3,6 @@ export ndgrid, meshgrid
 export getDivergenceMatrix, getNodalGradientMatrix, getCurlMatrix, getNodalLaplacianMatrix
 export getMassMatrix, getdMassMatrix
 
-# 1D operator
 function av(n)
 # A = av(n), 1D average operator
 	return spdiagm((fill(.5,n),fill(.5,n)),(0,1),n,n+1)
@@ -16,11 +15,19 @@ end
 
 # --- linear operator
 """
-Af = getFaceAverageMatrix(Mesh::AbstractTensorMesh)
+ 	function jInv.Mesh.getFaceAverageMatrix
+	
+	Returns Face-to-CellCenter average matrix from Mesh.Af. 
+	Matrix is constructed if Mesh.Af is empty. 
+	
+	For 2D Mesh: Af = [A1 A2]
+	For 3D Mesh: Af = [A1 A2 A3]
+	
+	Input: 
+		Mesh::Abstract Mesh
 
 """
 function getFaceAverageMatrix(Mesh::AbstractTensorMesh)
-# Mesh.Af = getFaceAverageMatrix(Mesh::AbstractTensorMesh) builds face-to-cc average operator
 	if isempty(Mesh.Af)
 		if Mesh.dim==2
 			A1 = kron(speye(Mesh.n[2]),av(Mesh.n[1]))
@@ -36,17 +43,42 @@ function getFaceAverageMatrix(Mesh::AbstractTensorMesh)
 	return Mesh.Af
 end
 
+"""
+ 	function jInv.Mesh.getEdgeAverageMatrix
+	
+	Returns Edge-to-CellCenter average matrix from Mesh.Ae. 
+	Matrix is constructed if Mesh.Ae is empty. 
+	
+	For 3D Mesh: Ae = [A1 A2 A3]
+	
+	Input: 
+		Mesh::Abstract Mesh
+
+"""
 function getEdgeAverageMatrix(Mesh::AbstractTensorMesh)
-# Mesh.Ae = getEdgeAverageMatrix(Mesh::AbstractTensorMesh) builds edge-to-cc average operator
 	if isempty(Mesh.Ae)
-		A1 = kron(av(Mesh.n[3]),kron(av(Mesh.n[2]),speye(Mesh.n[1]))) 
-		A2 = kron(av(Mesh.n[3]),kron(speye(Mesh.n[2]),av(Mesh.n[1]))) 
-		A3 = kron(speye(Mesh.n[3]),kron(av(Mesh.n[2]),av(Mesh.n[1])))
-		Mesh.Ae = (1/3)*[A1 A2 A3]
+		if Mesh.dim==3
+			A1 = kron(av(Mesh.n[3]),kron(av(Mesh.n[2]),speye(Mesh.n[1]))) 
+			A2 = kron(av(Mesh.n[3]),kron(speye(Mesh.n[2]),av(Mesh.n[1]))) 
+			A3 = kron(speye(Mesh.n[3]),kron(av(Mesh.n[2]),av(Mesh.n[1])))
+			Mesh.Ae = (1/3)*[A1 A2 A3]
+		else
+			error("getEdgeAverageMatrix not implemented fot $(Mesh.dim)D Meshes")
+		end
 	end
 	return Mesh.Ae
 end
 
+"""
+ 	function jInv.Mesh.getNodalAverageMatrix
+	
+	Returns Nodal-to-CellCenter average matrix from Mesh.An. 
+	Matrix is constructed if Mesh.An is empty. 
+	
+	Input: 
+		Mesh::Abstract Mesh
+
+"""
 function getNodalAverageMatrix(Mesh::AbstractTensorMesh)
 # Mesh.An = getNodalAverageMatrix(Mesh::TensorMesh3D) builds nodal-to-cc average operator
 	if isempty(Mesh.An)

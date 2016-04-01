@@ -3,6 +3,60 @@ export getCellCenteredGrid, getNodalGrid, getFaceGrids, getEdgeGrids
 export getCellCenteredAxes, getNodalAxes
 export getVolume, getVolumeInv, getFaceArea, getFaceAreaInv, getLength, getLengthInv
 
+"""
+	type jInv.Mesh.TensorMesh3D <: AbstractTensorMesh
+		
+	Fields:
+	
+		h1::Vector{Float64}     - cell size in x1 direction
+		h2::Vector{Float64}     - cell size in x2 direction
+		h3::Vector{Float64}     - cell size in x3 direction
+		x0::Vector{Float64}     - origin
+		dim::Int                - dimension (dim=3)
+		n::Vector{Int64}        - number of cells in each direction
+		nc::Int                 - nc total number of cells (nc=prod(n))
+		nf::Vector{Int64}       - number of faces
+		ne::Vector{Int64}       - number of edges
+	
+	Persistent Operators:
+	
+	Operators should not be accessed directly. They will be built, if needed,
+	when accessing them using specified method. clear!(M) will release all 
+	memory.
+	
+		Div::SparseMatrixCSC    - divergence (faces -> cell-centers)
+								  Access via: getDivergenceMatrix(M)
+		Grad::SparseMatrixCSC   - gradient (nodal -> edges)
+								  Access via: getNodalGradientMatrix(M)
+		Curl::SparseMatrixCSC   - curl (edges -> faces)
+								  Access via: getCurlMatrix(M)
+		Af::SparseMatrixCSC     - face average (faces -> cell-centers)
+								  Access via: getFaceAverageMatrix(M)
+		Ae::SparseMatrixCSC     - edge average (edges -> cell-centers)
+								  Access via: getEdgeAverageMatrix(M)
+		An::SparseMatrixCSC     - nodal average (nodes -> cell-centers)
+								  Access via: getNodalAverageMatrix(M)
+		V::SparseMatrixCSC      - cell volumes (diagonal matrix)
+								  Access via: getVolume(M)
+		F::SparseMatrixCSC      - face area (diagonal matrix)
+								  Access via: getFaceArea(M)
+		L::SparseMatrixCSC      - edge length (diagonal matrix)
+								  Access via: getLength(M)
+		Vi::SparseMatrixCSC     - inverse cell volumes (diagonal matrix)
+								  Access via: getVolumeInv(M)
+		Fi::SparseMatrixCSC     - inverse face area (diagonal matrix)
+								  Access via: getFaceAreaInv(M)
+		Li::SparseMatrixCSC     - inverse edge length (diagonal matrix)
+								  Access via: getLengthAreaInv(M)
+		nLap::SparseMatrixCSC   - nodal Laplacian
+								  Access via: getNodalLaplacian(M)
+	
+	Example: 
+	
+	h1 = rand(4); h2 = rand(6); h3 = rand(5);
+	M  = getTensorMesh2D(h1,h2,h3)
+	
+"""
 type TensorMesh3D <: AbstractTensorMesh
 	h1::Vector{Float64}
 	h2::Vector{Float64}
@@ -28,9 +82,22 @@ type TensorMesh3D <: AbstractTensorMesh
 	nLap::SparseMatrixCSC
 end
 
+"""
+	function jInv.Mesh.getTensorMesh3D
+		
+	constructs TensorMesh3D
+	
+	Required Input:
+	
+	   h1::Array - cell-sizes in x1 direction
+	   h2::Array - cell-sizes in x2 direction
+	   h3::Array - cell-sizes in x3 direction
 
+	Optional Input
+	   x0::Array - origin (default = zeros(3))
 
-function getTensorMesh3D(h1,h2,h3,x0=zeros(3))
+"""
+function getTensorMesh3D(h1::Array,h2::Array,h3::Array,x0=zeros(3))
 	n = [length(h1); length(h2);  length(h3)]
 	nc = prod(n)
 	nf = [(n[1]+1)*n[2]*n[3]; n[1]*(n[2]+1)*n[3]; n[1]*n[2]*(n[3]+1) ]
@@ -39,8 +106,6 @@ function getTensorMesh3D(h1,h2,h3,x0=zeros(3))
 	dim = 3
 return  TensorMesh3D(h1,h2,h3,x0,dim,n,nc,nf,ne,empt,empt,empt,empt,empt,empt,empt,empt,empt,empt,empt,empt,empt)
 end
-
-
 
 import Base.==
 function ==(M1::TensorMesh3D,M2::TensorMesh3D)
@@ -95,7 +160,6 @@ function ==(M1::TensorMesh3D,M2::TensorMesh3D)
 	return all(isEqual)
 end
 
-# --- grid constructors
 
 function getNodalAxes(Mesh::TensorMesh3D)
 	xn,yn,zn = getNodalAxes(Mesh.h1,Mesh.h2,Mesh.h3)

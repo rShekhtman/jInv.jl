@@ -4,7 +4,61 @@ export getCellCenteredAxes, getNodalAxes
 export getVolume, getVolumeInv, getFaceArea, getFaceAreaInv, getLength, getLengthInv
 export getEdgeMassMatrix
 
+"""
+	type jInv.Mesh.RegularMesh <: AbstractTensorMesh
+		
+	Regular mesh in 1D, 2D, and 3D
+	
+	Fields:
+		
+		domain::Vector{Float64}  - physical domain [min(x1) max(x1) min(x2) max(x2)]
+		h::Vector{Float64}       - cell size
+		x0::Vector{Float64}      - origin
+		dim::Int                 - dimension of mesh
+		n::Vector{Int64}         - number of cells in each dimension
+		nc::Int                  - total number of cells
+		nf::Vector{Int64}        - number of faces in each dimension
+		ne::Vector{Int64}        - number of edges in each dimension
+		
+		
+		Persistent Operators:
 
+		Operators should not be accessed directly. They will be built, if needed,
+		when accessing them using specified method. clear!(M) will release all 
+		memory.
+
+			Div::SparseMatrixCSC    - divergence (faces -> cell-centers)
+									  Access via: getDivergenceMatrix(M)
+			Grad::SparseMatrixCSC   - gradient (nodal -> edges)
+									  Access via: getNodalGradientMatrix(M)
+			Curl::SparseMatrixCSC   - curl (edges -> faces)
+									  Access via: getCurlMatrix(M)
+			Af::SparseMatrixCSC     - face average (faces -> cell-centers)
+									  Access via: getFaceAverageMatrix(M)
+			Ae::SparseMatrixCSC     - edge average (edges -> cell-centers)
+									  Access via: getEdgeAverageMatrix(M)
+			An::SparseMatrixCSC     - nodal average (nodes -> cell-centers)
+									  Access via: getNodalAverageMatrix(M)
+			V::SparseMatrixCSC      - cell volumes (diagonal matrix)
+									  Access via: getVolume(M)
+			F::SparseMatrixCSC      - face area (diagonal matrix)
+									  Access via: getFaceArea(M)
+			L::SparseMatrixCSC      - edge length (diagonal matrix)
+									  Access via: getLength(M)
+			Vi::SparseMatrixCSC     - inverse cell volumes (diagonal matrix)
+									  Access via: getVolumeInv(M)
+			Fi::SparseMatrixCSC     - inverse face area (diagonal matrix)
+									  Access via: getFaceAreaInv(M)
+			Li::SparseMatrixCSC     - inverse edge length (diagonal matrix)
+									  Access via: getLengthAreaInv(M)
+			nLap::SparseMatrixCSC   - nodal Laplacian
+									  Access via: getNodalLaplacian(M)
+		
+	Examples:
+	M2D  = getRegularMesh([1.2 2.4 2.2 5.0],[3,4])	
+	M3D  = getRegularMesh([1.2 2.4 2.2 5.0 0 1],[3,4,7])	
+		
+"""
 type RegularMesh <: AbstractTensorMesh
 	domain::Vector{Float64} 
 	h::Vector{Float64} 
@@ -29,6 +83,20 @@ type RegularMesh <: AbstractTensorMesh
 	nLap::SparseMatrixCSC
 end
 
+"""
+	function jInv.Mesh.getRegularMesh
+		
+	Constructs regular mesh
+	
+	Input: 
+		domain - physical domain rectangular
+		n      - number of cells in each dimension
+
+	Examples:
+	M2D  = getRegularMesh([1.2 2.4 2.2 5.0],[3,4])	
+	M3D  = getRegularMesh([1.2 2.4 2.2 5.0 0 1],[3,4,7])	
+
+"""
 function getRegularMesh(domain,n)
 	domain = vec(float(domain))
 	n     = vec(n)
