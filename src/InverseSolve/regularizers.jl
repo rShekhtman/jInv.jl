@@ -60,26 +60,23 @@ end
 	
 	Compute smallness regularizer (L2 difference to reference model)
 		
-		R(m) = 0.5*||Iact*(m-mref)||_V^2
+		R(m) = 0.5*||m-mref||_V^2
 		
 	Input:
 		m     - model
 		mref  - reference model
 		M     - Mesh
-		Iact  - regularization operator
 	
 	Output
 		Rc    - value of regularizer
 		dR    - gradient w.r.t. m
 		d2R   - Hessian
 """
-function smallnessReg(m::Vector,mref,M::AbstractMesh;Iact=1.0)
-	# Rc = .5* || Grad*m ||^2
+function smallnessReg(m::Vector,mref,M::AbstractMesh)
 	dm   = m .- mref
-	d2R  = Iact'*speye(length(m))*Iact
-	dR   = d2R*dm
-	Rc   = 0.5*dot(dm,dR)
-	return Rc,dR,d2R
+	dR   = dm
+	Rc   = 0.5*dot(dm,dm)
+	return Rc,dR,speye(length(m))
 end
 
 function wdiffusionReg(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])

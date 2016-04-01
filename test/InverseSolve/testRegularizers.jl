@@ -13,12 +13,16 @@ Iact  = speye(Bool,M.nc)
 Iact  = Iact[:,vec(idx).==1] 
 mc    = randn(size(Iact,2))
 
-regFuns = [diffusionReg, wdiffusionReg, smallnessReg, wTVReg]
+regFuns = [ 
+			(m,mref,M)->diffusionReg(m,mref,M,Iact=Iact), 
+			(m,mref,M)->wdiffusionReg(m,mref,M,Iact=Iact), 
+			smallnessReg, 
+			(m,mref,M)->wTVReg(m,mref,M,Iact=Iact)]
 for k=1:length(regFuns)
 	println("checkDerivative of $(regFuns[k])")
 	
 	function testFun(x,v=[])
-		Sc,dS,d2S = regFuns[k](x,0.*x,M,Iact=Iact)
+		Sc,dS,d2S = regFuns[k](x,0.*x,M)
 		if isempty(v)
 			return Sc
 		else
