@@ -24,13 +24,13 @@ end
 
 function applySSORCG(Hs::Function, d2R::SparseMatrixCSC,v::Vector,param)
 	aux = param.auxVec;
-	SSOR(r) = (aux[:]=0.0; xt=ssorPrecTrans!(d2R,aux,r,diagonal); return aux);
+	SSOR(r) = (aux[:]=0.0; xt=ssorPrecTrans!(d2R,aux,r,param.diagonal); return aux);
 	x = KrylovMethods.cg(d2R,v,tol=param.tol,maxIter=param.maxCGIter,M=SSOR,out=-1)[1]
 	return x;
 end
 
 function setupSSORCG(Hs::Function, d2R::SparseMatrixCSC,param)
-	param.diagonal = omega.omega./diag(d2R);
+	param.diagonal = param.omega./diag(d2R);
 	param.auxVec   = zeros(size(d2R,2));
 	return;
 end
