@@ -92,6 +92,7 @@ function wdiffusionReg(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
    elseif length(C) == 5
       #Af  = getFaceAverageMatrix(M)
       #wt  = Af'*C[5]
+      alpha1 = C[1]; alpha2 = C[2]; alpha3 = C[3]; alpha4 = C[4]
       wt   = C[5]
       Wt   = sdiag([alpha1*ones(M.nf[1]);alpha2*ones(M.nf[2]);alpha3*ones(M.nf[3])]) *
              sdiag(wt)

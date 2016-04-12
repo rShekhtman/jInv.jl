@@ -1,4 +1,4 @@
-export expMod, boundMod, fMod
+export expMod, boundMod, fMod,dummyMod
 
 
 """
@@ -24,6 +24,11 @@ end
 function fMod(m;f::Function=identity,df::Function=m->ones(length(m)))
 	return f(m),sdiag(df(m))
 end
+
+function identityMod(m)
+	return m, UniformScaling(1.0)
+end
+
 
 export boundMod
 """

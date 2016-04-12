@@ -1,8 +1,6 @@
-[![Build Status](https://travis-ci.org/lruthotto/jInv.jl.svg?branch=master)](https://travis-ci.org/lruthotto/jInv.jl) 
-[![Coverage Status](https://coveralls.io/repos/github/lruthotto/jInv.jl/badge.svg?branch=master)](https://coveralls.io/github/lruthotto/jInv.jl?branch=master)
-[![Build status](https://ci.appveyor.com/api/projects/status/0pxgtmm08b0w6wgh?svg=true)](https://ci.appveyor.com/project/lruthotto/jinv-jl-81lel)
-
-*This fork is used to restructure some things in jInv.InverseSolve. The goal is to make the package easier to use for multiphysics problems and random sampling of data. Making this easier, required some major changes in the way InverseParam is used. Once everything is stable, this fork will be merged. Please look at the difference between this and the original version and let me know if you have any comments.*
+[![Build Status](https://travis-ci.org/JuliaInv/jInv.jl.svg?branch=master)](https://travis-ci.org/JuliaInv/jInv.jl) 
+[![Coverage Status](https://coveralls.io/repos/github/JuliaInv/jInv.jl/badge.svg?branch=master)](https://coveralls.io/github/JuliaInv/jInv.jl?branch=master)
+[![Build status](https://ci.appveyor.com/api/projects/status/0pxgtmm08b0w6wgh?svg=true)](https://ci.appveyor.com/project/JuliaInv/jinv-jl-81lel)
 
 # jInv
 
