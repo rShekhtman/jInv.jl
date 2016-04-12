@@ -31,20 +31,10 @@ function prepareMesh2Mesh(pFor::Array{RemoteRef{Channel{Any}}},Minv::AbstractMes
 	# send sigma to all workers
 	MinvRef = Array(RemoteRef{Channel{Any}},maximum(workers()))
 	
-	tic()
 	@sync begin
 		for p=workerList
 			@async begin
 				MinvRef[p] = remotecall_wait(p,identity,Minv)   # send model to workers
-			end
-		end
-	end
-	sendTime=toq()
-	println("Time for sending out Minv $sendTime")
-		
-	@sync begin
-		for p=workerList
-			@async begin
 				for idx=1:length(pFor)
 					if p==pFor[idx].where
 						Mesh2Mesh[idx] = remotecall_wait(p,prepareMesh2Mesh,pFor[idx],MinvRef[p],compact)

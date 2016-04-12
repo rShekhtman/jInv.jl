@@ -16,7 +16,7 @@ function getData(sigma::RemoteRef{Channel{Any}},pFor::RemoteRef{Channel{Any}},Me
 end
 
 
-function getData(sigma::Vector,pFor::Array{ForwardProbType},Mesh2Mesh::Array{SparseMatrixCSC},doClear::Bool=false,workerList=workers())
+function getData(sigma::Vector,pFor::Array{ForwardProbType},Mesh2Mesh::Array=ones(length(pFor)),doClear::Bool=false,workerList=workers())
 	#= 
 		load and solve forward problems in parallel
 	=#
@@ -36,7 +36,7 @@ function getData(sigma::Vector,pFor::Array{ForwardProbType},Mesh2Mesh::Array{Spa
 						break
 					end
 					P = Mesh2Mesh[idx]
-					if eltype(P.nzval)==Int16
+					if isa(P,SparseMatrixCSC) && eltype(P.nzval)==Int16
 						P = SparseMatrixCSC(P.m,P.n,P.colptr,P.rowval,2.^float(3*P.nzval))
 					end
 					Dobs[idx],pFor[idx]    = remotecall_fetch(p, getData,P'*sigma,pFor[idx],doClear)

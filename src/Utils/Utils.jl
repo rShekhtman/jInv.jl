@@ -55,4 +55,13 @@ module Utils
 	function clear{T}(A::SparseMatrixCSC{T})
 		return spzeros(0,0);
 	end	
+	
+	export getWorkerIds
+	function getWorkerIds(A::Array{RemoteRef{Channel{Any}}})
+		Ids = []
+		for k=1:length(A)
+			push!(Ids,A[k].where)
+		end
+		return unique(Ids)	
+	end
 end

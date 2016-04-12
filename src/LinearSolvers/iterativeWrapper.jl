@@ -44,7 +44,8 @@ Required Input:
 		Inputs are: (A,b,M), A is matrix, b is right hand side, M is preconditioner
 		Outputs are: (x,flag,err,iter), x is approximate solution
 
-Optional Inputs
+Optional Inputs:
+
 	PC::Symbol     - specifies preconditioner, default:ssor
 	maxIter        - maximum number of iterations, default:500
 	tol            - tolerance on relative residual, default=1e-5
