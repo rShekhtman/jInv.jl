@@ -16,7 +16,7 @@ function computeMisfit(sig,     # conductivity on inv mesh (active cells only)
 	#	Notes: Everything is stored in memory on the node executing this function.
 	#          The gradient and sensitivities returned are with respect to the conductivity on the inv mesh.
 	#
-	# try
+
 	times = zeros(4)
 	
 	sigma,dsigma = pMis.modelfun(sig)
@@ -124,7 +124,7 @@ function computeMisfit(sigma,
 				# solve forward problems
 				for idx=1:length(pMisRefs)
 					if pMisRefs[idx].where==p
-						Dc[idx],Fi,d2F[idx],tt =	remotecall_fetch(p,computeMisfit,sigRef[p],pMisRefs[idx],dFiRef[p],doDerivative)
+						Dc[idx],Fi,d2F[idx],tt = remotecall_fetch(p,computeMisfit,sigRef[p],pMisRefs[idx],dFiRef[p],doDerivative)
 						updateRes(Fi,idx)
 						updateTimes(tt)
 					end
@@ -173,8 +173,7 @@ function computeMisfit(sigma,pMis::Array,doDerivative::Bool=true,indCredit=colle
  						if idx == -1
  							break
  						end
- 							Dc[idx],Fi,dFi,d2F[idx],pMis[idx],tt = 
- remotecall_fetch(p,computeMisfit,sigma,pMis[idx],doDerivative)
+ 							Dc[idx],Fi,dFi,d2F[idx],pMis[idx],tt = remotecall_fetch(p,computeMisfit,sigma,pMis[idx],doDerivative)
  							updateRes(Fi,dFi,idx)
 							updateTimes(tt)
  					end

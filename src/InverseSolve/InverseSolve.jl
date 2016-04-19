@@ -7,7 +7,7 @@ module InverseSolve
 	using jInv.ForwardShare
 	using jInv.LinearSolvers
 	
-	# import jInv.ForwardShare.ForwardProbType
+	import jInv.ForwardShare.ForwardProbType
 	
 	export getName,AbstractModel, AbstractMisfit
 
@@ -16,56 +16,7 @@ module InverseSolve
 	
 	include("HessianPreconditioners.jl")
 	
-	export MisfitParam
-	"""
-	type jInv.InverseSolve.MisfitParam
-		
-	Type storing information about one term in the misfit
-	
-	F(m) = sum_i^n phi_i(pFor(model(m)),dobs,Wd)
-	
-	Fields:
-	
-		pFor::ForwardProbType  - forward problem
-		Wd                     - inverse standard deviation
-		dobs                   - observed data
-		misfit::Function       - misfit function
-		modelfun::Function        - model function (evaluated locally)
-		gloc	               - mapping from inverse to forward mesh
-	   
-	Constructors:
-	
-		getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=identity)
-	"""
-	type MisfitParam
-		pFor::ForwardProbType
-		Wd
-		dobs
-		misfit::Function
-		modelfun::Function
-		gloc	
-	end
-	
-	export getMisfitParam
-	"""
-	function jInv.InverseSolve.getMisfitParam
-		
-	Required Input:	
-	
-		pFor::ForwardProbType  - forward problem
-		Wd                     - inverse standard deviation of data
-		dobs                   - observed data
-		misfit::Function        - misfit function
-	
-	Optional Input:
-	
-		modelfun::Function     - model function (if all misfits have
-								 same model function, put modelfun for efficiency)
-		gloc                   - mapping from inverse to forward mesh (default: identity)
-	"""
-	function getMisfitParam(pFor::ForwardProbType, Wd, dobs, misfit::Function, modelfun::Function=fMod, gloc=getGlobalToLocal(1.0))
-		return MisfitParam(pFor,Wd,dobs,misfit,modelfun,gloc)
-	end
+	include("misfitParam.jl")
 
 	"""
 	type jInv.InverseSolve.InverseParam
