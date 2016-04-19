@@ -131,5 +131,6 @@ function clear!(P::MisfitParam;clearPFor::Bool=true, clearData::Bool=false,clear
 	end
 	if clearMesh2Mesh
 		P.gloc = getGlobalToLocal(1.0);
-	end		
+	end
+	return P;
 end
