@@ -63,8 +63,8 @@ Input for a call:
 	Iact							        	- Projector to active cells.
 	sigmaBack::Vector							- Background model ("frozen" cells).					
 	Mesh2MeshRFs::Union{Array{RemoteRef{Channel{Any}}},Array{Float64}}	- mapping from inverse to forward mesh (default: identity) 
-	modelfun::Function=dummyMod 						- model function. If all misfits have same model function, 
-										  put modelfun in inverseParam and dummyMod here for efficiency.
+	modelfun::Function=identityMod 						- model function. If all misfits have same model function, 
+										  put modelfun in inverseParam and identityMod here for efficiency.
 	fname="" 								- (optional)
 
 """
@@ -119,6 +119,17 @@ function getMisfitParam(pForRF::RemoteRef{Channel{Any}}, Wd, dobs, misfit::Funct
 	pMis 		= getMisfitParam(pFor,Wd,dobs,misfit,modelfun, prepareGlobalToLocal(Mesh2Mesh,Iact,sigmaBack,fname));
 	return pMis;
 end
-	
-	
-	
+
+import jInv.Utils.clear!
+function clear!(P::MisfitParam;clearPFor::Bool=true, clearData::Bool=false,clearMesh2Mesh::Bool=false)
+	if clearPFor
+		clear!(P.pFor);
+	end
+	if clearData
+		P.Wd   = 0;
+		P.dobs = 0;
+	end
+	if clearMesh2Mesh
+		P.gloc = getGlobalToLocal(1.0);
+	end		
+end
