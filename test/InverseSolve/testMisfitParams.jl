@@ -3,8 +3,8 @@
 	using jInv.Mesh
 	using jInv.LinearSolvers
 	using jInv.ForwardShare
+	using jInv.Utils
 	using Base.Test
-
 
 type LSparam <: ForwardProbType
 	A::SparseMatrixCSC
@@ -22,6 +22,14 @@ end
 function jInv.ForwardShare.getSensTMatVec(v::Vector,m::Vector,pFor::LSparam)
 	return pFor.A'*v
 end
+
+
+import jInv.Utils.clear!
+function clear!(pFor::LSparam)
+	pFor.A = speye(0);
+	pFor.Ainv = [];
+end
+
 end
 # build domain and true image
 domain = [0.0 1.0 0.0 1.0]
@@ -118,3 +126,10 @@ x1, = projGNCG(x0,pInv,pMis)
 pInv.maxIter = 5
 x2, = projGNCG(x0,pInv,pMisRefs)
 @test norm(x1-x2)/norm(x1) < 1e-12
+
+clear!(pMisRefs);
+for k=1:length(pMis)
+	clear!(pMis[k],clearPFor=true, clearData=true,clearMesh2Mesh=true);
+end
+
+
