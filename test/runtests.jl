@@ -7,6 +7,12 @@ catch
 	allPassed = false
 	warn("Mesh had test errors")
 end
+try 
+	include("ForwardShare/runtests.jl")
+catch
+	allPassed = false
+	warn("ForwardShare had test errors")
+end
 
 try 
 	include("Utils/runtests.jl")
