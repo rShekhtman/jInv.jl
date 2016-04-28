@@ -33,7 +33,7 @@ for k=1:length(regFuns)
 	@test chkDer
 end
 
-regFuns = [wdiffusionRegNodal]
+regFuns = [wdiffusionRegNodal;wTVRegNodal]
 idx   = ones(Int,(n[1]+1,n[2]+1,n[3]+1))
 idx[:,:,1:5] = 0
 Iact  = speye(Bool,prod(M.n+1))
@@ -54,3 +54,36 @@ for k=1:length(regFuns)
 	chkDer, = checkDerivative(testFun,mc,out=false)
 	@test chkDer
 end
+
+
+regFuns = [logBarrier;logBarrierSquared]
+idx   = ones(Int,(n[1]+1,n[2]+1,n[3]+1))
+idx[:,:,1:5] = 0
+Iact  = speye(Bool,prod(M.n+1))
+Iact  = Iact[:,vec(idx).==1] 
+mc    = ones(size(Iact,2)) + 0.05*randn(size(Iact,2));
+
+low   = ones(length(mc))*0.4;
+high  = ones(length(mc))*1.6;
+epsilon = ones(length(mc))*0.58;
+
+for k=1:length(regFuns)
+	println("checkDerivative of $(regFuns[k])")
+	
+	function testFun(x,v=[])
+		Sc,dS,d2S = regFuns[k](x,0.*x,M,low,high,epsilon)
+		if isempty(v)
+			return Sc
+		else
+			return Sc,dot(dS,v)
+		end
+	end
+	chkDer, = checkDerivative(testFun,mc,out=false)
+	@test chkDer
+end
+
+
+
+
+
+

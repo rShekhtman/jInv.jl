@@ -220,6 +220,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 		#  Check stopping criteria for outer iteration. 
 		updateHis!(iter,His,Jc,F,Dc,R,alpha[1],countnz(Active),stepNorm,tMis,tReg)
 	
+		dumpResults(mc,Dc,iter,pInv,pMis);
 		if iter >= maxIter
 			break
 		elseif stepNorm < stepTol
@@ -238,7 +239,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 		dF = dsig'*dF
 		gc = dF + dR
 		
-		dumpResults(mc,Dc,iter,pInv,pMis);
+		
 		
 	end # while outer_flag == 0
 	
