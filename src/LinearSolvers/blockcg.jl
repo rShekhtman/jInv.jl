@@ -71,7 +71,7 @@ function solveLinearSystem!(A,B,X,param::BlockPCGsolver,doTranspose=0)
 		
 	tic()
 	X[:]=0.0
-	X,flag,err,iter = KrylovMethods.blockcg(Af,full(B),X=X, tol=param.tol,maxIter=param.maxIter,M=param.Ainv,out=param.out,ortho=param.ortho)
+	X,flag,err,iter = KrylovMethods.blockCG(Af,full(B),X=X, tol=param.tol,maxIter=param.maxIter,M=param.Ainv,out=param.out,ortho=param.ortho)
 	param.nIter+=iter*nrhs
 	param.timeCG+=toq();
 	return X, param
