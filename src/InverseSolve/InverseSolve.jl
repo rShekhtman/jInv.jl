@@ -36,7 +36,7 @@ module InverseSolve
 		pcgTol::Real          - tolerance for PCG
 		minUpdate::Real       - stopping criteria
     	maxIter::Int          - maximum number of iterations
-	
+		HesPrec				  - A preconditioner for the Hessian.
 	Constructor:
 		getInverseParam
 	
@@ -108,6 +108,7 @@ module InverseSolve
 	include("regularizers.jl")
 	include("projGNCG.jl")
 	include("projPCG.jl")
+	include("barrierGNCG.jl")
 	include("computeMisfit.jl")
 	include("computeGradMisfit.jl")
 	include("HessMatVec.jl")
