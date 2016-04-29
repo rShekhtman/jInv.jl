@@ -74,3 +74,11 @@ x1, = projGNCG(x0,pInv,pMis)
 pInv.maxIter = 5
 x2, = projGNCG(x0,pInv,pMisRefs)
 @test norm(x1-x2)/norm(x1) < 1e-12
+
+
+pInv.maxIter = 5
+x1, = barrierGNCG(x0,pInv,pMis)
+pInv.maxIter = 5
+x2, = barrierGNCG(x0,pInv,pMisRefs)
+@test norm(x1-x2)/norm(x1) < 1e-12
+

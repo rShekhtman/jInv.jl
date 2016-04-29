@@ -61,7 +61,11 @@ function getEdgeAverageMatrix(Mesh::AbstractTensorMesh)
 			A1 = kron(av(Mesh.n[3]),kron(av(Mesh.n[2]),speye(Mesh.n[1]))) 
 			A2 = kron(av(Mesh.n[3]),kron(speye(Mesh.n[2]),av(Mesh.n[1]))) 
 			A3 = kron(speye(Mesh.n[3]),kron(av(Mesh.n[2]),av(Mesh.n[1])))
-			Mesh.Ae = (1/3)*[A1 A2 A3]
+			Mesh.Ae = [A1 A2 A3]
+		elseif Mesh.dim==2
+			A1 = kron(av(Mesh.n[2]),speye(Mesh.n[1]))
+			A2 = kron(speye(Mesh.n[2]),av(Mesh.n[1]))
+			Mesh.Ae = [A1 A2]
 		else
 			error("getEdgeAverageMatrix not implemented fot $(Mesh.dim)D Meshes")
 		end

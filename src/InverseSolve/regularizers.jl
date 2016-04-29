@@ -1,4 +1,4 @@
-export diffusionReg, wdiffusionReg, wTVReg, wdiffusionRegNodal,computeRegularizer,smallnessReg
+export diffusionReg, wdiffusionReg, wTVReg, wdiffusionRegNodal,wTVRegNodal,computeRegularizer,smallnessReg,logBarrier,logBarrierSquared
 
 function computeRegularizer(regFun::Function,mc::Vector,mref::Vector,MInv::AbstractMesh,alpha)
 	R,dR,d2R = regFun(mc,mref,MInv)
@@ -157,9 +157,11 @@ function wTVReg(m::Vector,mref,M::AbstractMesh; Iact=1.0, C=[],eps=1e-3)
 	Div  = Iact'*(Div*Wt)   # project to the active cells
 	V    = getVolume(M); v = diag(V)
 	Af   = getFaceAverageMatrix(M)
+	
+	wTV  = sqrt(Af*(Div'*dm).^2 .+eps);
 
-	Rc   = dot(v,sqrt(Af*(Div'*dm).^2 .+eps))
-	d2R  = Div*sdiag(Af'*(v./sqrt(Af*(Div'*dm).^2 .+eps)))*Div'
+	Rc   = dot(v,wTV);
+	d2R  = Div*sdiag(Af'*(v./wTV))*Div'
 	dR   = d2R*dm;
 	return Rc,dR,d2R
 end
@@ -184,21 +186,56 @@ end
 		d2R   - Hessian
 """
 
+# function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])	
+	# dm = m.-mref;
+	# if isempty(C)
+		# C = [1,1,1,1,1e-5];
+	# end
+	# if M.dim==3
+		# Wt   = sdiag([C[1]*ones((M.n[3]+1)*(M.n[2]+1)*(M.n[1]));C[2]*ones((M.n[3]+1)*(M.n[2])*(M.n[1]+1));C[3]*ones((M.n[3])*(M.n[2]+1)*(M.n[1]+1))]);
+	# else
+		# Wt   = sdiag([C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))]);
+	# end
+	# Grad   = Wt*getNodalGradientMatrix(M)*Iact
+	# d2R = Grad'*Grad;
+	# d2R += C[4]*speye(length(m));
+	# dR  = d2R*dm;
+	# Rc  = 0.5*dot(dm,dR);
+	# if isnan(Rc)
+		# dump(m)
+	# end
+   # return Rc,dR,d2R
+# end	 
+
+
 function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])	
 	dm = m.-mref;
 	if isempty(C)
 		C = [1,1,1,1,1e-5];
 	end
 	if M.dim==3
-		Wt   = sdiag([C[1]*ones((M.n[3]+1)*(M.n[2]+1)*(M.n[1]));C[2]*ones((M.n[3]+1)*(M.n[2])*(M.n[1]+1));C[3]*ones((M.n[3])*(M.n[2]+1)*(M.n[1]+1))]);
+		Wt   = [C[1]*ones((M.n[3]+1)*(M.n[2]+1)*(M.n[1]));C[2]*ones((M.n[3]+1)*(M.n[2])*(M.n[1]+1));C[3]*ones((M.n[3])*(M.n[2]+1)*(M.n[1]+1))];
 	else
-		Wt   = sdiag([C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))]);
+		Wt   = [C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))];
 	end
-	Grad   = Wt*getNodalGradientMatrix(M)*Iact
-	d2R = Grad'*Grad;
-	d2R += C[4]*speye(length(m));
+	
+	V    = getVolume(M);
+	Af   = getEdgeAverageMatrix(M)
+	v    = (Af'*diag(V))
+	Wt   = sdiag(Wt.*(v.*Wt));
+	
+	Av = getNodalAverageMatrix(M);
+	
+	mass = Iact'*Av'*V*Av*Iact;
+	
+	
+	Grad   = getNodalGradientMatrix(M)*Iact;
+	
+	d2R = Grad'*Wt*Grad;
+	d2R += C[4]*mass;
 	dR  = d2R*dm;
 	Rc  = 0.5*dot(dm,dR);
+	
 	if isnan(Rc)
 		dump(m)
 	end
@@ -206,12 +243,148 @@ function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, 
 end	 
 
 
-# function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
+
+function wTVRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])	
+	dm = m.-mref;
+	if isempty(C)
+		C = [1,1,1,1,1e-5];
+	end
+	eps = 1e-3;
+	if M.dim==3
+		Wt   = sdiag([C[1]*ones((M.n[3]+1)*(M.n[2]+1)*(M.n[1]));C[2]*ones((M.n[3]+1)*(M.n[2])*(M.n[1]+1));C[3]*ones((M.n[3])*(M.n[2]+1)*(M.n[1]+1))]);
+	else
+		Wt   = sdiag([C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))]);
+	end
 	
-	# G   = getNodalGradientMatrix(M)*Iact
-	# d2R = G'*G
-	# dR  = d2R*m
-	# Rc  = 0.5*dot(m,dR)
-   # return Rc,dR,d2R
-# end	 
-   
+	
+	V    = getVolume(M);
+	Av = getNodalAverageMatrix(M);
+	mass = Iact'*Av'*V*Av*Iact;
+	d2R  = C[4]*mass;
+	Rc   = 0.5*dot(dm,d2R*dm);
+	
+	v      = diag(V)
+	Af     = getEdgeAverageMatrix(M)	
+	Grad   = Wt*getNodalGradientMatrix(M)*Iact;
+	wTV    = sqrt(Af*((Grad*dm).^2+eps));
+	Rc     += dot(v,wTV);
+	d2R    += Grad'*sdiag(Af'*(v./wTV))*Grad; 
+	dR     = d2R*dm
+	if isnan(Rc)
+		dump(m)
+	end
+   return Rc,dR,d2R
+end	 
+
+
+"""
+	Rc,dR,d2R = logBarrier(m::Vector, z::Vector, M::AbstractMesh,low::Vector,high::Vector, epsilon)
+	
+	Computes logBarrier regularizer
+	
+	R = -log(1 - ((m-high)/epsilon).^2) if high-epsilon <  m < high
+					0					if low+epsilon  <= m <= high-epsilon
+		-log(1 - ((m-low)/epsilon).^2)	if low          <  m < low+epsilon
+		
+	Input:
+		m     	- model
+		z     	- not being used. Here for compatibility.
+		M     	- Mesh. not being used. Here for compatibility.
+		low   	- low bound for each coordinate.
+		high  	- high bound for each coordinate.
+		epsilon - layer width of the barier. 
+	
+	Output
+		g    - value of regularizer
+		dg    - gradient w.r.t. m
+		d2g   - Hessian (diagonal matrix). Second derivative is not continous.
+"""
+
+
+function logBarrier(m::Vector,z::Vector,M::AbstractMesh, low::Vector, high::Vector ,epsilon = min(0.1*abs(low),0.1*abs(high))) 
+	z = copy(m);
+	indProj = zeros(length(m));
+	
+	if length(find(m.>=high)) + length(find(m.<=low))>0
+		error("m should be strictly in between low and high ",length(find(m.>=high)) + length(find(m.<=low)));
+	end
+	
+	low = low + epsilon;
+	high = high - epsilon;
+	t = z.<low;
+	indProj[t]  = 1.0;
+	z[t]  = low[t];
+	t = z.>high;
+	indProj[t] = 1.0;
+	z[t] = high[t];
+		
+	e 	= (epsilon+1e-10);
+	dm  = (m-z)./e;
+	f   = 1 - dm.^2; # > 0
+	if minimum(f) < 0.0
+		error("negative f");
+	end
+	df  = (-2.0).*indProj.*(dm./e);   
+	d2f = (-2.0).*(indProj./(e.^2));
+		
+	g   = -sum(log(f));
+	dg  = -df./f;
+	d2g = dg.^2 - d2f./f  ;
+	return g,dg,sdiag(d2g);
+end
+
+
+"""
+	Rc,dR,d2R = logBarrierSquared(m::Vector, z::Vector, M::AbstractMesh,low::Vector,high::Vector, epsilon)
+	
+	Computes logBarrier regularizer
+	
+	R = (log(1 - ((m-high)/epsilon).^2))^2 if high-epsilon <  m < high
+					0					   if low+epsilon  <= m <= high-epsilon
+		(log(1 - ((m-low)/epsilon).^2))^2  if low          <  m < low+epsilon
+		
+	Input:
+		m     	- model
+		z     	- not being used. Here for compatibility.
+		M     	- Mesh. not being used. Here for compatibility.
+		low   	- low bound for each coordinate.
+		high  	- high bound for each coordinate.
+		epsilon - layer width of the barier. 
+	
+	Output
+		g    - value of regularizer
+		dg    - gradient w.r.t. m
+		d2g   - Gauss Newton Hessian approximation (diagonal matrix). Second derivative approx is continous.
+"""
+	
+	
+function logBarrierSquared(m::Vector,z::Vector,M::AbstractMesh, low::Vector, high::Vector ,epsilon = min(0.1*abs(low),0.1*abs(high))) 
+	if length(find(m.>=high)) + length(find(m.<=low))>0
+		error("m should be in between low and high");
+	end
+	z = copy(m);
+	indProj = zeros(length(m));
+	low = low + epsilon;
+	high = high - epsilon;
+	t = z.<low;
+	indProj[t]  = 1.0;
+	z[t]  = low[t];
+	t = z.>high;
+	indProj[t] = 1.0;
+	z[t] = high[t];
+		
+	e 	= (epsilon+1e-10);
+	dm  = (m-z)./e;
+	f   = 1 - dm.^2; # > 0
+	if minimum(f) < 0.0
+		error("negative f");
+	end
+	df  = (-2.0).*indProj.*(dm./e);   
+		
+	r   = log(f);
+	dr  = df./f;
+	g   = 0.5*dot(r,r);
+	dg  = dr.*r;
+	d2g = dr.^2;
+	return g,dg,sdiag(d2g);
+end
