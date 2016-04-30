@@ -1,7 +1,8 @@
 export getFaceAverageMatrix, getEdgeAverageMatrix, getNodalAverageMatrix
 export ndgrid, meshgrid
 export getDivergenceMatrix, getNodalGradientMatrix, getCurlMatrix, getNodalLaplacianMatrix
-export getMassMatrix, getdMassMatrix
+export getEdgeMassMatrix, getdEdgeMassMatrix, getFaceMassMatrix,
+       getdFaceMassMatrix,getNodalMassMatrix,getdNodalMassMatrix
 
 function av(n)
 # A = av(n), 1D average operator
@@ -97,6 +98,133 @@ function getNodalAverageMatrix(Mesh::AbstractTensorMesh)
 	return Mesh.An
 end
 
+"""
+	function jInv.Mesh.getEdgeMassMatrix(mesh,sigma)
+	
+	Returns mass matrix on cell edges, weighted by vector sigma.
+	Matrix is always constructed. Uses pre-constructed edge averaging
+	and cell volume matrices if available.
+	
+	Input: 
+		Mesh::Abstract Mesh
+	       sigma::Vector
+	
+	Output:
+		SparseMatrixCSC{Float64,Int64}
+"""
+function getEdgeMassMatrix(M::AbstractMesh,sigma::Vector)
+
+	Ae   = getEdgeAverageMatrix(M)
+	V    = getVolume(M)
+	Masse    = sdiag(Ae'*(V*vec(sigma)))
+	return Masse
+end
+
+"""
+	function jInv.Mesh.getdEdgeMassMatrix(mesh,v)
+	
+	Returns derivative of edge mass matrix. Matrix is always 
+	constructed. Uses pre-constructed edge averaging
+	and cell volume matrices if available.
+	
+	Input: 
+		Mesh::Abstract Mesh
+		   v::Vector
+	
+	Output:
+		SparseMatrixCSC{Float64,Int64}
+"""
+function getdEdgeMassMatrix(M::AbstractMesh,v::Vector)
+   # Derivative
+
+	Ae   = getEdgeAverageMatrix(M)
+	V    = getVolume(M)
+	return sdiag(v)*Ae'*V
+end
+
+"""
+	function jInv.Mesh.getFaceMassMatrix(Mesh,sigma)
+	
+	Returns face mass matrix, weighted by vector sigma. 
+	Matrix is always constructed. Uses pre-constructed face averaging
+	and cell volume matrices if available.
+	
+	Input: 
+		Mesh::Abstract Mesh
+	       sigma::Vector
+		
+	
+	Output:
+		SparseMatrixCSC{Float64,Int64}
+"""
+function getFaceMassMatrix(M::AbstractMesh,sigma::Vector)
+	Af    = getFaceAverageMatrix(M)
+	V     = getVolume(M)
+	Massf = sdiag(Af'*(V*sigma))
+	return Massf
+end
+
+"""
+	function jInv.Mesh.getdFaceMassMatrix(Mesh,v)
+	
+	Returns derivative of face mass matrix. Matrix is always 
+	constructed. Uses pre-constructed face averaging
+	and cell volume matrices if available.
+	
+	Input: 
+		Mesh::Abstract Mesh
+		   v::Vector
+	
+	Output:
+		SparseMatrixCSC{Float64,Int64}
+"""
+function getdFaceMassMatrix(M::AbstractMesh,v::Vector)
+	Af    = getFaceAverageMatrix(M)
+	V     = getVolume(M)
+	Massf = sdiag(v)*Af'*V
+	return Massf
+end
+
+"""
+	function jInv.Mesh.getNodalMassMatrix(Mesh,sigma)
+	
+	Returns nodal mass matrix, weighted by vector sigma. 
+	Matrix is always constructed. Uses pre-constructed nodal averaging
+	and cell volume matrices if available.
+	
+	Input: 
+		Mesh::Abstract Mesh
+	       sigma::Vector
+	
+	Output:
+		SparseMatrixCSC{Float64,Int64}
+"""
+function getNodalMassMatrix(M::AbstractMesh,sigma::Vector)
+    An = getNodalAverageMatrix(M)
+    V = getVolume(M)
+    Mn = spdiagm(An'*(V*sigma))
+  return Mn
+end
+
+"""
+	function jInv.Mesh.getdNodalMassMatrix(Mesh,v)
+	
+	Returns derivative of nodal mass matrix. Matrix is always 
+	constructed. Uses pre-constructed nodal averaging
+	and cell volume matrices if available.
+	
+	Input: 
+		Mesh::Abstract Mesh
+		   v::Vector
+	
+	Output:
+		SparseMatrixCSC{Float64,Int64}
+"""
+function getdNodalMassMatrix(M::AbstractMesh,v::Vector)
+	An  = getNodalAverageMatrix(M)
+	V   = getVolume(V)
+	dMn = spdiagm(v)*An'*V
+end
 
 # --- ndgrid
 ndgrid(v::AbstractVector) = copy(v)

@@ -32,11 +32,11 @@ function checkDerivative(f::Function,x0;out::Bool=true,tol::Float64=1.9,nSuccess
 		println(@sprintf("%9s\t%9s\t%9s\t%9s\t%9s\t%5s","h","E0","E1","O1","O2","OK?"))
 	end
 	
-	f0,dvf = f(x0,v)
-	nf0 = norm(f0)
-	#dvf   = real(dvf)
-	Error = zeros(10,2)
-	Order = zeros(10,2)
+	f0,dvf  = f(x0,v)
+	nf0     = norm(f0)
+	#dvf    = real(dvf)
+	Error   = zeros(10,2)
+	Order   = zeros(10,2)
 	Success = zeros(10)
 	for j=1:10
 		ft = f(x0+10.0^(-j)*v)            # function value

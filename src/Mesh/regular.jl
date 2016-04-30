@@ -2,7 +2,6 @@ export RegularMesh, getRegularMesh
 export getCellCenteredGrid, getNodalGrid, getEdgeGrids, getFaceGrids
 export getCellCenteredAxes, getNodalAxes
 export getVolume, getVolumeInv, getFaceArea, getFaceAreaInv, getLength, getLengthInv
-export getEdgeMassMatrix
 
 """
 	type jInv.Mesh.RegularMesh <: AbstractTensorMesh
