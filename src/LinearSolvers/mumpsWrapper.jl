@@ -1,4 +1,4 @@
-export MUMPSsolver, getMUMPSsolver,solveLinearSystem,copySolver
+export MUMPSsolver, getMUMPSsolver,copySolver
 
 """
 type MUMPSsolver
@@ -33,7 +33,6 @@ end
 
 	
 if hasMUMPS
-	using MUMPS
 		
 	function getMUMPSsolver(Ainv=[],doClear=1,ooc=0,sym=0)
 		return MUMPSsolver(Ainv,doClear,ooc,sym,0,0.0,0,0.)

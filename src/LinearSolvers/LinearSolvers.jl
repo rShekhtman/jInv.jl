@@ -6,15 +6,20 @@ module LinearSolvers
 	using KrylovMethods
 	
 	# check if MUMPS can be used
-	const minMUMPSversion = VersionNumber(0,0,1)
 	hasMUMPS=false
-	vMUMPS = VersionNumber(0,0,0)
 	try 
-		vMUMPS = Pkg.installed("MUMPS")
-		hasMUMPS = vMUMPS >= minMUMPSversion
+		using MUMPS
+		hasMUMPS = true
 	catch 
 	end
 	
+	# check if Pardiso is installed
+	hasPardiso = false
+	try
+		using Pardiso
+		hasPardiso = true
+	catch
+	end
 	
 	# check if ParSPMatVec is available
 	hasParSpMatVec = false
@@ -29,7 +34,7 @@ module LinearSolvers
 		using ParSpMatVec
 	end
 	
-	export solveLinearSystem
+	export solveLinearSystem!,solveLinearSystem
 	
 	solveLinearSystem(A,B,param::AbstractSolver,doTranspose::Int=0) = solveLinearSystem!(A,B,zeros(eltype(B),size(B)),param,doTranspose)
 
@@ -37,6 +42,7 @@ module LinearSolvers
 	# include("pcgWrapper.jl")
 	include("iterativeWrapper.jl")
 	include("blockcg.jl")
+	include("PardisoWrapper.jl")
 	# include("julia.jl")
 	
 	import jInv.Utils.clear!
@@ -44,5 +50,7 @@ module LinearSolvers
 	function clear!(M::AbstractSolver)
 		M.Ainv = []
 	end
+	
+	export clear!
 
 end # module LinearSolvers
