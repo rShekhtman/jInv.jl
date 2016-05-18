@@ -18,7 +18,7 @@ Fields:
 	   
 Constructors:
 
-getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=identity) 
+getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0)) 
 
 getMisfitParam(pForRFs::Array{RemoteRef{Channel{Any}}}, Wd::Array, dobs::Array, misfit::Function, 
 							Iact,sigmaBack::Vector,
@@ -41,7 +41,7 @@ function jInv.InverseSolve.getMisfitParam
 Required Input:	
 		
 Input for a call: 
-	getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=identity) 
+	getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0)) 
 	
 	pFor::ForwardProbType  - forward problem
 	Wd                     - inverse standard deviation of data

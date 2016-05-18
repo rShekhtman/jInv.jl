@@ -239,6 +239,7 @@ function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, 
 	if isnan(Rc)
 		dump(m)
 	end
+	clear(M);
    return Rc,dR,d2R
 end	 
 
@@ -273,6 +274,7 @@ function wTVRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 	if isnan(Rc)
 		dump(m)
 	end
+	clear(M);
    return Rc,dR,d2R
 end	 
 
