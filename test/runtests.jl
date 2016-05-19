@@ -28,5 +28,13 @@ catch
 	warn("InverseSolve had test errors")
 end
 
+try 
+	include("LinearSolvers/testLinearSolvers.jl")
+catch
+	allPassed = false
+	warn("LinearSolvers had test errors")
+end
+
+
 @test allPassed == true
 

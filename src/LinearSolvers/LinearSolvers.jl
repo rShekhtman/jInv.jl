@@ -36,7 +36,9 @@ module LinearSolvers
 	include("mumpsWrapper.jl")
 	# include("pcgWrapper.jl")
 	include("iterativeWrapper.jl")
-	include("blockcg.jl")
+	include("blockIterativeWrapper.jl")
+	# include("blockcg.jl")
+	# include("blockbicgstb.jl")
 	# include("julia.jl")
 	
 	import jInv.Utils.clear!
