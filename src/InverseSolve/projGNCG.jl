@@ -221,10 +221,10 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 		updateHis!(iter,His,Jc,F,Dc,R,alpha[1],countnz(Active),stepNorm,tMis,tReg)
 	
 		dumpResults(mc,Dc,iter,pInv,pMis);
-		if iter >= maxIter
-			break
-		elseif stepNorm < stepTol
+		if stepNorm < stepTol
 			outerFlag = 1
+			break
+		elseif iter >= maxIter
 			break
 		end
 		# Evaluate gradient

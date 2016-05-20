@@ -82,3 +82,15 @@ pInv.maxIter = 5
 x2, = barrierGNCG(x0,pInv,pMisRefs)
 @test norm(x1-x2)/norm(x1) < 1e-12
 
+#Test iterated Tikhonov
+pInv.maxIter = 2
+pInv.alpha   = 100.
+nAlpha = 3
+alphaFac = 10.
+targetMisfit = 20.0
+x1,Dc,flag1,     = iteratedTikhonov(x0,pInv,pMis,nAlpha,alphaFac,targetMisfit)
+pInv.alpha = 100.
+pInv.mref  = x0
+x2,Dc,flag2,hist = iteratedTikhonov(x0,pInv,pMisRefs,nAlpha,alphaFac,targetMisfit)
+@test typeof(hist) <: Array{InverseSolve.projGNCGhis}
+@test norm(x1-x2)/norm(x1) < 1e-12

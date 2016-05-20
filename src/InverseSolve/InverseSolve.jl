@@ -112,5 +112,6 @@ module InverseSolve
 	include("computeMisfit.jl")
 	include("computeGradMisfit.jl")
 	include("HessMatVec.jl")
+	include("iteratedTikhonov.jl")
 	
 end

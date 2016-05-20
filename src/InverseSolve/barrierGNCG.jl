@@ -169,15 +169,14 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1, indCr
 		
 		
 		dumpResults(mc,Dc,iter,pInv,pMis);
-		
-		if iter >= maxIter
-			break
-		elseif stepNorm < stepTol
+		if stepNorm < stepTol
 			outerFlag = 1
 			break
+		elseif iter >= maxIter
+			break
 		end
+		
 		# Evaluate gradient
-
 		tic()
 		if isempty(indCredit)
 			dF = computeGradMisfit(sig,Dc,pMis)
