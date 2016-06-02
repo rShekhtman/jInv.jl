@@ -51,6 +51,7 @@ module LinearSolvers
 	include("iterativeWrapper.jl")
 	include("blockIterativeWrapper.jl")
 	include("PardisoWrapper.jl")
+	include("juliaWrapper.jl")
 	
 	import jInv.Utils.clear!
 
