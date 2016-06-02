@@ -36,7 +36,7 @@ type BlockIterativeSolver<: AbstractSolver
 	nIter::Int
 	nBuildPC::Int
 	timePC::Real
-	timeCG::Real
+	timeSolve::Real
 	timeMV::Real
 end
 
@@ -130,7 +130,7 @@ function solveLinearSystem!(A,B,X,param::BlockIterativeSolver,doTranspose=0)
 	X,flag,err,iter = param.IterMethod(Af,B,X=X,M=param.Ainv,tol=param.tol,
 										maxIter=param.maxIter,out=param.out)
 	param.nIter+=iter*nrhs
-	param.timeCG+=toq();
+	param.timeSolve+=toq();
 	return X, param
 end # function solveLinearSystem 
 
