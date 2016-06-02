@@ -6,10 +6,17 @@ module LinearSolvers
 	using KrylovMethods
 	
 	# check if MUMPS can be used
+	const minMUMPSversion = VersionNumber(0,0,1)
 	hasMUMPS=false
 	try 
 		using MUMPS
 		hasMUMPS = true
+		if myid()==1
+			vMUMPS = Pkg.installed("MUMPS")
+			if vMUMPS < minMUMPSversion; 
+				warn("MUMPS is outdated! Please update to version $(minMUMPSversion) or higher.")
+			end
+		end
 	catch 
 	end
 	
@@ -24,14 +31,16 @@ module LinearSolvers
 	# check if ParSPMatVec is available
 	hasParSpMatVec = false
 	const minVerParSpMatVec = VersionNumber(0,0,1)
-		vParSpMatVec = VersionNumber(0,0,0)
-	try 
-		vParSpMatVec = Pkg.installed("ParSpMatVec")
-		hasParSpMatVec = vParSpMatVec>=minVerParSpMatVec
-	catch 
-	end
-	if hasParSpMatVec
+	try 	
 		using ParSpMatVec
+		hasParSpMatVec = true
+		if myid()==1
+			vParSpMatVec = Pkg.installed("ParSpMatVec")
+			if vParSpMatVec < minVerParSpMatVec; 
+				warn("ParSpMatVec is outdated! Please update to version $(minVerParSpMatVec) or higher.")
+			end
+		end
+	catch 
 	end
 	
 	export solveLinearSystem!,solveLinearSystem
@@ -39,11 +48,9 @@ module LinearSolvers
 	solveLinearSystem(A,B,param::AbstractSolver,doTranspose::Int=0) = solveLinearSystem!(A,B,zeros(eltype(B),size(B)),param,doTranspose)
 
 	include("mumpsWrapper.jl")
-	# include("pcgWrapper.jl")
 	include("iterativeWrapper.jl")
-	include("blockcg.jl")
+	include("blockIterativeWrapper.jl")
 	include("PardisoWrapper.jl")
-	# include("julia.jl")
 	
 	import jInv.Utils.clear!
 

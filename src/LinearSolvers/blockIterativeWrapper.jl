@@ -1,7 +1,7 @@
-export IterativeSolver,getIterativeSolver,solveLinearSystem!
+export BlockIterativeSolver,getBlockIterativeSolver,solveLinearSystem!
 
 """ 
-type jInv.LinearSolvers.IterativeSolver <: AbstractSolver
+type BlockIterativeSolver
 	
 Fields:
 
@@ -17,13 +17,12 @@ Fields:
 	isTranspose - if true, transpose(A) is provided to solver, else A is proved to solver
 		      default=false, use isTranspose=true for efficiency with caution
 		      note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
+	
 
-Example:
-
-	getIterativeSolver(cg)
-
+Example
+getBlockIterativeSolver()
 """
-type IterativeSolver<: AbstractSolver
+type BlockIterativeSolver<: AbstractSolver
 	IterMethod::Function
 	PC::Symbol
 	maxIter::Int
@@ -37,27 +36,26 @@ type IterativeSolver<: AbstractSolver
 	nIter::Int
 	nBuildPC::Int
 	timePC::Real
-	timeSolve::Real
+	timeCG::Real
 	timeMV::Real
 end
 
 """
-function jInv.LinearSolvers.getIterativeSolver
+function jInv.LinearSolvers.getBlockIterativeSolver
 	
-constructs IterativeSolver
+constructs BlockIterativeSolver
 
 Required Input:
 
 	IterMethod::Function   - function handle for linear solvers 
-		Inputs are: (A,b,M), A is matrix, b is right hand side, M is preconditioner
-			Examples: IterMethod = KrylovMethods.cg   #KrylovMethods.cg already has required API
-				  IterMethod(A,b;M=M,tol=1e-1,maxIter=10,out=-1) =
-				                  bicgstb(A,b,M1=M,tol=tol,maxIter=maxIter,out=out)
-				  IterMethod(A,b;M=M,tol=1e-1,maxIter=10,out=-1)  = 
-				                  gmres(A,b,5,M1=M,tol=tol,maxIter=maxIter,out=out)
-			The keyword arguments of IterMethod for bicgstb and gmres
+		Inputs are: (A,B,M), A is matrix, B are right hand sides, M is preconditioner
+			Examples: 
+				  IterMethod = blockCG
+				  IterMethod(A,B;M=M,tol=1e-1,maxIter=10,out=-1) =
+				                  blockBiCGSTB(A,b,M1=M,tol=tol,maxIter=maxIter,out=out)
+			The keyword arguments of IterMethod for blockBiCGSTB
 			will be initialized with the fields in the IterativeSolver type.
-		Outputs are: (x,flag,err,iter), x is approximate solution
+		Outputs are: (X,flag,err,iter), X are approximate solutions
 
 Optional Inputs:
 
@@ -73,59 +71,68 @@ Optional Inputs:
 		              default=false, use isTranspose=true for efficiency with caution
 		              note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
 """
-function getIterativeSolver(IterMethod::Function;PC=:ssor,maxIter=500,tol=1e-5,
-					Ainv=identity,out=-1,doClear::Bool=true,nthreads::Int=4,sym=0,isTranspose=false)
- 	return IterativeSolver(IterMethod,PC,maxIter,tol,Ainv,out,doClear,nthreads,sym,isTranspose,0,0,.0,.0,.0)
+function getBlockIterativeSolver(IterMethod;PC=:ssor,maxIter=10,tol=1e-4,Ainv=identity,
+	out=-1,doClear::Bool=true,ortho::Bool=false,nthreads::Int=4,sym=0,isTranspose=false)
+	return BlockIterativeSolver(IterMethod,PC,maxIter,tol,Ainv,out,doClear,nthreads,sym,isTranspose,0,0,.0,.0,.0)
 end
 
-function solveLinearSystem!(A,B,X,param::IterativeSolver,doTranspose=0)
+
+function solveLinearSystem!(A,B,X,param::BlockIterativeSolver,doTranspose=0)
 	if param.doClear
 		# clear preconditioner
 		clear!(param)
 		param.doClear=false
 	end
 	
-	# build preconditioner
+	
+	n = size(B,1)
+	nrhs = size(B,2)
+	# build preconditioner The preconditioners here are symmetric anyway.
 	if param.Ainv == []
 		if param.PC==:ssor
 			OmInvD = 1./diag(A);
-			x      = zeros(eltype(A),size(B,1))
-			M(r)   = (x[:]=0.0; tic(); x=ssorPrecTrans!(A,x,r,OmInvD); param.timePC+=toq(); return x);
+			Xt      = zeros(n,nrhs)
+			M(R)   = (Xt[:]=0.0; tic(); Xt=ssorPrecTrans!(A,Xt,R,OmInvD); param.timePC+=toq(); return Xt);
 			param.Ainv= M
 		elseif param.PC==:jac
 			OmInvD = 1./diag(A)
-			M(r)   = (tic(); x=r.*OmInvD; param.timePC+=toq(); return x); 
+			M(R)   = (tic(); Xt=R.*OmInvD; param.timePC+=toq(); return Xt); 
 			param.Ainv= M
 		else 
-			error("Iterativesolver: preconditioner $(param.PC) not implemented.")
+			error("PCGsolver: preconditioner $(param.PC) not implemented.")
 		end
 		param.nBuildPC+=1
 	end
 	
+	if issparse(B)
+		B = full(B);
+	end
 	# solve systems
-	y     = zeros(eltype(A),size(X,1))
+	Y    = zeros(n,nrhs)
 	doTranspose = (param.isTranspose) ? mod(doTranspose+1,2) : doTranspose
 	if hasParSpMatVec
 		if (param.sym==1) ||  ((param.sym != 1) && (doTranspose == 1)) 
-			Af(x) = (y[:]=0.0; tic(); ParSpMatVec.Ac_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y,param.nthreads); param.timeMV+=toq(); return y)
+			Af(X) = (Y[:]=0.0; tic(); ParSpMatVec.Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
 		elseif (param.sym != 1) && (doTranspose == 0)
-			Af(x) = (y[:]=0.0; tic(); ParSpMatVec.A_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y,param.nthreads); param.timeMV+=toq(); return y)
+			Af(X) = (Y[:]=0.0; tic(); ParSpMatVec.A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
 		end
 			
 	else
 		if (param.sym==1) ||  ((param.sym != 1) && (doTranspose == 1)) 
-			Af(x) = (y[:]=0.0; tic(); Ac_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y); param.timeMV+=toq(); return y)
+			Af(X) = (Y[:]=0.0; tic(); Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
 		elseif (param.sym != 1) && (doTranspose == 0)
-			Af(x) = (y[:]=0.0; tic(); A_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y); param.timeMV+=toq(); return y)
+			Af(X) = (Y[:]=0.0; tic(); A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
 		end
 	end
-	
+		
 	tic()
-	for i=1:size(X,2)
-		bi      = vec(full(B[:,i]))
-		X[:,i],flag,err,iter = param.IterMethod(Af,bi,M = param.Ainv,tol=param.tol,maxIter=param.maxIter,out=param.out)
-		param.nIter+=iter
-	end	
-	param.timeSolve+=toq();
+	X[:]=0.0
+	X,flag,err,iter = param.IterMethod(Af,B,X=X,M=param.Ainv,tol=param.tol,
+										maxIter=param.maxIter,out=param.out)
+	param.nIter+=iter*nrhs
+	param.timeCG+=toq();
 	return X, param
-end # function solveLinearSystem PCGsolver
+end # function solveLinearSystem 
+
+
+
