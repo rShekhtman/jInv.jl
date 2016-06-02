@@ -22,6 +22,7 @@ x,  = solveLinearSystem(Ar,b,sSym);
 println("===  Test Julia Wrapper: nonsymmetric matrices ====");
 n = 100
 sNonSym   = getJuliaSolver(sym = 0);
+sNonSym = copySolver(sNonSym);
 A = sprandn(n,n,5/n) + 10*speye(n)
 B = randn(n)
 

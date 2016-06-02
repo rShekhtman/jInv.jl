@@ -54,5 +54,5 @@ function clear!(param::JuliaSolver)
 end
 	
 function copySolver(Ainv::JuliaSolver)
-	return getJuliaSolver([],Ainv.sym,0,Ainv.doClear);
+	return getJuliaSolver(sym = Ainv.sym,doClear = Ainv.doClear);
 end
