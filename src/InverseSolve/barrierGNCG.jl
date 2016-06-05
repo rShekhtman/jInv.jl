@@ -22,7 +22,7 @@ return d;
 end
 
 
-function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1, indCredit=[],dumpResults::Function = dummy,out::Int=2)
+function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.boundsHigh - pInv.boundsLow), indCredit=[],dumpResults::Function = dummy,out::Int=2)
 
 	maxIter     = pInv.maxIter      #  Max. no. iterations.
 	pcgMaxIter  = pInv.pcgMaxIter   #  Max cg iters.
@@ -39,8 +39,6 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1, indCr
 	#  Initialization.
 	#---------------------------------------------------------------------------
 	
-	epsilon = min(epsilon,0.1*abs(low),0.1*abs(high));
-
 	# Active 	= convert(BitArray,zeros(Bool,length(mc)));  # Compute zero active set
 	
 	# logBarrierReg(m,mref,M) = logBarrier(m,mref,M,low,high,epsilon);
