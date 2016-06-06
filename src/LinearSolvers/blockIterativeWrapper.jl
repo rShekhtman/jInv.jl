@@ -112,21 +112,21 @@ function solveLinearSystem!(A,B,X,param::BlockIterativeSolver,doTranspose=0)
 	doTranspose = (param.isTranspose) ? mod(doTranspose+1,2) : doTranspose
 	if hasParSpMatVec
 		if (param.sym==1) ||  ((param.sym != 1) && (doTranspose == 1)) 
-			Af(X) = (Y[:]=0.0; tic(); ParSpMatVec.Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
+			Af(X) = (tic(); ParSpMatVec.Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
 		elseif (param.sym != 1) && (doTranspose == 0)
-			Af(X) = (Y[:]=0.0; tic(); ParSpMatVec.A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
+			Af(X) = (tic(); ParSpMatVec.A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
 		end
 			
 	else
 		if (param.sym==1) ||  ((param.sym != 1) && (doTranspose == 1)) 
-			Af(X) = (Y[:]=0.0; tic(); Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
+			Af(X) = (tic(); Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
 		elseif (param.sym != 1) && (doTranspose == 0)
-			Af(X) = (Y[:]=0.0; tic(); A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
+			Af(X) = (tic(); A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
 		end
 	end
-		
+	X[:]=0.0	
 	tic()
-	X[:]=0.0
+	
 	X,flag,err,iter = param.IterMethod(Af,B,X=X,M=param.Ainv,tol=param.tol,
 										maxIter=param.maxIter,out=param.out)
 	param.nIter+=iter*nrhs
