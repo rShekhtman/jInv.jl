@@ -116,6 +116,8 @@ function getMisfitParam(pForRF::RemoteRef{Channel{Any}}, Wd, dobs, misfit::Funct
 	pFor 		= take!(pForRF);
 	Iact 		= fetch(Iact);
 	sigmaBack 	= fetch(sigmaBack);
+	Wd              = fetch(Wd);
+	dobs            = fetch(dobs);
 	pMis 		= getMisfitParam(pFor,Wd,dobs,misfit,modelfun, prepareGlobalToLocal(Mesh2Mesh,Iact,sigmaBack,fname));
 	return pMis;
 end

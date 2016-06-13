@@ -21,26 +21,38 @@ module LinearSolvers
 	end
 	
 	# check if Pardiso is installed
+	const minPardisoVersion = VersionNumber(0,1,2)
 	hasPardiso = false
 	try
 		using Pardiso
 		hasPardiso = true
+		if myid()==1
+		  vPardiso = Pkg.installed("Pardiso")
+		  if vPardiso < minPardisoVersion
+		    warn("jInv Pardiso support requires Pardiso.jl version $(minPardisoVersion) or greater. Pardiso support will not be loaded")
+		    hasPardiso = false
+		  end
+		end
 	catch
 	end
 	
 	# check if ParSPMatVec is available
 	hasParSpMatVec = false
 	const minVerParSpMatVec = VersionNumber(0,0,1)
+		vParSpMatVec = VersionNumber(0,0,0)
 	try 	
-		using ParSpMatVec
-		hasParSpMatVec = true
-		if myid()==1
-			vParSpMatVec = Pkg.installed("ParSpMatVec")
-			if vParSpMatVec < minVerParSpMatVec; 
-				warn("ParSpMatVec is outdated! Please update to version $(minVerParSpMatVec) or higher.")
-			end
-		end
+ -		using ParSpMatVec
+ -		hasParSpMatVec = true
+ -		if myid()==1
+ -			vParSpMatVec = Pkg.installed("ParSpMatVec")
+ -			if vParSpMatVec < minVerParSpMatVec; 
+ -				warn("ParSpMatVec is outdated! Please update to version $(minVerParSpMatVec) or higher.")
+ -			end
+ -		end
 	catch 
+	end
+	if hasParSpMatVec
+		using ParSpMatVec
 	end
 	
 	export solveLinearSystem!,solveLinearSystem
