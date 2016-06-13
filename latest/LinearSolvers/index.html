@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="JuliaInv">
+  
+  <title>LinearSolvers - jInv.jl</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link href="../assets/Documenter.css" rel="stylesheet">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "LinearSolvers";
+    var mkdocs_page_input_path = "LinearSolvers.md";
+    var mkdocs_page_url = "/LinearSolvers/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="../assets/mathjaxhelper.js"></script>
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> jInv.jl</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../Mesh/">Mesh</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">LinearSolvers</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#jinvlinearsolvers">jInv.LinearSolvers</a></li>
+                
+                    <li><a class="toctree-l4" href="#supported-packages">Supported Packages</a></li>
+                
+                    <li><a class="toctree-l4" href="#list-of-types-and-methods">List of types and methods</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../InverseSolve/">InverseSolve</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../ForwardShare/">ForwardShare</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../Utils/">Utils</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">jInv.jl</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>LinearSolvers</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id='jInv.LinearSolvers-1'></a></p>
+<h1 id="jinvlinearsolvers">jInv.LinearSolvers</h1>
+<p>The <code>LinearSolvers</code> submodule provides wrappers iterative and direct solvers for linear systems such as discretized PDEs.</p>
+<p><a id='Supported-Packages-1'></a></p>
+<h2 id="supported-packages">Supported Packages</h2>
+<p>The module looks for MUMPS, Pardiso, and SpMatVec. </p>
+<p><a id='List-of-types-and-methods-1'></a></p>
+<h2 id="list-of-types-and-methods">List of types and methods</h2>
+<p><a id='jInv.LinearSolvers.BlockIterativeSolver' href='#jInv.LinearSolvers.BlockIterativeSolver'>#</a>
+<strong><code>jInv.LinearSolvers.BlockIterativeSolver</code></strong> &mdash; <em>Type</em>.</p>
+<p>type BlockIterativeSolver</p>
+<p>Fields:</p>
+<pre><code>IterMethod - iterative method to apply
+PC      - symbol, (:ssor, :jac,...)
+maxIter - maximum number of iterations
+tol     - tolerance
+Ainv    - preconditioner
+out     - flag for output
+doClear - flag for deleting preconditioner
+nthreads - number of threads for spmatvecs
+sym      - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
+isTranspose - if true, transpose(A) is provided to solver, else A is proved to solver
+          default=false, use isTranspose=true for efficiency with caution
+          note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
+</code></pre>
+
+<p>Example getBlockIterativeSolver()</p>
+<p><a id='jInv.LinearSolvers.IterativeSolver' href='#jInv.LinearSolvers.IterativeSolver'>#</a>
+<strong><code>jInv.LinearSolvers.IterativeSolver</code></strong> &mdash; <em>Type</em>.</p>
+<p>type jInv.LinearSolvers.IterativeSolver &lt;: AbstractSolver</p>
+<p>Fields:</p>
+<pre><code>IterMethod - iterative method to apply
+PC      - symbol, (:ssor, :jac,...)
+maxIter - maximum number of iterations
+tol     - tolerance
+Ainv    - preconditioner
+out     - flag for output
+doClear - flag for deleting preconditioner
+nthreads - number of threads for spmatvecs
+sym      - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
+isTranspose - if true, transpose(A) is provided to solver, else A is proved to solver
+          default=false, use isTranspose=true for efficiency with caution
+          note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
+</code></pre>
+
+<p>Example:</p>
+<pre><code>getIterativeSolver(cg)
+</code></pre>
+
+<p><a id='jInv.LinearSolvers.MUMPSsolver' href='#jInv.LinearSolvers.MUMPSsolver'>#</a>
+<strong><code>jInv.LinearSolvers.MUMPSsolver</code></strong> &mdash; <em>Type</em>.</p>
+<p>type MUMPSsolver</p>
+<p>Fields:</p>
+<pre><code>Ainv    - holds MUMPSfactorization
+doClear - flag to clear factorization
+ooc     - flag for out-of-core option
+sym     - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
+nFac    - number of factorizations performed
+facTime - cumulative time for factorizations
+nSolve  - number of solves
+solveTime - cumnulative time for solves
+</code></pre>
+
+<p>Example: </p>
+<pre><code>Ainv = getMUMPSsolver()
+</code></pre>
+
+<p><a id='jInv.LinearSolvers.jInvPardisoSolver' href='#jInv.LinearSolvers.jInvPardisoSolver'>#</a>
+<strong><code>jInv.LinearSolvers.jInvPardisoSolver</code></strong> &mdash; <em>Type</em>.</p>
+<p>type jInvPardisoSolver</p>
+<p>Fields:</p>
+<pre><code>Ainv    - holds PardisoFactorization
+doClear - flag to clear factorization
+ooc     - flag for out-of-core option
+sym     - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
+nFac    - number of factorizations performed
+facTime - cumulative time for factorizations
+nSolve  - number of solves
+solveTime - cumnulative time for solves
+</code></pre>
+
+<p>Example: </p>
+<pre><code>Ainv = getjInvPardisoSolver()
+</code></pre>
+
+<p><a id='jInv.LinearSolvers.getBlockIterativeSolver' href='#jInv.LinearSolvers.getBlockIterativeSolver'>#</a>
+<strong><code>jInv.LinearSolvers.getBlockIterativeSolver</code></strong> &mdash; <em>Function</em>.</p>
+<p>function jInv.LinearSolvers.getBlockIterativeSolver</p>
+<p>constructs BlockIterativeSolver</p>
+<p>Required Input:</p>
+<pre><code>IterMethod::Function   - function handle for linear solvers 
+    Inputs are: (A,B,M), A is matrix, B are right hand sides, M is preconditioner
+        Examples: 
+              IterMethod = blockCG
+              IterMethod(A,B;M=M,tol=1e-1,maxIter=10,out=-1) =
+                              blockBiCGSTB(A,b,M1=M,tol=tol,maxIter=maxIter,out=out)
+        The keyword arguments of IterMethod for blockBiCGSTB
+        will be initialized with the fields in the IterativeSolver type.
+    Outputs are: (X,flag,err,iter), X are approximate solutions
+</code></pre>
+
+<p>Optional Inputs:</p>
+<pre><code>PC::Symbol     - specifies preconditioner, default:ssor
+maxIter        - maximum number of iterations, default:500
+tol            - tolerance on relative residual, default=1e-5
+Ainv           - preconditioner, default=identity
+out            - flag for output, default=-1 (no output)
+doClear        - flag for clearing the preconditioner, default=true
+nthreads       - number of threads to use for matvecs (requires ParSpMatVec.jl), default=4
+sym            - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
+isTranspose    - if true, transpose(A) is provided to solver, else A is proved to solver
+                  default=false, use isTranspose=true for efficiency with caution
+                  note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
+</code></pre>
+
+<p><a id='jInv.LinearSolvers.getIterativeSolver' href='#jInv.LinearSolvers.getIterativeSolver'>#</a>
+<strong><code>jInv.LinearSolvers.getIterativeSolver</code></strong> &mdash; <em>Function</em>.</p>
+<p>function jInv.LinearSolvers.getIterativeSolver</p>
+<p>constructs IterativeSolver</p>
+<p>Required Input:</p>
+<pre><code>IterMethod::Function   - function handle for linear solvers 
+    Inputs are: (A,b,M), A is matrix, b is right hand side, M is preconditioner
+        Examples: IterMethod = KrylovMethods.cg   #KrylovMethods.cg already has required API
+              IterMethod(A,b;M=M,tol=1e-1,maxIter=10,out=-1) =
+                              bicgstb(A,b,M1=M,tol=tol,maxIter=maxIter,out=out)
+              IterMethod(A,b;M=M,tol=1e-1,maxIter=10,out=-1)  = 
+                              gmres(A,b,5,M1=M,tol=tol,maxIter=maxIter,out=out)
+        The keyword arguments of IterMethod for bicgstb and gmres
+        will be initialized with the fields in the IterativeSolver type.
+    Outputs are: (x,flag,err,iter), x is approximate solution
+</code></pre>
+
+<p>Optional Inputs:</p>
+<pre><code>PC::Symbol     - specifies preconditioner, default:ssor
+maxIter        - maximum number of iterations, default:500
+tol            - tolerance on relative residual, default=1e-5
+Ainv           - preconditioner, default=identity
+out            - flag for output, default=-1 (no output)
+doClear        - flag for clearing the preconditioner, default=true
+nthreads       - number of threads to use for matvecs (requires ParSpMatVec.jl), default=4
+sym            - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
+isTranspose    - if true, transpose(A) is provided to solver, else A is proved to solver
+                  default=false, use isTranspose=true for efficiency with caution
+                  note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../InverseSolve/" class="btn btn-neutral float-right" title="InverseSolve">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Mesh/" class="btn btn-neutral" title="Mesh"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Mesh/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../InverseSolve/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

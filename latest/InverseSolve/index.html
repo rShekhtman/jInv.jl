@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="JuliaInv">
+  
+  <title>InverseSolve - jInv.jl</title>
+  
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  <link href="../assets/Documenter.css" rel="stylesheet">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "InverseSolve";
+    var mkdocs_page_input_path = "InverseSolve.md";
+    var mkdocs_page_url = "/InverseSolve/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script> 
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="../assets/mathjaxhelper.js"></script>
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> jInv.jl</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../Mesh/">Mesh</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../LinearSolvers/">LinearSolvers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">InverseSolve</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#jinvinversesolve">jInv.InverseSolve</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../ForwardShare/">ForwardShare</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../Utils/">Utils</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">jInv.jl</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>InverseSolve</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id='jInv.InverseSolve-1'></a></p>
+<h1 id="jinvinversesolve">jInv.InverseSolve</h1>
+<p>The <code>InverseSolve</code> submodule contains misfit functions, regularizers, optimization and other tools for solving PDE parameter estimation problems. </p>
+<p><a id='jInv.InverseSolve.GlobalToLocal' href='#jInv.InverseSolve.GlobalToLocal'>#</a>
+<strong><code>jInv.InverseSolve.GlobalToLocal</code></strong> &mdash; <em>Type</em>.</p>
+<p>type jInv.InverseSolve.GlobalToLocal</p>
+<p>Maps global model to local model</p>
+<p>sigLocal = PForInv*sigGlobal + sigmaBackground</p>
+<p>Fields:     PForInv::SparseMatrixCSC - linear operator between inverse mesh and                                forward mesh, e.g., linear interpolation matrix                                and projection on active set.     sigmaBackground::Vector  - background model</p>
+<p>Constructors:     getGlobalToLocal(P::SparseMatrixCSC)  getGlobalToLocal(P::SparseMatrixCSC,sigmaBack::Vector)</p>
+<p>Example:    Mesh2Mesh = getInterpolationMatrix(Minv,Mfwd)   # Minv and Mfwd have different resolutions  sigmaBack = 1.2*ones(Minv.nc)                   # put background conductivity   gloc      = getGlobalToLocal(Mesh2Mesh,sigmaBack)</p>
+<pre><code>sigLocal     = gloc.PForInv' * sigGlobal + gloc.sigmaBack
+# this call is equivalent, but needed in case the Mesh2Mesh matrix is compressed
+sigLocalFast = interpGlobalToLocal(sigGlobal,gloc.PForInv,gloc.sigmaBack)
+</code></pre>
+
+<p><a id='jInv.InverseSolve.InverseParam' href='#jInv.InverseSolve.InverseParam'>#</a>
+<strong><code>jInv.InverseSolve.InverseParam</code></strong> &mdash; <em>Type</em>.</p>
+<pre><code>type jInv.InverseSolve.InverseParam
+
+Type storing parameters for Inversion. 
+
+Fields:
+    Minv::AbstractMesh
+    modelfun::Function    - model function (evaluated by main worker), see models.jl
+    regularizer::Function - regularizer, see regularizer.jl
+    alpha::Real           - regularization parameter
+    mref::Array           - reference model
+    boundsLow::Vector     - lower bounds for model
+    boundsHigh::Vector    - upper bounds for model
+    maxStep::Real         - maximum step in optimization
+    pcgMaxIter::Int       - maximum number of PCG iterations
+    pcgTol::Real          - tolerance for PCG
+    minUpdate::Real       - stopping criteria
+    maxIter::Int          - maximum number of iterations
+    HesPrec               - A preconditioner for the Hessian.
+Constructor:
+    getInverseParam
+
+Example: 
+    Minv = getRegularMesh(domain,n)
+    modelfun = expMod
+    regularizer(m,mref,Minv) = wdiffusionReg(m,mref,Minv)
+    alpha   = 1e-3
+    mref    = zeros(Minv.nc)
+    pInv = getInverseParam(Minv,modelfun,regularizer,alpha,mref)
+</code></pre>
+
+<p><a id='jInv.InverseSolve.MisfitParam' href='#jInv.InverseSolve.MisfitParam'>#</a>
+<strong><code>jInv.InverseSolve.MisfitParam</code></strong> &mdash; <em>Type</em>.</p>
+<p>type jInv.InverseSolve.MisfitParam</p>
+<p>Type storing information about one term in the misfit</p>
+<p>F(m) = sum_i^n phi_i(pFor(model(m)),dobs,Wd)</p>
+<p>Fields:</p>
+<pre><code>pFor::ForwardProbType  - forward problem
+Wd                     - inverse standard deviation
+dobs                   - observed data
+misfit::Function       - misfit function
+modelfun::Function     - model function (evaluated locally)
+gloc                   - mapping from inverse to forward mesh (including active cells projection).
+</code></pre>
+
+<p>Constructors:</p>
+<p>getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0)) </p>
+<p>getMisfitParam(pForRFs::Array{RemoteRef{Channel{Any}}}, Wd::Array, dobs::Array, misfit::Function,                           Iact,sigmaBack::Vector,                             Mesh2MeshRFs::Union{Array{RemoteRef{Channel{Any}}},Array{Float64}}=ones(length(pForRFs)),                           modelfun::Function=identityMod,fname="")</p>
+<p><a id='jInv.InverseSolve.HuberFun' href='#jInv.InverseSolve.HuberFun'>#</a>
+<strong><code>jInv.InverseSolve.HuberFun</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>mis,dmis,d2mis = HuberFun(dc,dobs,Wd,C)
+
+Computes misfit via
+
+    misfit(dc,dobs) = sqrt(abs(Wd*res).^2 + eps)
+
+Input:
+    dc::Array   -  simulated data
+    dobs::Array -  measured data
+    Wd::Array   -  diagional weighting
+    eps         -  conditioning parameter (default=1e-3)
+
+Output:
+    mis::Real   -  misfit
+    dmis        -  gradient
+    d2mis       -  diagonal of Hessian
+</code></pre>
+
+<p><a id='jInv.InverseSolve.SSDFun' href='#jInv.InverseSolve.SSDFun'>#</a>
+<strong><code>jInv.InverseSolve.SSDFun</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>For complex data misfit is computed as 0.5*|real(dc)-(dobs)|_Wd^2 +  0.5*|complex(dc)-complex(dobs)|_W^2
+</code></pre>
+
+<pre><code>mis,dmis,d2mis = SSDFun(dc,dobs,Wd)
+
+Input:
+
+    dc::Array   -  simulated data
+    dobs::Array -  measured data
+    Wd::Array   -  diagonal weighting
+
+Output:
+
+    mis::Real   -  misfit, 0.5*|dc-dobs|_Wd^2
+    dmis        -  gradient
+    d2mis       -  diagonal of Hessian
+</code></pre>
+
+<p><a id='jInv.InverseSolve.boundMod' href='#jInv.InverseSolve.boundMod'>#</a>
+<strong><code>jInv.InverseSolve.boundMod</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>sigma,dsigma = boundMod(m;boundLow=0.0,boundHigh=1.0)
+
+maps model parameter to conductivity via
+
+    sigma = 0.5*(boundHigh-boundLow) * (tanh(m)+1.0 ) + boundLow
+</code></pre>
+
+<p><a id='jInv.InverseSolve.computeMisfit' href='#jInv.InverseSolve.computeMisfit'>#</a>
+<strong><code>jInv.InverseSolve.computeMisfit</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>Dc,F,dF,d2F = computeMisfit(...)
+
+Computes misfit for PDE parameter estimation problem.
+
+computeMisfit has several options.
+</code></pre>
+
+<p><a id='jInv.InverseSolve.diffusionReg' href='#jInv.InverseSolve.diffusionReg'>#</a>
+<strong><code>jInv.InverseSolve.diffusionReg</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>Rc,dR,d2R = diffusionReg(m,mref,M,Iact=1.0)
+
+Compute diffusion regularizer
+    0.5*||GRAD*(m-mref)||_V^2
+
+Input:
+    m     - model
+    mref  - reference model
+    M     - Mesh
+    Iact  - projector on active cells
+
+Output
+    Rc    - value of regularizer
+    dR    - gradient w.r.t. m
+    d2R   - Hessian
+</code></pre>
+
+<p><a id='jInv.InverseSolve.expMod' href='#jInv.InverseSolve.expMod'>#</a>
+<strong><code>jInv.InverseSolve.expMod</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>sigma,dsigma = expMod(model)
+
+maps model parameter to conductivity via
+
+sigma(m) = exp(m)
+</code></pre>
+
+<p><a id='jInv.InverseSolve.fMod' href='#jInv.InverseSolve.fMod'>#</a>
+<strong><code>jInv.InverseSolve.fMod</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>sigma,dsigma = fMod(model;f::Function=identity,df::Function=m-&gt;speye(length(m)))
+
+maps model parameter to conductivity via
+
+sigma(m) = f(m) and dsigma(m) = sdiag(df(m))
+</code></pre>
+
+<p><a id='jInv.InverseSolve.getInverseParam' href='#jInv.InverseSolve.getInverseParam'>#</a>
+<strong><code>jInv.InverseSolve.getInverseParam</code></strong> &mdash; <em>Function</em>.</p>
+<p>function jInv.InverseSolve.getInverseParam(...)</p>
+<p>Constructs an InverseParam</p>
+<p>Required Input:</p>
+<pre><code>Minv::AbstractMesh    - mesh of model
+modFun::Function      - model
+regularizer::Function - regularizer, see regularizer.jl
+alpha::Real           - regularization parameter
+mref                  - reference model
+boundsLow::Vector     - lower bounds for model
+boundsHigh::Vector    - upper bounds for model
+</code></pre>
+
+<p>Optional Inputs:</p>
+<pre><code>maxStep::Real=1.0     - maximum step in optimization
+pcgMaxIter::Int=10    - maximum number of PCG iterations
+pcgTol::Real          - tolerance for PCG
+minUpdate::Real=1e-4  - stopping criteria
+maxIter::Int=10       - maximum number of iterations
+</code></pre>
+
+<p><a id='jInv.InverseSolve.getMisfitParam' href='#jInv.InverseSolve.getMisfitParam'>#</a>
+<strong><code>jInv.InverseSolve.getMisfitParam</code></strong> &mdash; <em>Function</em>.</p>
+<p>function jInv.InverseSolve.getMisfitParam</p>
+<p>Required Input: </p>
+<p>Input for a call:   getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0)) </p>
+<pre><code>pFor::ForwardProbType  - forward problem
+Wd                     - inverse standard deviation of data
+dobs                   - observed data
+misfit::Function       - Misfit function 
+modelfun::Function     - model function. If all misfits have same model function, 
+                         put modelfun in inverseParam and identityMod here for efficiency.
+gloc                   - mapping from inverse to forward mesh (default: identity). See globalToLocal.jl
+</code></pre>
+
+<p>Input for a call:   getMisfitParam(pForRFs::Array{RemoteRef{Channel{Any}}}, Wd::Array, dobs::Array, misfit::Function,                           Iact,sigmaBack::Vector, Mesh2MeshRFs::Union{Array{RemoteRef{Channel{Any}}},Array{Float64}}=ones(length(pForRFs)),                           modelfun::Function=identityMod,fname="")</p>
+<pre><code>pForRFs::Array{RemoteRef{Channel{Any}}}                 - Array of remote references for forward problem parameters on each worker.
+Wd::Array                               - Array of inverse standard deviation for the data on each worker.
+dobs::Array                             - Array of observed data for each worker.
+misfit::Function                            - Misfit function 
+Iact                                        - Projector to active cells.
+sigmaBack::Vector                           - Background model (&quot;frozen&quot; cells).                    
+Mesh2MeshRFs::Union{Array{RemoteRef{Channel{Any}}},Array{Float64}}  - mapping from inverse to forward mesh (default: identity) 
+modelfun::Function=identityMod                      - model function. If all misfits have same model function, 
+                                      put modelfun in inverseParam and identityMod here for efficiency.
+fname=&quot;&quot;                                - (optional)
+</code></pre>
+
+<p><a id='jInv.InverseSolve.iteratedTikhonov' href='#jInv.InverseSolve.iteratedTikhonov'>#</a>
+<strong><code>jInv.InverseSolve.iteratedTikhonov</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>mc,DC = iteratedTikhonov(mc,pInv::InverseParam,pMis,nAlpha,alphaFac,
+                        targetMisfit;indCredit=[],dumpResults::Function=dummy)
+
+Perform (Projected) Gauss-NewtonCG using iterated Tikhonov procedure to decrease
+regularization parameter and update reference model after fixed number of GN iterations
+set in pInv.
+
+Input:
+       mc::Vector         - Initial guess for model
+       pInv::InverseParam - parameter for inversion
+       pMis               - misfit terms
+       nAlpha             - maximum number of allowed regularization parameter (alpha) values
+       alphaFac           - alpha decrease factor. alpha_(i+1) = alpha_i/alphaFac
+       targetMisfit       - Termination criterion. iteratedTikhonov will exit 
+                             -when data misfit &lt; targetMisfit
+       indCredit          - indices of forward problems to work on
+       dumpResults        - A function pointer for saving the results throughout the iterations.
+                             - We assume that dumpResults is dumpResults(mc,Dc,iter,pInv,pMis), 
+                             - where mc is the recovered model, Dc is the predicted data. 
+                             - If dumpResults is not given, nothing is done (dummy() is called).
+
+Output:
+       mc                 - final model
+       Dc                 - final computed data
+       tikhonovFlag       - Data misfit convergence flag
+       hist               - Iteration history. This is a vector. Each entry is
+                             - a structure containing the projGNCG history for each
+                             - alpha value.
+</code></pre>
+
+<p><a id='jInv.InverseSolve.logBarrier' href='#jInv.InverseSolve.logBarrier'>#</a>
+<strong><code>jInv.InverseSolve.logBarrier</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>Rc,dR,d2R = logBarrier(m::Vector, z::Vector, M::AbstractMesh,low::Vector,high::Vector, epsilon)
+
+Computes logBarrier regularizer
+
+R = -log(1 - ((m-high)/epsilon).^2) if high-epsilon &lt;  m &lt; high
+                0                   if low+epsilon  &lt;= m &lt;= high-epsilon
+    -log(1 - ((m-low)/epsilon).^2)  if low          &lt;  m &lt; low+epsilon
+
+Input:
+    m       - model
+    z       - not being used. Here for compatibility.
+    M       - Mesh. not being used. Here for compatibility.
+    low     - low bound for each coordinate.
+    high    - high bound for each coordinate.
+    epsilon - layer width of the barier. 
+
+Output
+    g    - value of regularizer
+    dg    - gradient w.r.t. m
+    d2g   - Hessian (diagonal matrix). Second derivative is not continous.
+</code></pre>
+
+<p><a id='jInv.InverseSolve.logBarrierSquared' href='#jInv.InverseSolve.logBarrierSquared'>#</a>
+<strong><code>jInv.InverseSolve.logBarrierSquared</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>Rc,dR,d2R = logBarrierSquared(m::Vector, z::Vector, M::AbstractMesh,low::Vector,high::Vector, epsilon)
+
+Computes logBarrier regularizer
+
+R = (log(1 - ((m-high)/epsilon).^2))^2 if high-epsilon &lt;  m &lt; high
+                0                      if low+epsilon  &lt;= m &lt;= high-epsilon
+    (log(1 - ((m-low)/epsilon).^2))^2  if low          &lt;  m &lt; low+epsilon
+
+Input:
+    m       - model
+    z       - not being used. Here for compatibility.
+    M       - Mesh. not being used. Here for compatibility.
+    low     - low bound for each coordinate.
+    high    - high bound for each coordinate.
+    epsilon - layer width of the barier. 
+
+Output
+    g    - value of regularizer
+    dg    - gradient w.r.t. m
+    d2g   - Gauss Newton Hessian approximation (diagonal matrix). Second derivative approx is continous.
+</code></pre>
+
+<p><a id='jInv.InverseSolve.projGNCG' href='#jInv.InverseSolve.projGNCG'>#</a>
+<strong><code>jInv.InverseSolve.projGNCG</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>mc,Dc,outerFlag = projGNCG(mc,pInv::InverseParam,pMis, indFor = [], dumpResults::Function = dummy)
+
+(Projected) Gauss-NewtonCG
+
+Input:
+
+    mc::Vector          - intial guess for model
+    pInv::InverseParam  - parameter for inversion
+    pMis                - misfit terms
+    indCredit           - indices of forward problems to work on
+    dumpResults         - A function pointer for saving the results throughout the iterations.
+                        - We assume that dumpResults is dumpResults(mc,Dc,iter,pInv,pMis), 
+                        - where mc is the recovered model, Dc is the predicted data. 
+                        - If dumpResults is not given, nothing is done (dummy() is called).
+    out::Int            - flag for output (-1: no output, 1: final status, 2: residual norm at each iteration)
+
+Output:
+    mc                  - final model
+    Dc                  - data
+    outerFlag           - flag for convergence
+    His                 - iteration history
+</code></pre>
+
+<p><a id='jInv.InverseSolve.projPCG' href='#jInv.InverseSolve.projPCG'>#</a>
+<strong><code>jInv.InverseSolve.projPCG</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>dm = projPCG(H,g,Active,Precond,cgTol,maxIter)
+
+Projected Preconditioned Conjugate Gradient method for solving
+
+    H*dm = g    subject to    dm[!Active] == 0 
+
+Input:
+
+    H::Function       -  computes action of Hessian
+    g::Vector         -  right hand side
+    Active            -  describes active cells
+    Precond::Function - preconditioner
+    cgTol             - tolerance
+    maxIter             - maximum number of iterations
+</code></pre>
+
+<p><a id='jInv.InverseSolve.smallnessReg' href='#jInv.InverseSolve.smallnessReg'>#</a>
+<strong><code>jInv.InverseSolve.smallnessReg</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>Rc,dR,d2R = smallnessReg(m,mref,M,Iact=1.0)
+
+Compute smallness regularizer (L2 difference to reference model)
+
+    R(m) = 0.5*||m-mref||_V^2
+
+Input:
+    m     - model
+    mref  - reference model
+    M     - Mesh
+
+Output
+    Rc    - value of regularizer
+    dR    - gradient w.r.t. m
+    d2R   - Hessian
+</code></pre>
+
+<p><a id='jInv.InverseSolve.wTVReg' href='#jInv.InverseSolve.wTVReg'>#</a>
+<strong><code>jInv.InverseSolve.wTVReg</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>Rc,dR,d2R = wTVReg(m,mref,M,Iact,C=[])
+
+Compute weighted total variation regularizer
+
+Input:
+    m     - model
+    mref  - reference model
+    M     - Mesh
+    Iact  - projector on active cells
+    C     - anisotropy parameters (default: [1 1 1])
+    eps   - conditioning parameter for TV norm (default: 1e-3)
+
+Output
+    Rc    - value of regularizer
+    dR    - gradient w.r.t. m
+    d2R   - Hessian
+</code></pre>
+
+<p><a id='jInv.InverseSolve.wdiffusionRegNodal' href='#jInv.InverseSolve.wdiffusionRegNodal'>#</a>
+<strong><code>jInv.InverseSolve.wdiffusionRegNodal</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>Rc,dR,d2R = wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
+
+Computes weighted diffusion regularizer for nodal model
+
+Input:
+    m     - model
+    mref  - reference model
+    M     - Mesh
+    Iact  - projector on active cells
+    C     - optional parameters
+
+Output
+    Rc    - value of regularizer
+    dR    - gradient w.r.t. m
+    d2R   - Hessian
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../ForwardShare/" class="btn btn-neutral float-right" title="ForwardShare">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../LinearSolvers/" class="btn btn-neutral" title="LinearSolvers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../LinearSolvers/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../ForwardShare/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

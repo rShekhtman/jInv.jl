@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="jInv.jl - A Flexible Flexible Julia Package for PDE Parameter Estimation">
+  <meta name="author" content="JuliaInv">
+  
+  <title>jInv.jl</title>
+  
+
+  <link rel="shortcut icon" href="./img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
+  <link href="./assets/Documenter.css" rel="stylesheet">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "None";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = "/";
+  </script>
+  
+  <script src="./js/jquery-2.1.1.min.js"></script>
+  <script src="./js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script>
+  <script src="./js/theme.js"></script> 
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="./assets/mathjaxhelper.js"></script>
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> jInv.jl</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href=".">Home</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#jinv-a-flexible-flexible-julia-package-for-pde-parameter-estimation">jInv - A Flexible Flexible Julia Package for PDE Parameter Estimation</a></li>
+                
+                    <li><a class="toctree-l4" href="#build-status">Build status</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#overview">Overview</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#installation">Installation</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#requirements">Requirements</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="Mesh/">Mesh</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="LinearSolvers/">LinearSolvers</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="InverseSolve/">InverseSolve</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="ForwardShare/">ForwardShare</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="Utils/">Utils</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">jInv.jl</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github"> Edit on GitHub</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><a id='jInv-A-Flexible-Flexible-Julia-Package-for-PDE-Parameter-Estimation-1'></a></p>
+<h1 id="jinv-a-flexible-flexible-julia-package-for-pde-parameter-estimation">jInv - A Flexible Flexible Julia Package for PDE Parameter Estimation</h1>
+<ul>
+<li><a href="Mesh/#jInv.Mesh-1">jInv.Mesh</a><ul>
+<li><a href="Mesh/#List-of-types-and-methods-1">List of types and methods</a></li>
+</ul>
+</li>
+<li><a href="LinearSolvers/#jInv.LinearSolvers-1">jInv.LinearSolvers</a><ul>
+<li><a href="LinearSolvers/#Supported-Packages-1">Supported Packages</a></li>
+<li><a href="LinearSolvers/#List-of-types-and-methods-1">List of types and methods</a></li>
+</ul>
+</li>
+<li><a href="InverseSolve/#jInv.InverseSolve-1">jInv.InverseSolve</a></li>
+<li><a href="ForwardShare/#jInv.ForwardShare-1">jInv.ForwardShare</a><ul>
+<li><a href="ForwardShare/#List-of-types-and-methods-1">List of types and methods</a></li>
+</ul>
+</li>
+<li><a href="Utils/#jInv.Utils-1">jInv.Utils</a><ul>
+<li><a href="Utils/#List-of-methods-1">List of methods</a></li>
+</ul>
+</li>
+</ul>
+<p><code>jInv</code> is a flexible framework for PDE parameter estimation in Julia. It provides easy to extend core functions used in PDE-constrained inverse problems.</p>
+<p><a id='Build-status-1'></a></p>
+<h2 id="build-status">Build status</h2>
+<p><a href="https://travis-ci.org/JuliaInv/jInv.jl"><img alt="Build Status" src="https://travis-ci.org/JuliaInv/jInv.jl.svg?branch=master" /></a>  <a href="https://coveralls.io/github/JuliaInv/jInv.jl?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/JuliaInv/jInv.jl/badge.svg?branch=master" /></a> <a href="https://ci.appveyor.com/project/JuliaInv/jinv-jl-81lel"><img alt="Build status" src="https://ci.appveyor.com/api/projects/status/0pxgtmm08b0w6wgh?svg=true" /></a></p>
+<p><a id='Overview-1'></a></p>
+<h1 id="overview">Overview</h1>
+<p>jInv consists of five submodules:</p>
+<ol>
+<li><code>ForwardShare</code> - methods for solving forward problems in parallel.</li>
+<li><code>InverseSolve</code> - methods commonly used in inverse problems such as misfit functions, regularization and numerical optimization. </li>
+<li><code>Mesh</code> - regular and tensor meshes in 2D and 3D as well as differential operators.</li>
+<li><code>LinearSolvers</code> - interfaces to sparse and (if installed) direct linear solvers that can be used for solving the discretized PDEs.</li>
+<li><code>Utils</code> - utility functions</li>
+</ol>
+<p><a id='Installation-1'></a></p>
+<h1 id="installation">Installation</h1>
+<p>In julia type:</p>
+<pre><code class="julia">julia&gt; Pkg.clone(&quot;https://github.com/JuliaInv/jInv.jl&quot;,&quot;jInv&quot;)
+ERROR: jInv already exists
+
+julia&gt; Pkg.test(&quot;jInv&quot;)
+INFO: Cloning jInv from https://github.com/JuliaInv/jInv.jl
+INFO: Testing jInv
+3-dimensional regular mesh of size [3,4,5]
+Number of cells:   60
+Number of faces:   [80,75,72] = 227
+Number of edges:   [90,96,100] = 286
+Number of nodes:   120
+Coordinate origin: [1.2,0.0,0.0]
+Domain size:       [1.2,2.4,0.0,1.1,0.0,2.3]
+Cell size:         [0.39999999999999997,0.275,0.45999999999999996]
+2-dimensional regular mesh of size [3,4]
+Number of cells:   12
+Number of faces:   [16,15] = 31
+Number of edges:   [15,16] = 31
+Number of nodes:   20
+Coordinate origin: [1.2,0.0]
+Domain size:       [1.2,2.4,0.0,1.1]
+Cell size:         [0.39999999999999997,0.275]
+3-dimensional tensor mesh of size [4,5,6]
+Number of cells:   120
+Number of faces:   [150,144,140] = 434
+Number of edges:   [168,175,180] = 523
+Number of nodes:   210
+Coordinate origin: [0.0,0.0,0.0]
+Domain size:       2.4874770907290342m x 2.263538324157847m x 4.601618609653395m
+Minimum cell size: 0.10409410616346637m x 0.1063921350421797m x 0.5717056366822553m
+Maximum cell size: 0.8181844999994075m x 0.7520988572693696m x 0.9999689403955194m
+==== compare regular and tensor mesh ====
+    test cell-centered axes...passed
+    test nodal axes...passed
+    test cell-centered grid...passed
+    test nodal grid...passed
+    test face grid...passed
+    test edge grid...passed
+    test volume...passed
+    test area...passed
+    test length...passed
+    test counting...passed
+    test nodal gradient matrix...passed
+    test divergence matrix...passed
+    test curl matrix...passed
+    test face average matrix...passed
+    test edge average matrix...passed
+==== test differential operators ====
+    testing differential operators for jInv.Mesh.TensorMesh3D...passed!
+    testing differential operators for jInv.Mesh.RegularMesh...passed!
+    testing differential operators for jInv.Mesh.TensorMesh3D...passed!
+   test getInterpolationMatrix (RegularMesh) ...  dim=2 dim=3 passed
+   test getInterpolationMatrix (TensorMesh) ... passed
+==== test differential operators ====
+    testing nodal averaging for jInv.Mesh.TensorMesh3D...passed!
+    testing nodal averaging for jInv.Mesh.RegularMesh...passed!
+    testing nodal averaging for jInv.Mesh.TensorMesh3D...passed!
+    testing nodal averaging for jInv.Mesh.RegularMesh...passed!
+==== test persistency of linear operators ====
+ Mesh: All tests passed!
+test prepareMesh2Mesh
+compare remote versions with local ones
+test interpGlobal2Local
+test interpLocal2Global
+ Testing module Utils
+   Testing sparseUtils
+   sparseUtils: All tests passed!
+testing sortpermFast
+testing uniqueidx
+   test checkDerivative ...        h           E0          E1          O1          O2     OK?
+1.000e-01   5.670e-01   1.170e-01   0.000e+00   0.000e+00       0
+1.000e-02   6.723e-02   1.170e-03   9.260e-01   2.000e+00       1
+1.000e-03   6.828e-03   1.170e-05   9.933e-01   2.000e+00       1
+1.000e-04   6.838e-04   1.170e-07   9.993e-01   2.000e+00       1
+1.000e-05   6.840e-05   1.170e-09   9.999e-01   2.000e+00       1
+1.000e-06   6.840e-06   1.170e-11   1.000e+00   2.000e+00       1
+1.000e-07   6.840e-07   1.168e-13   1.000e+00   2.001e+00       1
+1.000e-08   6.840e-08   9.330e-16   1.000e+00   2.097e+00       1
+1.000e-09   6.840e-09   0.000e+00   1.000e+00   Inf     1
+1.000e-10   6.840e-10   0.000e+00   1.000e+00   NaN     1
+        h          E0          E1          O1          O2     OK?
+1.000e-01   5.461e-02   1.814e-03   0.000e+00   0.000e+00       0
+1.000e-02   5.356e-03   1.814e-05   1.008e+00   2.000e+00       1
+1.000e-03   5.346e-04   1.814e-07   1.001e+00   2.000e+00       1
+1.000e-04   5.345e-05   1.814e-09   1.000e+00   2.000e+00       1
+1.000e-05   5.345e-06   1.814e-11   1.000e+00   2.000e+00       1
+1.000e-06   5.345e-07   1.814e-13   1.000e+00   2.000e+00       1
+1.000e-07   5.345e-08   1.821e-15   1.000e+00   1.998e+00       1
+1.000e-08   5.345e-09   4.973e-17   1.000e+00   1.564e+00       1
+1.000e-09   5.345e-10   1.382e-16   1.000e+00   -4.440e-01      1
+1.000e-10   5.345e-11   1.086e-16   1.000e+00   1.046e-01       1
+passed
+ Utils: All tests passed
+ test module InverseSolve
+        checkDerivative of jInv.InverseSolve.expMod
+        checkDerivative of jInv.InverseSolve.boundMod
+        checkDerivative of jInv.InverseSolve.fMod
+Gradient test for jInv.InverseSolve.SSDFun (real)
+Gradient test for jInv.InverseSolve.HuberFun (real)
+Hessian test for jInv.InverseSolve.SSDFun (real)
+Gradient test for jInv.InverseSolve.SSDFun (complex)
+Hessian test for jInv.InverseSolve.SSDFun (complex)
+WARNING: skipped
+checkDerivative of (anonymous function)
+checkDerivative of (anonymous function)
+checkDerivative of jInv.InverseSolve.smallnessReg
+checkDerivative of (anonymous function)
+checkDerivative of jInv.InverseSolve.wdiffusionRegNodal
+checkDerivative of jInv.InverseSolve.wTVRegNodal
+checkDerivative of jInv.InverseSolve.logBarrier
+checkDerivative of jInv.InverseSolve.logBarrierSquared
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   1.63e+02    0.00e+00    1.00e+00    1.00e+00      0
+   .1   5.80e+00    5.14e+00            6.71e-02
+  2.0   5.80e+00    5.14e+00    1.00e+00    6.71e-02      1
+   .1   3.84e+00    6.09e+00            6.09e-02
+  3.0   3.84e+00    6.09e+00    1.00e+00    6.09e-02      3
+   .1   3.86e+00    6.06e+00            6.08e-02
+  4.0   3.86e+00    6.06e+00    1.00e+00    6.08e-02      3
+   .1   3.86e+00    6.06e+00            6.08e-02
+  5.0   3.86e+00    6.06e+00    1.00e+00    6.08e-02      3
+   .1   3.86e+00    6.06e+00            6.08e-02
+projGNCG iterated maxIter=5 times but reached only stepNorm of 0.00011775631184729463 instead 0.0001.
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   1.63e+02    0.00e+00    1.00e+00    1.00e+00      0
+   .1   5.80e+00    5.14e+00            6.71e-02
+  2.0   5.80e+00    5.14e+00    1.00e+00    6.71e-02      1
+   .1   3.84e+00    6.09e+00            6.09e-02
+  3.0   3.84e+00    6.09e+00    1.00e+00    6.09e-02      3
+   .1   3.86e+00    6.06e+00            6.08e-02
+  4.0   3.86e+00    6.06e+00    1.00e+00    6.08e-02      3
+   .1   3.86e+00    6.06e+00            6.08e-02
+  5.0   3.86e+00    6.06e+00    1.00e+00    6.08e-02      3
+   .1   3.86e+00    6.06e+00            6.08e-02
+projGNCG iterated maxIter=5 times but reached only stepNorm of 0.00011775631184729463 instead 0.0001.
+ InverseSolve: All tests passed!
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   2.37e+01    0.00e+00    1.00e+00    1.00e+00      0
+   .1   1.56e+00    3.08e+00            1.96e-01
+  2.0   1.56e+00    3.08e+00    1.00e+00    1.96e-01      0
+   .1   1.48e+00    3.13e+00            1.94e-01
+  3.0   1.48e+00    3.13e+00    1.00e+00    1.94e-01      0
+   .1   1.49e+00    3.12e+00            1.94e-01
+  4.0   1.49e+00    3.12e+00    1.00e+00    1.94e-01      0
+   .1   1.48e+00    3.12e+00            1.94e-01
+  5.0   1.48e+00    3.12e+00    1.00e+00    1.94e-01      0
+   .1   1.48e+00    3.12e+00            1.94e-01
+projGNCG reached desired accuracy at iteration 5.
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   2.37e+01    0.00e+00    1.00e+00    1.00e+00      0
+   .1   1.56e+00    3.08e+00            1.96e-01
+  2.0   1.56e+00    3.08e+00    1.00e+00    1.96e-01      0
+   .1   1.48e+00    3.13e+00            1.94e-01
+  3.0   1.48e+00    3.13e+00    1.00e+00    1.94e-01      0
+   .1   1.49e+00    3.12e+00            1.94e-01
+  4.0   1.49e+00    3.12e+00    1.00e+00    1.94e-01      0
+   .1   1.48e+00    3.12e+00            1.94e-01
+  5.0   1.48e+00    3.12e+00    1.00e+00    1.94e-01      0
+   .1   1.48e+00    3.12e+00            1.94e-01
+projGNCG reached desired accuracy at iteration 5.
+i.LS           F           R    alpha[1]       Jc/J0
+  1.0   2.37e+01    0.00e+00    1.00e+00    1.00e+00
+   .1   1.56e+00    3.08e+00            1.96e-01
+  2.0   1.56e+00    3.08e+00    1.00e+00    1.96e-01
+   .1   1.48e+00    3.12e+00            1.94e-01
+  3.0   1.48e+00    3.12e+00    1.00e+00    1.94e-01
+   .1   1.49e+00    3.12e+00            1.94e-01
+  4.0   1.49e+00    3.12e+00    1.00e+00    1.94e-01
+   .1   1.49e+00    3.12e+00            1.94e-01
+  5.0   1.49e+00    3.12e+00    1.00e+00    1.94e-01
+   .1   1.49e+00    3.12e+00            1.94e-01
+barrierGNCG iterated maxIter=5 times but reached only stepNorm of 0.00011970494100010942 instead 0.0001.
+i.LS           F           R    alpha[1]       Jc/J0
+  1.0   2.37e+01    0.00e+00    1.00e+00    1.00e+00
+   .1   1.56e+00    3.08e+00            1.96e-01
+  2.0   1.56e+00    3.08e+00    1.00e+00    1.96e-01
+   .1   1.48e+00    3.12e+00            1.94e-01
+  3.0   1.48e+00    3.12e+00    1.00e+00    1.94e-01
+   .1   1.49e+00    3.12e+00            1.94e-01
+  4.0   1.49e+00    3.12e+00    1.00e+00    1.94e-01
+   .1   1.49e+00    3.12e+00            1.94e-01
+  5.0   1.49e+00    3.12e+00    1.00e+00    1.94e-01
+   .1   1.49e+00    3.12e+00            1.94e-01
+barrierGNCG iterated maxIter=5 times but reached only stepNorm of 0.00011970494100010942 instead 0.0001.
+Starting projGNCG minimization with alpha 1 of 3
+alpha = 100.0
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   2.37e+01    0.00e+00    1.00e+02    1.00e+00      0
+   .1   2.13e+01    1.18e+00            9.47e-01
+  2.0   2.13e+01    1.18e+00    1.00e+02    9.47e-01      0
+   .1   2.13e+01    1.18e+00            9.47e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0026596155235069155 instead 0.0001.
+[23.710931128839622,21.264693460301274,21.26662236260858]
+Starting projGNCG minimization with alpha 2 of 3
+alpha = 10.0
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   2.13e+01    0.00e+00    1.00e+01    1.00e+00      0
+   .1   9.56e+00    4.49e+00            6.61e-01
+  2.0   9.56e+00    4.49e+00    1.00e+01    6.61e-01      0
+   .1   9.56e+00    4.49e+00            6.61e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0025915056896651245 instead 0.0001.
+[21.26662236260858,9.562164311018957,9.563975630795511]
+iteratedTikhonov exiting after reaching desired misfit
+Starting projGNCG minimization with alpha 1 of 3
+alpha = 100.0
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   2.37e+01    0.00e+00    1.00e+02    1.00e+00      0
+   .1   2.13e+01    1.18e+00            9.47e-01
+  2.0   2.13e+01    1.18e+00    1.00e+02    9.47e-01      0
+   .1   2.13e+01    1.18e+00            9.47e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0026596155235069155 instead 0.0001.
+[23.710931128839622,21.264693460301274,21.26662236260858]
+Starting projGNCG minimization with alpha 2 of 3
+alpha = 10.0
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   2.13e+01    0.00e+00    1.00e+01    1.00e+00      0
+   .1   9.56e+00    4.49e+00            6.61e-01
+  2.0   9.56e+00    4.49e+00    1.00e+01    6.61e-01      0
+   .1   9.56e+00    4.49e+00            6.61e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0025915056896651245 instead 0.0001.
+[21.26662236260858,9.562164311018957,9.563975630795511]
+iteratedTikhonov exiting after reaching desired misfit
+===  Example 2D DivSigGrad ====
+cg achieved desired tolerance at iteration 7. Residual norm is 5.09e-06.
+bcgstb achieved desired tolerance at iteration 4. Residual norm is 1.15e-05.
+===  Test for nonsymmetric matrices ====
+===  Example 2D DivSigGrad ====
+blockCG achieved desired tolerance at iteration 6. Residual norm is 1.81e-05.
+blockBiCGSTB achieved desired tolerance at iteration 3. Residual norm is 1.45e-04.
+===  Test for nonsymmetric matrices ====
+===  Test Julia Wrapper: Symmetric ====
+===  Test Julia Wrapper: nonsymmetric matrices ====
+===  End Test Julia Wrapper ====
+</code></pre>
+
+<p><a id='Requirements-1'></a></p>
+<h1 id="requirements">Requirements</h1>
+<p>jInv is developed using Julia versions 0.4.x.</p>
+<ol>
+<li><a href="https://github.com/lruthotto/KrylovMethods.jl"><code>KrylovMethods.jl</code></a>  - iterative methods for solving (sparse) linear systems. </li>
+</ol>
+<p>Additional (optional) packages for higher performance. <code>jInv</code> detects automatically if these packages are installed and uses them by default.</p>
+<ol>
+<li><a href="https://github.com/JuliaSparse/MUMPS.jl"><code>MUMPS.jl</code></a> - wrapper for MUMPS. Used as a direct PDE solver. </li>
+<li><a href="https://github.com/lruthotto/ParSpMatVec.jl"><code>ParSpMatVec.jl</code></a> - shared memory implementation for sparse matrix vector products.</li>
+</ol>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Mesh/" class="btn btn-neutral float-right" title="Mesh">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+        <span style="margin-left: 15px"><a href="Mesh/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 0.15.3
+Build Date UTC : 2016-06-13 16:34:39.532483
+-->
