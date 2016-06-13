@@ -3,22 +3,22 @@ export diffusionReg, wdiffusionReg, wTVReg, wdiffusionRegNodal,wTVRegNodal,compu
 function computeRegularizer(regFun::Function,mc::Vector,mref::Vector,MInv::AbstractMesh,alpha)
 	R,dR,d2R = regFun(mc,mref,MInv)
 	return alpha*R, alpha*dR, alpha*d2R
-end	
-	
+end
+
 function computeRegularizer(regFun::Array{Function},mc::Vector,mref::Array,MInv::AbstractMesh,alpha::Array{Float64})
 	numReg = length(regFun)
-	if size(mref,2)!=numReg; 
+	if size(mref,2)!=numReg;
 		error("computeRegularizer: number of regularizer (=$numReg) does not match number of reference models (=$(size(mref,2))).")
 	end
-	if length(alpha)!=numReg; 
+	if length(alpha)!=numReg;
 		error("computeRegularizer: number of regularizer (=$numReg) does not match number of alphas (=$(length(alpha))).")
 	end
-	
+
 	R = 0.0; dR = zeros(length(mc)); d2R = spzeros(length(mc),length(mc))
 	for k=1:numReg
 		Rt,dRt,d2Rt = regFun[k](mc,mref[:,k],MInv)
 		R   += alpha[k]*Rt
-		dR  += alpha[k]*dRt 
+		dR  += alpha[k]*dRt
 		d2R += alpha[k]*d2Rt
 	end
 	return R, dR, d2R
@@ -27,16 +27,16 @@ end
 
 """
 	Rc,dR,d2R = diffusionReg(m,mref,M,Iact=1.0)
-	
+
 	Compute diffusion regularizer
 		0.5*||GRAD*(m-mref)||_V^2
-		
+
 	Input:
 		m     - model
 		mref  - reference model
 		M     - Mesh
 		Iact  - projector on active cells
-	
+
 	Output
 		Rc    - value of regularizer
 		dR    - gradient w.r.t. m
@@ -57,16 +57,16 @@ end
 
 """
 	Rc,dR,d2R = smallnessReg(m,mref,M,Iact=1.0)
-	
+
 	Compute smallness regularizer (L2 difference to reference model)
-		
+
 		R(m) = 0.5*||m-mref||_V^2
-		
+
 	Input:
 		m     - model
 		mref  - reference model
 		M     - Mesh
-	
+
 	Output
 		Rc    - value of regularizer
 		dR    - gradient w.r.t. m
@@ -105,7 +105,7 @@ function wdiffusionReg(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
    else
       error("bad regparams in wdiffusionReg")
    end
-   
+
    dm   = m .- mref
    Div  = getDivergenceMatrix(M)
 
@@ -126,9 +126,9 @@ end # function wdiffusionReg
 
 """
 	Rc,dR,d2R = wTVReg(m,mref,M,Iact,C=[])
-	
+
 	Compute weighted total variation regularizer
-		
+
 	Input:
 		m     - model
 		mref  - reference model
@@ -136,7 +136,7 @@ end # function wdiffusionReg
 		Iact  - projector on active cells
 		C     - anisotropy parameters (default: [1 1 1])
 		eps   - conditioning parameter for TV norm (default: 1e-3)
-	
+
 	Output
 		Rc    - value of regularizer
 		dR    - gradient w.r.t. m
@@ -157,7 +157,7 @@ function wTVReg(m::Vector,mref,M::AbstractMesh; Iact=1.0, C=[],eps=1e-3)
 	Div  = Iact'*(Div*Wt)   # project to the active cells
 	V    = getVolume(M); v = diag(V)
 	Af   = getFaceAverageMatrix(M)
-	
+
 	wTV  = sqrt(Af*(Div'*dm).^2 .+eps);
 
 	Rc   = dot(v,wTV);
@@ -170,45 +170,23 @@ end
 
 """
 	Rc,dR,d2R = wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
-	
+
 	Computes weighted diffusion regularizer for nodal model
-	
+
 	Input:
 		m     - model
 		mref  - reference model
 		M     - Mesh
 		Iact  - projector on active cells
 		C     - optional parameters
-	
+
 	Output
 		Rc    - value of regularizer
 		dR    - gradient w.r.t. m
 		d2R   - Hessian
 """
 
-# function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])	
-	# dm = m.-mref;
-	# if isempty(C)
-		# C = [1,1,1,1,1e-5];
-	# end
-	# if M.dim==3
-		# Wt   = sdiag([C[1]*ones((M.n[3]+1)*(M.n[2]+1)*(M.n[1]));C[2]*ones((M.n[3]+1)*(M.n[2])*(M.n[1]+1));C[3]*ones((M.n[3])*(M.n[2]+1)*(M.n[1]+1))]);
-	# else
-		# Wt   = sdiag([C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))]);
-	# end
-	# Grad   = Wt*getNodalGradientMatrix(M)*Iact
-	# d2R = Grad'*Grad;
-	# d2R += C[4]*speye(length(m));
-	# dR  = d2R*dm;
-	# Rc  = 0.5*dot(dm,dR);
-	# if isnan(Rc)
-		# dump(m)
-	# end
-   # return Rc,dR,d2R
-# end	 
-
-
-function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])	
+function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 	dm = m.-mref;
 	if isempty(C)
 		C = [1,1,1,1,1e-5];
@@ -218,34 +196,34 @@ function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, 
 	else
 		Wt   = [C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))];
 	end
-	
+
 	V    = getVolume(M);
 	Af   = getEdgeAverageMatrix(M)
 	v    = (Af'*diag(V))
 	Wt   = sdiag(Wt.*(v.*Wt));
-	
+
 	Av = getNodalAverageMatrix(M);
-	
+
 	mass = Iact'*Av'*V*Av*Iact;
-	
-	
+
+
 	Grad   = getNodalGradientMatrix(M)*Iact;
-	
+
 	d2R = Grad'*Wt*Grad;
 	d2R += C[4]*mass;
 	dR  = d2R*dm;
 	Rc  = 0.5*dot(dm,dR);
-	
+
 	if isnan(Rc)
 		dump(m)
 	end
-	clear(M);
+	clear!(M);
    return Rc,dR,d2R
-end	 
+end
 
 
 
-function wTVRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])	
+function wTVRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 	dm = m.-mref;
 	if isempty(C)
 		C = [1,1,1,1,1e-5];
@@ -256,46 +234,46 @@ function wTVRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 	else
 		Wt   = sdiag([C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))]);
 	end
-	
-	
+
+
 	V    = getVolume(M);
 	Av = getNodalAverageMatrix(M);
 	mass = Iact'*Av'*V*Av*Iact;
 	d2R  = C[4]*mass;
 	Rc   = 0.5*dot(dm,d2R*dm);
-	
+
 	v      = diag(V)
-	Af     = getEdgeAverageMatrix(M)	
+	Af     = getEdgeAverageMatrix(M)
 	Grad   = Wt*getNodalGradientMatrix(M)*Iact;
 	wTV    = sqrt(Af*((Grad*dm).^2+eps));
 	Rc     += dot(v,wTV);
-	d2R    += Grad'*sdiag(Af'*(v./wTV))*Grad; 
+	d2R    += Grad'*sdiag(Af'*(v./wTV))*Grad;
 	dR     = d2R*dm
 	if isnan(Rc)
 		dump(m)
 	end
-	clear(M);
+	clear!(M);
    return Rc,dR,d2R
-end	 
+end
 
 
 """
 	Rc,dR,d2R = logBarrier(m::Vector, z::Vector, M::AbstractMesh,low::Vector,high::Vector, epsilon)
-	
+
 	Computes logBarrier regularizer
-	
+
 	R = -log(1 - ((m-high)/epsilon).^2) if high-epsilon <  m < high
 					0					if low+epsilon  <= m <= high-epsilon
 		-log(1 - ((m-low)/epsilon).^2)	if low          <  m < low+epsilon
-		
+
 	Input:
 		m     	- model
 		z     	- not being used. Here for compatibility.
 		M     	- Mesh. not being used. Here for compatibility.
 		low   	- low bound for each coordinate.
 		high  	- high bound for each coordinate.
-		epsilon - layer width of the barier. 
-	
+		epsilon - layer width of the barier.
+
 	Output
 		g    - value of regularizer
 		dg    - gradient w.r.t. m
@@ -303,14 +281,14 @@ end
 """
 
 
-function logBarrier(m::Vector,z::Vector,M::AbstractMesh, low::Vector, high::Vector ,epsilon = min(0.1*abs(low),0.1*abs(high))) 
+function logBarrier(m::Vector,z::Vector,M::AbstractMesh, low::Vector, high::Vector ,epsilon = min(0.1*abs(low),0.1*abs(high)))
 	z = copy(m);
 	indProj = zeros(length(m));
-	
+
 	if length(find(m.>=high)) + length(find(m.<=low))>0
 		error("m should be strictly in between low and high ",length(find(m.>=high)) + length(find(m.<=low)));
 	end
-	
+
 	low = low + epsilon;
 	high = high - epsilon;
 	t = z.<low;
@@ -319,16 +297,16 @@ function logBarrier(m::Vector,z::Vector,M::AbstractMesh, low::Vector, high::Vect
 	t = z.>high;
 	indProj[t] = 1.0;
 	z[t] = high[t];
-		
+
 	e 	= (epsilon+1e-10);
 	dm  = (m-z)./e;
 	f   = 1 - dm.^2; # > 0
 	if minimum(f) < 0.0
 		error("negative f");
 	end
-	df  = (-2.0).*indProj.*(dm./e);   
+	df  = (-2.0).*indProj.*(dm./e);
 	d2f = (-2.0).*(indProj./(e.^2));
-		
+
 	g   = -sum(log(f));
 	dg  = -df./f;
 	d2g = dg.^2 - d2f./f  ;
@@ -338,29 +316,29 @@ end
 
 """
 	Rc,dR,d2R = logBarrierSquared(m::Vector, z::Vector, M::AbstractMesh,low::Vector,high::Vector, epsilon)
-	
+
 	Computes logBarrier regularizer
-	
+
 	R = (log(1 - ((m-high)/epsilon).^2))^2 if high-epsilon <  m < high
 					0					   if low+epsilon  <= m <= high-epsilon
 		(log(1 - ((m-low)/epsilon).^2))^2  if low          <  m < low+epsilon
-		
+
 	Input:
 		m     	- model
 		z     	- not being used. Here for compatibility.
 		M     	- Mesh. not being used. Here for compatibility.
 		low   	- low bound for each coordinate.
 		high  	- high bound for each coordinate.
-		epsilon - layer width of the barier. 
-	
+		epsilon - layer width of the barier.
+
 	Output
 		g    - value of regularizer
 		dg    - gradient w.r.t. m
 		d2g   - Gauss Newton Hessian approximation (diagonal matrix). Second derivative approx is continous.
 """
-	
-	
-function logBarrierSquared(m::Vector,z::Vector,M::AbstractMesh, low::Vector, high::Vector ,epsilon = min(0.1*abs(low),0.1*abs(high))) 
+
+
+function logBarrierSquared(m::Vector,z::Vector,M::AbstractMesh, low::Vector, high::Vector ,epsilon = min(0.1*abs(low),0.1*abs(high)))
 	if length(find(m.>=high)) + length(find(m.<=low))>0
 		error("m should be in between low and high");
 	end
@@ -374,15 +352,15 @@ function logBarrierSquared(m::Vector,z::Vector,M::AbstractMesh, low::Vector, hig
 	t = z.>high;
 	indProj[t] = 1.0;
 	z[t] = high[t];
-		
+
 	e 	= (epsilon+1e-10);
 	dm  = (m-z)./e;
 	f   = 1 - dm.^2; # > 0
 	if minimum(f) < 0.0
 		error("negative f");
 	end
-	df  = (-2.0).*indProj.*(dm./e);   
-		
+	df  = (-2.0).*indProj.*(dm./e);
+
 	r   = log(f);
 	dr  = df./f;
 	g   = 0.5*dot(r,r);

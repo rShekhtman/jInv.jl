@@ -14,7 +14,7 @@ Fields:
 	nSolve  - number of solves
 	solveTime - cumnulative time for solves
 
-Example: 
+Example:
 
 	Ainv = getMUMPSsolver()
 """
@@ -31,44 +31,43 @@ end
 
 # See if MUMPS solver is installed and include code for it.
 
-	
+
 if hasMUMPS
-		
+
 	function getMUMPSsolver(Ainv=[],doClear=1,ooc=0,sym=0)
 		return MUMPSsolver(Ainv,doClear,ooc,sym,0,0.0,0,0.)
 	end
-	
+
 	function solveLinearSystem!(A,B,X,param::MUMPSsolver,doTranspose=0)
 		if param.doClear == 1
 			clear!(param)
 		end
-	
+
 		if param.Ainv==[]
 			tic()
 			param.Ainv = factorMUMPS(A, param.sym, param.ooc)
 			param.facTime+=toq()
 			param.nFac+=1
 		end
-	
+
 		tic()
 		U = applyMUMPS!(param.Ainv, B,X,doTranspose)
 		param.solveTime+=toq()
 		param.nSolve+=1
-	
-		return U, param		
+
+		return U, param
 	end # function solveLinearSystem MUMPSsolver
 			
-	import jInv.Utils.clear!
 	function clear!(M::MUMPSsolver)
 		if isa(M.Ainv,MUMPSfactorization)
 			destroyMUMPS(M.Ainv)
 			M.Ainv = []
 		end
 	end
-	
+
 	function copySolver(Ainv::MUMPSsolver)
 		return MUMPSsolver([],Ainv.doClear,Ainv.ooc,Ainv.sym,0,0.0,0,0.);
 	end
 
-	hasMUMPS=true			
+	hasMUMPS=true
 end

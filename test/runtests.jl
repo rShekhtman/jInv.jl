@@ -1,5 +1,7 @@
 using Base.Test
 
+include("setupTests.jl")
+
 allPassed = true
 try 
 	include("Mesh/runtests.jl")
@@ -33,6 +35,13 @@ try
 catch
 	allPassed = false
 	warn("LinearSolvers had test errors")
+end
+
+try 
+	include("Vis/runtests.jl")
+catch
+	allPassed = false
+	warn("Vis had test errors")
 end
 
 

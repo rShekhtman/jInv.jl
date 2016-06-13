@@ -1,28 +1,28 @@
 module InverseSolve
-	
+
+	using Compat
 	using KrylovMethods
-	
 	using jInv.Utils
 	using jInv.Mesh
 	using jInv.ForwardShare
 	using jInv.LinearSolvers
-	
+
 	import jInv.ForwardShare.ForwardProbType
-	
+
 	export getName,AbstractModel, AbstractMisfit
 
 	abstract AbstractModel
 	abstract AbstractMisfit
-	
+
 	include("HessianPreconditioners.jl")
-	
+
 	include("misfitParam.jl")
 
 	"""
 	type jInv.InverseSolve.InverseParam
-	
-	Type storing parameters for Inversion. 
-	
+
+	Type storing parameters for Inversion.
+
 	Fields:
 		Minv::AbstractMesh
 		modelfun::Function    - model function (evaluated by main worker), see models.jl
@@ -39,8 +39,8 @@ module InverseSolve
 		HesPrec				  - A preconditioner for the Hessian.
 	Constructor:
 		getInverseParam
-	
-	Example: 
+
+	Example:
 	    Minv = getRegularMesh(domain,n)
 	    modelfun = expMod
 	    regularizer(m,mref,Minv) = wdiffusionReg(m,mref,Minv)
@@ -63,14 +63,14 @@ module InverseSolve
 		maxIter::Int
 		HesPrec
 	end  # type InverseParam
-	
+
 	"""
 	function jInv.InverseSolve.getInverseParam(...)
-	
+
 	Constructs an InverseParam
-	
+
 	Required Input:
-	
+
 		Minv::AbstractMesh    - mesh of model
 		modFun::Function      - model
 		regularizer::Function - regularizer, see regularizer.jl
@@ -78,9 +78,9 @@ module InverseSolve
 		mref                  - reference model
 		boundsLow::Vector     - lower bounds for model
 		boundsHigh::Vector    - upper bounds for model
-		
+
 	Optional Inputs:
-	
+
 		maxStep::Real=1.0     - maximum step in optimization
 	    pcgMaxIter::Int=10    - maximum number of PCG iterations
 	    pcgTol::Real          - tolerance for PCG
@@ -91,7 +91,7 @@ module InverseSolve
 							 regularizer,alpha,mref,
 							 boundsLow::Vector,boundsHigh::Vector; maxStep=1.0,pcgMaxIter=10,pcgTol=1e-1,
 							 minUpdate=1e-4,maxIter=10,HesPrec=getSSORRegularizationPreconditioner(1.0,1e-15,10))
-							 
+
 		return 	InverseParam(MInv,modFun,
 							 regularizer,alpha,mref,
 		                     boundsLow,boundsHigh,
@@ -107,11 +107,12 @@ module InverseSolve
 	include("misfit.jl")
 	include("regularizers.jl")
 	include("projGNCG.jl")
+	include("projSD.jl")
 	include("projPCG.jl")
 	include("barrierGNCG.jl")
 	include("computeMisfit.jl")
 	include("computeGradMisfit.jl")
 	include("HessMatVec.jl")
 	include("iteratedTikhonov.jl")
-	
+
 end

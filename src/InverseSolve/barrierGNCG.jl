@@ -97,9 +97,9 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 		
 		#  Set up Hessian and preconditioner.
 		if isempty(indCredit)
-			Hs(x) = dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x; 
+			Hs = x -> dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x; 
 		else
-			Hs(x) = dsig'*HessMatVec(dsig*x,pMis,sig,d2F,indDebit) + d2R*x;
+			Hs = x -> dsig'*HessMatVec(dsig*x,pMis,sig,d2F,indDebit) + d2R*x;
 		end
 		
 		
@@ -132,7 +132,7 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 			else
 				Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sigt,false,indCredit)
 			end
-			His.timeMisfit[iter+1,:]+=tMis'
+			His.timeMisfit[iter+1,:]+=tMis
 			
 			tic()
 			R,dR,d2R = computeRegularizer(regularizer,mt,mref,pInv.MInv,alpha) 

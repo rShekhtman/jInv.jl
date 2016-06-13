@@ -1,36 +1,5 @@
-@everywhere begin
-	using jInv.InverseSolve
-	using jInv.Mesh
-	using jInv.LinearSolvers
-	using jInv.ForwardShare
-	using jInv.Utils
-	using Base.Test
+include("../setupTests.jl")
 
-type LSparam <: ForwardProbType
-	A::SparseMatrixCSC
-	Ainv
-end
-
-function jInv.ForwardShare.getData(m::Vector,pFor::LSparam)
-	return pFor.A*m,pFor
-end
-
-function jInv.ForwardShare.getSensMatVec(v::Vector,m::Vector,pFor::LSparam)
-	return pFor.A*v
-end
-
-function jInv.ForwardShare.getSensTMatVec(v::Vector,m::Vector,pFor::LSparam)
-	return pFor.A'*v
-end
-
-
-import jInv.Utils.clear!
-function clear!(pFor::LSparam)
-	pFor.A = speye(0);
-	pFor.Ainv = [];
-end
-
-end
 # build domain and true image
 domain = [0.0 1.0 0.0 1.0]
 n      = [32,32]
@@ -38,7 +7,7 @@ Minv   = getRegularMesh(domain,n)
 xc     = getCellCenteredGrid(Minv)
 xtrue = sin(2*pi*xc[:,1]).*sin(pi*xc[:,2])
 
-# get noisy data 
+# get noisy data
 A     = speye(Minv.nc)
 ids   = sort(rand(1:Minv.nc,round(Int64,Minv.nc*.8)))
 A     = A[ids,:]
@@ -70,24 +39,28 @@ Wd2          = Wd[i2]
 Wd3          = Wd[i3]
 Wd4          = Wd[i4]
 
-pMisRefs    = Array{RemoteRef{Channel{Any}}}(6)
-pMisRefs[1] = @spawn getMisfitParam(pFor1,Wd1,bd1,SSDFun,fMod,gl1) 
-pMisRefs[2] = @spawn getMisfitParam(pFor2,Wd2,bd2,SSDFun,fMod,gl2)
+pMisRefs    = Array{RemoteChannel}(6)
+workerList  = workers()
+nw          = nworkers()
+pMisRefs[1] = initRemoteChannel(getMisfitParam,workerList[1%nw + 1],
+                                pFor1,Wd1,bd1,SSDFun,fMod,gl1)
+pMisRefs[2] = initRemoteChannel(getMisfitParam,workerList[2%nw + 1],
+                                pFor2,Wd2,bd2,SSDFun,fMod,gl2)
 
-pForRefs = Array(RemoteRef{Channel{Any}},4)
-pForRefs[1] = @spawn LSparam(A[i3,:],[])
-pForRefs[2] = @spawn LSparam(A[i4,:],[])
-pForRefs[3] = @spawn LSparam(A[i3,:],[])
-pForRefs[4] = @spawn LSparam(A[i4,:],[])
+pForRefs = Array(RemoteChannel,4)
+pForRefs[1] = initRemoteChannel(LSparam,workerList[3%nw+1],A[i3,:],[])
+pForRefs[2] = initRemoteChannel(LSparam,workerList[4%nw+1],A[i4,:],[])
+pForRefs[3] = initRemoteChannel(LSparam,workerList[5%nw+1],A[i3,:],[])
+pForRefs[4] = initRemoteChannel(LSparam,workerList[6%nw+1],A[i4,:],[])
 
-Mesh2Mesh = Array(RemoteRef{Channel{Any}},2)	
+Mesh2Mesh = Array(Future,2)
 for i=1:length(Mesh2Mesh)
 	k = pForRefs[i].where
 	if i==1
-		Mesh2Mesh[i] = remotecall(k,speye,Minv.nc);
+		Mesh2Mesh[i] = remotecall(speye,k,Minv.nc);
 		wait(Mesh2Mesh[i]);
 	elseif i==2
-		Mesh2Mesh[i] = remotecall(k,identity,1.0);
+		Mesh2Mesh[i] = remotecall(identity,k,1.0);
 		wait(Mesh2Mesh[i]);
 	end
 end
@@ -132,4 +105,7 @@ for k=1:length(pMis)
 	clear!(pMis[k],clearPFor=true, clearData=true,clearMesh2Mesh=true);
 end
 
-
+#Finalize pFor references
+for pf in pForRefs
+	finalize(pf)
+end

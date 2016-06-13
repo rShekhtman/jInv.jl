@@ -39,7 +39,7 @@ function buildOps!(M)
 end
 
 # first all fields should be empty
-for k=length(Meshes)	
+for k=length(Meshes)
 	@test isempty(Meshes[k].Div )
 	@test isempty(Meshes[k].Grad)
 	@test isempty(Meshes[k].Curl)
@@ -65,7 +65,7 @@ buildOps!(Mr2)
 
 
 # now all fields should be non-empty
-for k=length(Meshes)	
+for k=length(Meshes)
 	@test !isempty(Meshes[k].Div )
 	@test !isempty(Meshes[k].Grad)
 	@test !isempty(Meshes[k].Curl)
@@ -81,16 +81,16 @@ for k=length(Meshes)
 	@test !isempty(Meshes[k].nLap)
 end
 
-clear(Mt)
-clear(Mt2)
-clear(Mr)
-clear(Mr2)
+clear!(Mt)
+clear!(Mt2)
+clear!(Mr)
+clear!(Mr2)
 
 @test Mt == Mt2
 @test Mr == Mr2
 
 # now all matrices should be gone
-for k=length(Meshes)	
+for k=length(Meshes)
 	@test isempty(Meshes[k].Div )
 	@test isempty(Meshes[k].Grad)
 	@test isempty(Meshes[k].Curl)
@@ -105,4 +105,3 @@ for k=length(Meshes)
 	@test isempty(Meshes[k].Li  )
 	@test isempty(Meshes[k].nLap)
 end
-

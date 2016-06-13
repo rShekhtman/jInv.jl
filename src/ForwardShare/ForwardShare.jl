@@ -33,7 +33,7 @@ To define your own module, you must at least
       	return transpose(Sens)*x
       end
 
-	4) clear method for your type
+	4) clear! method for your type
 """
 module ForwardShare
 
@@ -62,26 +62,61 @@ module ForwardShare
 	"""
 	getSensTMatVec(v::Vector,m::Vector,param::ForwardProbType) = error("nyi")
 
-	export getSensTMatVec,getSensMatVec
+	"""
+	(m,n) = getSensMatSize(pFor)
+	
+	Returns size of sensitivity matrix where m is the number of data points
+	and n the number of parameters in the model. 
+	 
+	Input
+	
+		pFor - forward problem:: Union{ForwardProbType, Array, RemoteChannel}
+	
+	This is problem dependent and should be implemented in the respective
+	packages. 
+	"""
+	getSensMatSize(pFor::ForwardProbType) = error("nyi")
+	
+	function getSensMatSize(pFor::RemoteChannel)
+		if pFor.where != myid()
+			return remotecall_fetch(getSensMatSize,pFor.where,pFor)
+		else
+			return getSensMatSize(fetch(pFor))
+		end
+	end
+	
+	function getSensMatSize(pFor::Array)
+		n  = length(pFor)
+		sz = [0;0]
+		for k=1:n
+			(s1,s2) = getSensMatSize(pFor[k])
+			sz[2]=s2
+			sz[1]+=s1
+		end
+		return tuple(sz...)
+	end
+	
+	export getSensTMatVec,getSensMatVec, getSensMatSize
 
 	# # ===== Methods for parallelization =====
 	include("getDataParallel.jl")
 	include("prepareMesh2Mesh.jl")
 	include("interpLocalToGlobal.jl")
+	include("getSensMat.jl")
 
 	import jInv.Utils.clear!
 	function clear!(P::ForwardProbType;clearAinv::Bool=true,clearFields::Bool=true, clearMesh::Bool=false, clearSources::Bool=false, clearObs::Bool=false,clearAll::Bool=false)
 		if clearAll || clearMesh
-			Utils.clear(P.M)
+			Utils.clear!(P.M)
 		end
 		if clearAll || clearSources
-			P.Sources = clear(P.Sources)
+			P.Sources = clear!(P.Sources)
 		end
 		if clearAll || clearObs
-			P.Obs     = clear(P.Obs)
+			P.Obs     = clear!(P.Obs)
 		end
 		if clearAll || clearFields
-			P.Fields = clear(P.Fields)
+			P.Fields = clear!(P.Fields)
 		end
 		if clearAll || clearAinv
 			clear!(P.Ainv)
