@@ -272,6 +272,22 @@ Input:
     Mesh::Abstract Mesh
 </code></pre>
 
+<p><a id='jInv.Mesh.getEdgeMassMatrix' href='#jInv.Mesh.getEdgeMassMatrix'>#</a>
+<strong><code>jInv.Mesh.getEdgeMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>function jInv.Mesh.getEdgeMassMatrix(mesh,sigma)
+
+Returns mass matrix on cell edges, weighted by vector sigma.
+Matrix is always constructed. Uses pre-constructed edge averaging
+and cell volume matrices if available.
+
+Input: 
+    Mesh::Abstract Mesh
+       sigma::Vector
+
+Output:
+    SparseMatrixCSC{Float64,Int64}
+</code></pre>
+
 <p><a id='jInv.Mesh.getFaceAverageMatrix' href='#jInv.Mesh.getFaceAverageMatrix'>#</a>
 <strong><code>jInv.Mesh.getFaceAverageMatrix</code></strong> &mdash; <em>Function</em>.</p>
 <p>function jInv.Mesh.getFaceAverageMatrix</p>
@@ -283,6 +299,23 @@ For 3D Mesh: Af = [A1 A2 A3]
 
 Input: 
     Mesh::Abstract Mesh
+</code></pre>
+
+<p><a id='jInv.Mesh.getFaceMassMatrix' href='#jInv.Mesh.getFaceMassMatrix'>#</a>
+<strong><code>jInv.Mesh.getFaceMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>function jInv.Mesh.getFaceMassMatrix(Mesh,sigma)
+
+Returns face mass matrix, weighted by vector sigma. 
+Matrix is always constructed. Uses pre-constructed face averaging
+and cell volume matrices if available.
+
+Input: 
+    Mesh::Abstract Mesh
+       sigma::Vector
+
+
+Output:
+    SparseMatrixCSC{Float64,Int64}
 </code></pre>
 
 <p><a id='jInv.Mesh.getInterpolationMatrix' href='#jInv.Mesh.getInterpolationMatrix'>#</a>
@@ -310,6 +343,22 @@ Matrix is constructed if Mesh.An is empty.
 
 Input: 
     Mesh::Abstract Mesh
+</code></pre>
+
+<p><a id='jInv.Mesh.getNodalMassMatrix' href='#jInv.Mesh.getNodalMassMatrix'>#</a>
+<strong><code>jInv.Mesh.getNodalMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>function jInv.Mesh.getNodalMassMatrix(Mesh,sigma)
+
+Returns nodal mass matrix, weighted by vector sigma. 
+Matrix is always constructed. Uses pre-constructed nodal averaging
+and cell volume matrices if available.
+
+Input: 
+    Mesh::Abstract Mesh
+       sigma::Vector
+
+Output:
+    SparseMatrixCSC{Float64,Int64}
 </code></pre>
 
 <p><a id='jInv.Mesh.getRegularMesh' href='#jInv.Mesh.getRegularMesh'>#</a>
@@ -341,6 +390,54 @@ Required Input:
 
 Optional Input
    x0::Array - origin (default = zeros(3))
+</code></pre>
+
+<p><a id='jInv.Mesh.getdEdgeMassMatrix' href='#jInv.Mesh.getdEdgeMassMatrix'>#</a>
+<strong><code>jInv.Mesh.getdEdgeMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>function jInv.Mesh.getdEdgeMassMatrix(mesh,v)
+
+Returns derivative of edge mass matrix. Matrix is always 
+constructed. Uses pre-constructed edge averaging
+and cell volume matrices if available.
+
+Input: 
+    Mesh::Abstract Mesh
+       v::Vector
+
+Output:
+    SparseMatrixCSC{Float64,Int64}
+</code></pre>
+
+<p><a id='jInv.Mesh.getdFaceMassMatrix' href='#jInv.Mesh.getdFaceMassMatrix'>#</a>
+<strong><code>jInv.Mesh.getdFaceMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>function jInv.Mesh.getdFaceMassMatrix(Mesh,v)
+
+Returns derivative of face mass matrix. Matrix is always 
+constructed. Uses pre-constructed face averaging
+and cell volume matrices if available.
+
+Input: 
+    Mesh::Abstract Mesh
+       v::Vector
+
+Output:
+    SparseMatrixCSC{Float64,Int64}
+</code></pre>
+
+<p><a id='jInv.Mesh.getdNodalMassMatrix' href='#jInv.Mesh.getdNodalMassMatrix'>#</a>
+<strong><code>jInv.Mesh.getdNodalMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>function jInv.Mesh.getdNodalMassMatrix(Mesh,v)
+
+Returns derivative of nodal mass matrix. Matrix is always 
+constructed. Uses pre-constructed nodal averaging
+and cell volume matrices if available.
+
+Input: 
+    Mesh::Abstract Mesh
+       v::Vector
+
+Output:
+    SparseMatrixCSC{Float64,Int64}
 </code></pre>
               
             </div>
