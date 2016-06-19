@@ -3,6 +3,7 @@
 Julia files used to produce results reported in the above manuscript. Each experiment is organized in a separate folder with a README.md containing more information how to use the script.
 
 Overview:
+
 1. 3D Full Waveform Inversion (FWI) Experiment: see folder `FWIexample`
 2. Joint Travel Time Tomography and DC Resistivity: see folder `JointInversionExample`
 3. Weak scaling experiments: see folder `weakScaling`
