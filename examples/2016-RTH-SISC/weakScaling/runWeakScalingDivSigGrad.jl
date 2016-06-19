@@ -50,7 +50,7 @@ function main()
 	parsed_args = parse_commandline()
 	
 	nInv      = [128;128;64]
-	m         = 1500 + 3000*rand(nInv)
+	m         = 1500 + 3000*rand(tuple(nInv...))
 	# random conductivity model can be replaced by SEG model described in 
 	#
 	# Aminzadeh, F., Brac, J., and Kunz, T., 1997. 3D Salt and Overthrust models. SEG/EAGE Modeling Series, No. 1: Distribution CD of Salt and 	
