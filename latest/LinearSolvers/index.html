@@ -240,8 +240,8 @@ solveTime - cumulative time for solves
     Inputs are: (A,B,M), A is matrix, B are right hand sides, M is preconditioner
         Examples: 
               IterMethod = blockCG
-              IterMethod(A,B;M=M,tol=1e-1,maxIter=10,out=-1) =
-                              blockBiCGSTB(A,b,M1=M,tol=tol,maxIter=maxIter,out=out)
+              IterMethod(A,B;M=M,X=X,tol=1e-1,maxIter=10,out=-1) =
+                              blockBiCGSTB(A,b,M1=M,X=X,tol=tol,maxIter=maxIter,out=out)
         The keyword arguments of IterMethod for blockBiCGSTB
         will be initialized with the fields in the IterativeSolver type.
     Outputs are: (X,flag,err,iter), X are approximate solutions
