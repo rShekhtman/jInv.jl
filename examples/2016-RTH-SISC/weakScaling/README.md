@@ -2,7 +2,7 @@
 
 
 ## Travel Time Tomography
-For testing the scalability of the DC resistivity we used the file `runWeakScalingEikonal.jl` which can be run from the command line using 
+For testing the scalability of the travel time tomography using several workers we used the file `runWeakScalingEikonal.jl` which can be run from the command line using 
 ```
 #!/bin/bash
 for np in {1..24}
