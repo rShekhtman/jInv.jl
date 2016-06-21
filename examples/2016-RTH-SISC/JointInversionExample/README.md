@@ -6,4 +6,4 @@ invertDC  = true;
 invertEik = true;
 invertJoint = invertDC & invertEik
 ```  
-Choose the approprriate flags combination for the desired experiment.
+Choose the appropriate combination of flags for the desired experiment.
