@@ -329,5 +329,4 @@ function getLengthInv(Mesh::TensorMesh3D)
 return Mesh.Li
 end
 
-
-
+include("getEdgeIntegralOfPolygonalChain.jl")
