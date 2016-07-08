@@ -227,11 +227,13 @@ Output:
     d2mis       -  diagonal of Hessian
 </code></pre>
 
-<p><a id='jInv.InverseSolve.SSDFun' href='#jInv.InverseSolve.SSDFun'>#</a>
-<strong><code>jInv.InverseSolve.SSDFun</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.SSDFun-Tuple{Array{Complex{Float64},N},Array{Complex{Float64},N},Array{Complex{Float64},N}}' href='#jInv.InverseSolve.SSDFun-Tuple{Array{Complex{Float64},N},Array{Complex{Float64},N},Array{Complex{Float64},N}}'>#</a>
+<strong><code>jInv.InverseSolve.SSDFun</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>For complex data misfit is computed as 0.5*|real(dc)-(dobs)|_Wd^2 +  0.5*|complex(dc)-complex(dobs)|_W^2
 </code></pre>
 
+<p><a id='jInv.InverseSolve.SSDFun-Tuple{Array{Float64,N},Array{Float64,N},Array{Float64,N}}' href='#jInv.InverseSolve.SSDFun-Tuple{Array{Float64,N},Array{Float64,N},Array{Float64,N}}'>#</a>
+<strong><code>jInv.InverseSolve.SSDFun</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>mis,dmis,d2mis = SSDFun(dc,dobs,Wd)
 
 Input:
@@ -247,8 +249,8 @@ Output:
     d2mis       -  diagonal of Hessian
 </code></pre>
 
-<p><a id='jInv.InverseSolve.boundMod' href='#jInv.InverseSolve.boundMod'>#</a>
-<strong><code>jInv.InverseSolve.boundMod</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.boundMod-Tuple{Any}' href='#jInv.InverseSolve.boundMod-Tuple{Any}'>#</a>
+<strong><code>jInv.InverseSolve.boundMod</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>sigma,dsigma = boundMod(m;boundLow=0.0,boundHigh=1.0)
 
 maps model parameter to conductivity via
@@ -265,8 +267,8 @@ Computes misfit for PDE parameter estimation problem.
 computeMisfit has several options.
 </code></pre>
 
-<p><a id='jInv.InverseSolve.diffusionReg' href='#jInv.InverseSolve.diffusionReg'>#</a>
-<strong><code>jInv.InverseSolve.diffusionReg</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.diffusionReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}' href='#jInv.InverseSolve.diffusionReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}'>#</a>
+<strong><code>jInv.InverseSolve.diffusionReg</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rc,dR,d2R = diffusionReg(m,mref,M,Iact=1.0)
 
 Compute diffusion regularizer
@@ -284,8 +286,8 @@ Output
     d2R   - Hessian
 </code></pre>
 
-<p><a id='jInv.InverseSolve.expMod' href='#jInv.InverseSolve.expMod'>#</a>
-<strong><code>jInv.InverseSolve.expMod</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.expMod-Tuple{Any}' href='#jInv.InverseSolve.expMod-Tuple{Any}'>#</a>
+<strong><code>jInv.InverseSolve.expMod</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>sigma,dsigma = expMod(model)
 
 maps model parameter to conductivity via
@@ -293,8 +295,8 @@ maps model parameter to conductivity via
 sigma(m) = exp(m)
 </code></pre>
 
-<p><a id='jInv.InverseSolve.fMod' href='#jInv.InverseSolve.fMod'>#</a>
-<strong><code>jInv.InverseSolve.fMod</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.fMod-Tuple{Any}' href='#jInv.InverseSolve.fMod-Tuple{Any}'>#</a>
+<strong><code>jInv.InverseSolve.fMod</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>sigma,dsigma = fMod(model;f::Function=identity,df::Function=m-&gt;speye(length(m)))
 
 maps model parameter to conductivity via
@@ -302,8 +304,8 @@ maps model parameter to conductivity via
 sigma(m) = f(m) and dsigma(m) = sdiag(df(m))
 </code></pre>
 
-<p><a id='jInv.InverseSolve.getInverseParam' href='#jInv.InverseSolve.getInverseParam'>#</a>
-<strong><code>jInv.InverseSolve.getInverseParam</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.getInverseParam-Tuple{Any,Any,Any,Any,Any,Array{T,1},Array{T,1}}' href='#jInv.InverseSolve.getInverseParam-Tuple{Any,Any,Any,Any,Any,Array{T,1},Array{T,1}}'>#</a>
+<strong><code>jInv.InverseSolve.getInverseParam</code></strong> &mdash; <em>Method</em>.</p>
 <p>function jInv.InverseSolve.getInverseParam(...)</p>
 <p>Constructs an InverseParam</p>
 <p>Required Input:</p>
@@ -351,8 +353,8 @@ modelfun::Function=identityMod                      - model function. If all mis
 fname=&quot;&quot;                                - (optional)
 </code></pre>
 
-<p><a id='jInv.InverseSolve.iteratedTikhonov' href='#jInv.InverseSolve.iteratedTikhonov'>#</a>
-<strong><code>jInv.InverseSolve.iteratedTikhonov</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.iteratedTikhonov-Tuple{Any,jInv.InverseSolve.InverseParam,Any,Any,Any,Any}' href='#jInv.InverseSolve.iteratedTikhonov-Tuple{Any,jInv.InverseSolve.InverseParam,Any,Any,Any,Any}'>#</a>
+<strong><code>jInv.InverseSolve.iteratedTikhonov</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>mc,DC = iteratedTikhonov(mc,pInv::InverseParam,pMis,nAlpha,alphaFac,
                         targetMisfit;indCredit=[],dumpResults::Function=dummy)
 
@@ -431,8 +433,8 @@ Output
     d2g   - Gauss Newton Hessian approximation (diagonal matrix). Second derivative approx is continous.
 </code></pre>
 
-<p><a id='jInv.InverseSolve.projGNCG' href='#jInv.InverseSolve.projGNCG'>#</a>
-<strong><code>jInv.InverseSolve.projGNCG</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.projGNCG-Tuple{Any,jInv.InverseSolve.InverseParam,Any}' href='#jInv.InverseSolve.projGNCG-Tuple{Any,jInv.InverseSolve.InverseParam,Any}'>#</a>
+<strong><code>jInv.InverseSolve.projGNCG</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>mc,Dc,outerFlag = projGNCG(mc,pInv::InverseParam,pMis, indFor = [], dumpResults::Function = dummy)
 
 (Projected) Gauss-NewtonCG
@@ -456,8 +458,8 @@ Output:
     His                 - iteration history
 </code></pre>
 
-<p><a id='jInv.InverseSolve.projPCG' href='#jInv.InverseSolve.projPCG'>#</a>
-<strong><code>jInv.InverseSolve.projPCG</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.projPCG-Tuple{Function,Array{T,1},BitArray{N},Function,Real,Int64}' href='#jInv.InverseSolve.projPCG-Tuple{Function,Array{T,1},BitArray{N},Function,Real,Int64}'>#</a>
+<strong><code>jInv.InverseSolve.projPCG</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>dm = projPCG(H,g,Active,Precond,cgTol,maxIter)
 
 Projected Preconditioned Conjugate Gradient method for solving
@@ -474,8 +476,8 @@ Input:
     maxIter             - maximum number of iterations
 </code></pre>
 
-<p><a id='jInv.InverseSolve.smallnessReg' href='#jInv.InverseSolve.smallnessReg'>#</a>
-<strong><code>jInv.InverseSolve.smallnessReg</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.smallnessReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}' href='#jInv.InverseSolve.smallnessReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}'>#</a>
+<strong><code>jInv.InverseSolve.smallnessReg</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rc,dR,d2R = smallnessReg(m,mref,M,Iact=1.0)
 
 Compute smallness regularizer (L2 difference to reference model)
@@ -493,8 +495,8 @@ Output
     d2R   - Hessian
 </code></pre>
 
-<p><a id='jInv.InverseSolve.wTVReg' href='#jInv.InverseSolve.wTVReg'>#</a>
-<strong><code>jInv.InverseSolve.wTVReg</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.wTVReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}' href='#jInv.InverseSolve.wTVReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}'>#</a>
+<strong><code>jInv.InverseSolve.wTVReg</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rc,dR,d2R = wTVReg(m,mref,M,Iact,C=[])
 
 Compute weighted total variation regularizer
@@ -513,8 +515,8 @@ Output
     d2R   - Hessian
 </code></pre>
 
-<p><a id='jInv.InverseSolve.wdiffusionRegNodal' href='#jInv.InverseSolve.wdiffusionRegNodal'>#</a>
-<strong><code>jInv.InverseSolve.wdiffusionRegNodal</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.InverseSolve.wdiffusionRegNodal-Tuple{Array{T,1},Array{T,1},jInv.Mesh.AbstractMesh}' href='#jInv.InverseSolve.wdiffusionRegNodal-Tuple{Array{T,1},Array{T,1},jInv.Mesh.AbstractMesh}'>#</a>
+<strong><code>jInv.InverseSolve.wdiffusionRegNodal</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rc,dR,d2R = wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 
 Computes weighted diffusion regularizer for nodal model

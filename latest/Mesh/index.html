@@ -260,8 +260,8 @@ h1 = rand(4); h2 = rand(6); h3 = rand(5);
 M  = getTensorMesh2D(h1,h2,h3)
 </code></pre>
 
-<p><a id='jInv.Mesh.getEdgeAverageMatrix' href='#jInv.Mesh.getEdgeAverageMatrix'>#</a>
-<strong><code>jInv.Mesh.getEdgeAverageMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getEdgeAverageMatrix-Tuple{jInv.Mesh.AbstractTensorMesh}' href='#jInv.Mesh.getEdgeAverageMatrix-Tuple{jInv.Mesh.AbstractTensorMesh}'>#</a>
+<strong><code>jInv.Mesh.getEdgeAverageMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <p>function jInv.Mesh.getEdgeAverageMatrix</p>
 <pre><code>Returns Edge-to-CellCenter average matrix from Mesh.Ae. 
 Matrix is constructed if Mesh.Ae is empty. 
@@ -272,8 +272,39 @@ Input:
     Mesh::Abstract Mesh
 </code></pre>
 
-<p><a id='jInv.Mesh.getEdgeMassMatrix' href='#jInv.Mesh.getEdgeMassMatrix'>#</a>
-<strong><code>jInv.Mesh.getEdgeMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getEdgeIntegralOfPolygonalChain-Tuple{jInv.Mesh.TensorMesh3D,Array{Float64,2}}' href='#jInv.Mesh.getEdgeIntegralOfPolygonalChain-Tuple{jInv.Mesh.TensorMesh3D,Array{Float64,2}}'>#</a>
+<strong><code>jInv.Mesh.getEdgeIntegralOfPolygonalChain</code></strong> &mdash; <em>Method</em>.</p>
+<pre><code>    function jInv.Mesh.getEdgeIntegralOfPolygonalChain
+
+    s = getEdgeIntegralPolygonalChain(mesh,polygon)
+    s = getEdgeIntegralPolygonalChain(mesh,polygon,normalize)
+
+    Compute the integral of a piecewise linear edge grid basis projected onto
+    the edges of a polygonal chain. This function can be used to evaluate the
+    source term of a line current carried by the polygonal chain in electromagnetic
+    modelling.
+
+    The piecewise linear edge grid basis consists of the functions
+      phix_i (i = 1 ... numXEdges)
+      phiy_i (i = 1 ... numYEdges)
+      phiz_i (i = 1 ... numZEdges)
+    where phix_i, phiy_i, phiz_i = 1 at the i-th x/y/z-directed edge
+      and phix_i, phiy_i, phiz_i = 0 at all other edges.
+
+    INPUT
+    mesh ...... Tensor mesh
+    polygon ... vertices of polygonal chain as numVertices x 3 array
+    normalize . divide line integral by length of integration path (boolean, optional)
+
+    OUTPUT
+    s ......... source vector
+
+    For a closed current loop, specify polygon such that
+    polygon[1,:] == polygon[end,:]
+</code></pre>
+
+<p><a id='jInv.Mesh.getEdgeMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}' href='#jInv.Mesh.getEdgeMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}'>#</a>
+<strong><code>jInv.Mesh.getEdgeMassMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>function jInv.Mesh.getEdgeMassMatrix(mesh,sigma)
 
 Returns mass matrix on cell edges, weighted by vector sigma.
@@ -288,8 +319,8 @@ Output:
     SparseMatrixCSC{Float64,Int64}
 </code></pre>
 
-<p><a id='jInv.Mesh.getFaceAverageMatrix' href='#jInv.Mesh.getFaceAverageMatrix'>#</a>
-<strong><code>jInv.Mesh.getFaceAverageMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getFaceAverageMatrix-Tuple{jInv.Mesh.AbstractTensorMesh}' href='#jInv.Mesh.getFaceAverageMatrix-Tuple{jInv.Mesh.AbstractTensorMesh}'>#</a>
+<strong><code>jInv.Mesh.getFaceAverageMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <p>function jInv.Mesh.getFaceAverageMatrix</p>
 <pre><code>Returns Face-to-CellCenter average matrix from Mesh.Af. 
 Matrix is constructed if Mesh.Af is empty. 
@@ -301,8 +332,8 @@ Input:
     Mesh::Abstract Mesh
 </code></pre>
 
-<p><a id='jInv.Mesh.getFaceMassMatrix' href='#jInv.Mesh.getFaceMassMatrix'>#</a>
-<strong><code>jInv.Mesh.getFaceMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getFaceMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}' href='#jInv.Mesh.getFaceMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}'>#</a>
+<strong><code>jInv.Mesh.getFaceMassMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>function jInv.Mesh.getFaceMassMatrix(Mesh,sigma)
 
 Returns face mass matrix, weighted by vector sigma. 
@@ -318,8 +349,8 @@ Output:
     SparseMatrixCSC{Float64,Int64}
 </code></pre>
 
-<p><a id='jInv.Mesh.getInterpolationMatrix' href='#jInv.Mesh.getInterpolationMatrix'>#</a>
-<strong><code>jInv.Mesh.getInterpolationMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getInterpolationMatrix-Tuple{jInv.Mesh.AbstractTensorMesh,jInv.Mesh.AbstractTensorMesh}' href='#jInv.Mesh.getInterpolationMatrix-Tuple{jInv.Mesh.AbstractTensorMesh,jInv.Mesh.AbstractTensorMesh}'>#</a>
+<strong><code>jInv.Mesh.getInterpolationMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <p>function jInv.Mesh.getInterpolationMatrix</p>
 <p>computes bi/trilinear interpolation matrix P for cell-centered data from Mesh1 to Mesh2. If I1 is a cell-centerd discretization of some function  on Mesh1 then, its interpolant on Mesh2 is given by</p>
 <p>I2 = P*I1</p>
@@ -335,8 +366,8 @@ and the different forward problems.
 Mesh2Mesh = getInterpolationMatrix(Minv,Mfor)
 </code></pre>
 
-<p><a id='jInv.Mesh.getNodalAverageMatrix' href='#jInv.Mesh.getNodalAverageMatrix'>#</a>
-<strong><code>jInv.Mesh.getNodalAverageMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getNodalAverageMatrix-Tuple{jInv.Mesh.AbstractTensorMesh}' href='#jInv.Mesh.getNodalAverageMatrix-Tuple{jInv.Mesh.AbstractTensorMesh}'>#</a>
+<strong><code>jInv.Mesh.getNodalAverageMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <p>function jInv.Mesh.getNodalAverageMatrix</p>
 <pre><code>Returns Nodal-to-CellCenter average matrix from Mesh.An. 
 Matrix is constructed if Mesh.An is empty. 
@@ -345,8 +376,8 @@ Input:
     Mesh::Abstract Mesh
 </code></pre>
 
-<p><a id='jInv.Mesh.getNodalMassMatrix' href='#jInv.Mesh.getNodalMassMatrix'>#</a>
-<strong><code>jInv.Mesh.getNodalMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getNodalMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}' href='#jInv.Mesh.getNodalMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}'>#</a>
+<strong><code>jInv.Mesh.getNodalMassMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>function jInv.Mesh.getNodalMassMatrix(Mesh,sigma)
 
 Returns nodal mass matrix, weighted by vector sigma. 
@@ -361,8 +392,8 @@ Output:
     SparseMatrixCSC{Float64,Int64}
 </code></pre>
 
-<p><a id='jInv.Mesh.getRegularMesh' href='#jInv.Mesh.getRegularMesh'>#</a>
-<strong><code>jInv.Mesh.getRegularMesh</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getRegularMesh-Tuple{Any,Any}' href='#jInv.Mesh.getRegularMesh-Tuple{Any,Any}'>#</a>
+<strong><code>jInv.Mesh.getRegularMesh</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>function jInv.Mesh.getRegularMesh
 
 Constructs regular mesh
@@ -374,6 +405,18 @@ Input:
 Examples:
 M2D  = getRegularMesh([1.2 2.4 2.2 5.0],[3,4])  
 M3D  = getRegularMesh([1.2 2.4 2.2 5.0 0 1],[3,4,7])
+</code></pre>
+
+<p><a id='jInv.Mesh.getStraightLineCurrentIntegral-Tuple{Any,Any,Any,Any,Any,Any,Any,Any,Any}' href='#jInv.Mesh.getStraightLineCurrentIntegral-Tuple{Any,Any,Any,Any,Any,Any,Any,Any,Any}'>#</a>
+<strong><code>jInv.Mesh.getStraightLineCurrentIntegral</code></strong> &mdash; <em>Method</em>.</p>
+<pre><code>    function jInv.Mesh.getStraightLineCurrentIntegral
+
+    [sx,sy,sz] = getStraightLineCurrentIntegral(hx,hy,hz,ax,ay,az,bx,by,bz)
+
+    Compute integral int(W . J dx^3) in brick of size hx x hy x hz
+    where W denotes the 12 local bilinear edge basis functions
+    and where J prescribes a unit line current
+    between points (ax,ay,az) and (bx,by,bz).
 </code></pre>
 
 <p><a id='jInv.Mesh.getTensorMesh3D' href='#jInv.Mesh.getTensorMesh3D'>#</a>
@@ -392,8 +435,8 @@ Optional Input
    x0::Array - origin (default = zeros(3))
 </code></pre>
 
-<p><a id='jInv.Mesh.getdEdgeMassMatrix' href='#jInv.Mesh.getdEdgeMassMatrix'>#</a>
-<strong><code>jInv.Mesh.getdEdgeMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getdEdgeMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}' href='#jInv.Mesh.getdEdgeMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}'>#</a>
+<strong><code>jInv.Mesh.getdEdgeMassMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>function jInv.Mesh.getdEdgeMassMatrix(mesh,v)
 
 Returns derivative of edge mass matrix. Matrix is always 
@@ -408,8 +451,8 @@ Output:
     SparseMatrixCSC{Float64,Int64}
 </code></pre>
 
-<p><a id='jInv.Mesh.getdFaceMassMatrix' href='#jInv.Mesh.getdFaceMassMatrix'>#</a>
-<strong><code>jInv.Mesh.getdFaceMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getdFaceMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}' href='#jInv.Mesh.getdFaceMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}'>#</a>
+<strong><code>jInv.Mesh.getdFaceMassMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>function jInv.Mesh.getdFaceMassMatrix(Mesh,v)
 
 Returns derivative of face mass matrix. Matrix is always 
@@ -424,8 +467,8 @@ Output:
     SparseMatrixCSC{Float64,Int64}
 </code></pre>
 
-<p><a id='jInv.Mesh.getdNodalMassMatrix' href='#jInv.Mesh.getdNodalMassMatrix'>#</a>
-<strong><code>jInv.Mesh.getdNodalMassMatrix</code></strong> &mdash; <em>Function</em>.</p>
+<p><a id='jInv.Mesh.getdNodalMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}' href='#jInv.Mesh.getdNodalMassMatrix-Tuple{jInv.Mesh.AbstractMesh,Array{T,1}}'>#</a>
+<strong><code>jInv.Mesh.getdNodalMassMatrix</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>function jInv.Mesh.getdNodalMassMatrix(Mesh,v)
 
 Returns derivative of nodal mass matrix. Matrix is always 
