@@ -169,11 +169,242 @@
 <p><a id='Basic-Installation-1'></a></p>
 <h2 id="basic-installation">Basic Installation</h2>
 <p>To install <code>jInv</code> start a Julia session and type in the REPL (we currently support Julia versions 0.4.x):</p>
-<pre><code class="julia">julia&gt; Pkg.clone(&quot;https://github.com/JuliaInv/jInv.jl&quot;,&quot;jInv&quot;)
+<pre><code class="julia">INFO: Cloning jInv from https://github.com/JuliaInv/jInv.jl
+julia&gt; Pkg.clone(&quot;https://github.com/JuliaInv/jInv.jl&quot;,&quot;jInv&quot;)
 ERROR: jInv already exists
 
 julia&gt; Pkg.build(&quot;jInv&quot;)
-INFO: Cloning jInv from https://github.com/JuliaInv/jInv.jl
+
+INFO: Testing jInv
+3-dimensional regular mesh of size [3,4,5]
+Number of cells:   60
+Number of faces:   [80,75,72] = 227
+Number of edges:   [90,96,100] = 286
+Number of nodes:   120
+Coordinate origin: [1.2,0.0,0.0]
+Domain size:       [1.2,2.4,0.0,1.1,0.0,2.3]
+Cell size:         [0.39999999999999997,0.275,0.45999999999999996]
+2-dimensional regular mesh of size [3,4]
+Number of cells:   12
+Number of faces:   [16,15] = 31
+Number of edges:   [15,16] = 31
+Number of nodes:   20
+Coordinate origin: [1.2,0.0]
+Domain size:       [1.2,2.4,0.0,1.1]
+Cell size:         [0.39999999999999997,0.275]
+3-dimensional tensor mesh of size [4,5,6]
+Number of cells:   120
+Number of faces:   [150,144,140] = 434
+Number of edges:   [168,175,180] = 523
+Number of nodes:   210
+Coordinate origin: [0.0,0.0,0.0]
+Domain size:       2.206271409080668m x 1.8282795033989654m x 3.4519899585703953m
+Minimum cell size: 0.2182466387102555m x 0.026461889129025806m x 0.15571051220876586m
+Maximum cell size: 0.8602210310818348m x 0.9746840811811073m x 0.9419269399936876m
+==== compare regular and tensor mesh ====
+    test cell-centered axes...passed
+    test nodal axes...passed
+    test cell-centered grid...passed
+    test nodal grid...passed
+    test face grid...passed
+    test edge grid...passed
+    test volume...passed
+    test area...passed
+    test length...passed
+    test counting...passed
+    test nodal gradient matrix...passed
+    test divergence matrix...passed
+    test curl matrix...passed
+    test face average matrix...passed
+    test edge average matrix...passed
+==== test differential operators ====
+    testing differential operators for jInv.Mesh.TensorMesh3D...passed!
+    testing differential operators for jInv.Mesh.RegularMesh...passed!
+    testing differential operators for jInv.Mesh.TensorMesh3D...passed!
+   test getInterpolationMatrix (RegularMesh) ...  dim=2 dim=3 passed
+   test getInterpolationMatrix (TensorMesh) ... passed
+==== test differential operators ====
+    testing nodal averaging for jInv.Mesh.TensorMesh3D...passed!
+    testing nodal averaging for jInv.Mesh.RegularMesh...passed!
+    testing nodal averaging for jInv.Mesh.TensorMesh3D...passed!
+    testing nodal averaging for jInv.Mesh.RegularMesh...passed!
+==== test persistency of linear operators ====
+=== test getEdgeIntegralOfPolygonalChain ===
+ Mesh: All tests passed!
+test prepareMesh2Mesh
+compare remote versions with local ones
+test interpGlobal2Local
+test interpLocal2Global
+ Testing module Utils
+   Testing sparseUtils
+   sparseUtils: All tests passed!
+testing sortpermFast
+testing uniqueidx
+   test checkDerivative ...        h           E0          E1          O1          O2     OK?
+1.000e-01   5.028e-01   8.697e-02   0.000e+00   0.000e+00       0
+1.000e-02   5.811e-02   8.697e-04   9.372e-01   2.000e+00       1
+1.000e-03   5.889e-03   8.697e-06   9.942e-01   2.000e+00       1
+1.000e-04   5.897e-04   8.697e-08   9.994e-01   2.000e+00       1
+1.000e-05   5.898e-05   8.697e-10   9.999e-01   2.000e+00       1
+1.000e-06   5.898e-06   8.697e-12   1.000e+00   2.000e+00       1
+1.000e-07   5.898e-07   8.669e-14   1.000e+00   2.001e+00       1
+1.000e-08   5.898e-08   5.898e-16   1.000e+00   2.167e+00       1
+1.000e-09   5.898e-09   1.474e-16   1.000e+00   6.021e-01       1
+1.000e-10   5.898e-10   1.474e-16   1.000e+00   0.000e+00       1
+        h          E0          E1          O1          O2     OK?
+1.000e-01   4.295e-02   9.508e-04   0.000e+00   0.000e+00       0
+1.000e-02   4.259e-03   9.508e-06   1.004e+00   2.000e+00       1
+1.000e-03   4.255e-04   9.508e-08   1.000e+00   2.000e+00       1
+1.000e-04   4.255e-05   9.508e-10   1.000e+00   2.000e+00       1
+1.000e-05   4.255e-06   9.508e-12   1.000e+00   2.000e+00       1
+1.000e-06   4.255e-07   9.512e-14   1.000e+00   2.000e+00       1
+1.000e-07   4.255e-08   9.458e-16   1.000e+00   2.002e+00       1
+1.000e-08   4.255e-09   1.088e-16   1.000e+00   9.392e-01       1
+1.000e-09   4.255e-10   1.029e-16   1.000e+00   2.420e-02       1
+1.000e-10   4.255e-11   1.284e-16   1.000e+00   -9.608e-02      1
+passed
+ Utils: All tests passed
+ test module InverseSolve
+        checkDerivative of jInv.InverseSolve.expMod
+        checkDerivative of jInv.InverseSolve.boundMod
+        checkDerivative of jInv.InverseSolve.fMod
+Gradient test for jInv.InverseSolve.SSDFun (real)
+Gradient test for jInv.InverseSolve.HuberFun (real)
+Hessian test for jInv.InverseSolve.SSDFun (real)
+Gradient test for jInv.InverseSolve.SSDFun (complex)
+Hessian test for jInv.InverseSolve.SSDFun (complex)
+WARNING: skipped
+checkDerivative of (anonymous function)
+checkDerivative of (anonymous function)
+checkDerivative of jInv.InverseSolve.smallnessReg
+checkDerivative of (anonymous function)
+checkDerivative of jInv.InverseSolve.wdiffusionRegNodal
+checkDerivative of jInv.InverseSolve.wTVRegNodal
+checkDerivative of jInv.InverseSolve.logBarrier
+checkDerivative of jInv.InverseSolve.logBarrierSquared
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   1.72e+02    0.00e+00    1.00e+00    1.00e+00      0
+   .1   5.06e+00    5.55e+00            6.19e-02
+  2.0   5.06e+00    5.55e+00    1.00e+00    6.19e-02      1
+   .1   3.99e+00    6.07e+00            5.87e-02
+  3.0   3.99e+00    6.07e+00    1.00e+00    5.87e-02      1
+   .1   4.02e+00    6.04e+00            5.86e-02
+  4.0   4.02e+00    6.04e+00    1.00e+00    5.86e-02      1
+   .1   4.02e+00    6.04e+00            5.86e-02
+  5.0   4.02e+00    6.04e+00    1.00e+00    5.86e-02      1
+   .1   4.02e+00    6.04e+00            5.86e-02
+projGNCG reached desired accuracy at iteration 5.
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   1.72e+02    0.00e+00    1.00e+00    1.00e+00      0
+   .1   5.06e+00    5.55e+00            6.19e-02
+  2.0   5.06e+00    5.55e+00    1.00e+00    6.19e-02      1
+   .1   3.99e+00    6.07e+00            5.87e-02
+  3.0   3.99e+00    6.07e+00    1.00e+00    5.87e-02      1
+   .1   4.02e+00    6.04e+00            5.86e-02
+  4.0   4.02e+00    6.04e+00    1.00e+00    5.86e-02      1
+   .1   4.02e+00    6.04e+00            5.86e-02
+  5.0   4.02e+00    6.04e+00    1.00e+00    5.86e-02      1
+   .1   4.02e+00    6.04e+00            5.86e-02
+projGNCG reached desired accuracy at iteration 5.
+ InverseSolve: All tests passed!
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   3.06e+01    0.00e+00    1.00e+00    1.00e+00      0
+   .1   1.55e+00    3.47e+00            1.64e-01
+  2.0   1.55e+00    3.47e+00    1.00e+00    1.64e-01      0
+   .1   1.34e+00    3.59e+00            1.61e-01
+  3.0   1.34e+00    3.59e+00    1.00e+00    1.61e-01      0
+   .1   1.34e+00    3.59e+00            1.61e-01
+  4.0   1.34e+00    3.59e+00    1.00e+00    1.61e-01      0
+   .1   1.34e+00    3.59e+00            1.61e-01
+  5.0   1.34e+00    3.59e+00    1.00e+00    1.61e-01      0
+   .1   1.34e+00    3.59e+00            1.61e-01
+projGNCG reached desired accuracy at iteration 5.
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   3.06e+01    0.00e+00    1.00e+00    1.00e+00      0
+   .1   1.55e+00    3.47e+00            1.64e-01
+  2.0   1.55e+00    3.47e+00    1.00e+00    1.64e-01      0
+   .1   1.34e+00    3.59e+00            1.61e-01
+  3.0   1.34e+00    3.59e+00    1.00e+00    1.61e-01      0
+   .1   1.34e+00    3.59e+00            1.61e-01
+  4.0   1.34e+00    3.59e+00    1.00e+00    1.61e-01      0
+   .1   1.34e+00    3.59e+00            1.61e-01
+  5.0   1.34e+00    3.59e+00    1.00e+00    1.61e-01      0
+   .1   1.34e+00    3.59e+00            1.61e-01
+projGNCG reached desired accuracy at iteration 5.
+i.LS           F           R    alpha[1]       Jc/J0
+  1.0   3.06e+01    0.00e+00    1.00e+00    1.00e+00
+   .1   1.55e+00    4.62e+00            2.02e-01
+  2.0   1.55e+00    4.62e+00    1.00e+00    2.02e-01
+   .1   1.39e+00    3.69e+00            1.66e-01
+  3.0   1.39e+00    3.69e+00    1.00e+00    1.66e-01
+   .1   1.50e+00    3.47e+00            1.63e-01
+  4.0   1.50e+00    3.47e+00    1.00e+00    1.63e-01
+   .1   1.48e+00    3.49e+00            1.62e-01
+  5.0   1.48e+00    3.49e+00    1.00e+00    1.62e-01
+   .1   1.48e+00    3.49e+00            1.62e-01
+barrierGNCG iterated maxIter=5 times but reached only stepNorm of 0.0014893540447245002 instead 0.0001.
+i.LS           F           R    alpha[1]       Jc/J0
+  1.0   3.06e+01    0.00e+00    1.00e+00    1.00e+00
+   .1   1.55e+00    4.62e+00            2.02e-01
+  2.0   1.55e+00    4.62e+00    1.00e+00    2.02e-01
+   .1   1.39e+00    3.69e+00            1.66e-01
+  3.0   1.39e+00    3.69e+00    1.00e+00    1.66e-01
+   .1   1.50e+00    3.47e+00            1.63e-01
+  4.0   1.50e+00    3.47e+00    1.00e+00    1.63e-01
+   .1   1.48e+00    3.49e+00            1.62e-01
+  5.0   1.48e+00    3.49e+00    1.00e+00    1.62e-01
+   .1   1.48e+00    3.49e+00            1.62e-01
+barrierGNCG iterated maxIter=5 times but reached only stepNorm of 0.0014893540447245002 instead 0.0001.
+Starting projGNCG minimization with alpha 1 of 3
+alpha = 100.0
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   3.06e+01    0.00e+00    1.00e+02    1.00e+00      0
+   .1   2.70e+01    1.73e+00            9.39e-01
+  2.0   2.70e+01    1.73e+00    1.00e+02    9.39e-01      0
+   .1   2.70e+01    1.73e+00            9.39e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.00024389471030164186 instead 0.0001.
+[30.59738501677412,27.00805759306389,27.008055989149028]
+Starting projGNCG minimization with alpha 2 of 3
+alpha = 10.0
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   2.70e+01    0.00e+00    1.00e+01    1.00e+00      0
+   .1   1.06e+01    6.12e+00            6.19e-01
+  2.0   1.06e+01    6.12e+00    1.00e+01    6.19e-01      0
+   .1   1.06e+01    6.12e+00            6.19e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0035189857194566354 instead 0.0001.
+[27.008055989149028,10.606465661044009,10.608724416310553]
+iteratedTikhonov exiting after reaching desired misfit
+Starting projGNCG minimization with alpha 1 of 3
+alpha = 100.0
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   3.06e+01    0.00e+00    1.00e+02    1.00e+00      0
+   .1   2.70e+01    1.73e+00            9.39e-01
+  2.0   2.70e+01    1.73e+00    1.00e+02    9.39e-01      0
+   .1   2.70e+01    1.73e+00            9.39e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.00024389471030164186 instead 0.0001.
+[30.59738501677412,27.00805759306389,27.008055989149028]
+Starting projGNCG minimization with alpha 2 of 3
+alpha = 10.0
+i.LS           F           R    alpha[1]       Jc/J0     #Active
+  1.0   2.70e+01    0.00e+00    1.00e+01    1.00e+00      0
+   .1   1.06e+01    6.12e+00            6.19e-01
+  2.0   1.06e+01    6.12e+00    1.00e+01    6.19e-01      0
+   .1   1.06e+01    6.12e+00            6.19e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0035189857194566354 instead 0.0001.
+[27.008055989149028,10.606465661044009,10.608724416310553]
+iteratedTikhonov exiting after reaching desired misfit
+===  Example 2D DivSigGrad ====
+cg achieved desired tolerance at iteration 7. Residual norm is 3.08e-06.
+bcgstb achieved desired tolerance at iteration 4. Residual norm is 5.28e-06.
+===  Test for nonsymmetric matrices ====
+===  Example 2D DivSigGrad ====
+blockCG achieved desired tolerance at iteration 6. Residual norm is 3.89e-05.
+blockBiCGSTB achieved desired tolerance at iteration 3.5. Residual norm is 4.40e-05.
+===  Test for nonsymmetric matrices ====
+===  Test Julia Wrapper: Symmetric ====
+===  Test Julia Wrapper: nonsymmetric matrices ====
+===  End Test Julia Wrapper ====
+INFO: jInv tests passed
 </code></pre>
 
 <p>The above commands clone the latest version of <code>jInv</code> and install the dependency <a href="https://github.com/lruthotto/KrylovMethods.jl"><code>KrylovMethods.jl</code></a>, which provides iterative methods for solving (sparse) linear systems. Finally, some unit tests are run. </p>
@@ -232,5 +463,5 @@ INFO: Cloning jInv from https://github.com/JuliaInv/jInv.jl
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-07-08 12:13:27.200379
+Build Date UTC : 2016-08-05 13:51:21.125375
 -->
