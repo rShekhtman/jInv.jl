@@ -41,3 +41,7 @@ Pkg.test("jInv")
 
 1. [`DivSigGrad.jl`](https://github.com/JuliaInv/DivSigGrad.jl) - Inverse conductivity problems
 2. [`FWI.jl`](https://github.com/JuliaInv/FWI.jl) - Full Waveform Inversion
+
+# Acknowledgements
+
+This material is in part based upon work supported by the National Science Foundation under Grant Number 1522599. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
