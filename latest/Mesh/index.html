@@ -108,6 +108,13 @@
     </li>
 <li>
           
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../About/">About</a>
+        
+    </li>
+<li>
+          
         </ul>
       </div>
       &nbsp;
@@ -258,6 +265,18 @@ Example:
 
 h1 = rand(4); h2 = rand(6); h3 = rand(5);
 M  = getTensorMesh2D(h1,h2,h3)
+</code></pre>
+
+<p><a id='jInv.Mesh.getBoundaryNodes-Tuple{jInv.Mesh.AbstractTensorMesh}' href='#jInv.Mesh.getBoundaryNodes-Tuple{jInv.Mesh.AbstractTensorMesh}'>#</a>
+<strong><code>jInv.Mesh.getBoundaryNodes</code></strong> &mdash; <em>Method</em>.</p>
+<p>function jInv.Mesh.getBoundaryNodes(Mesh)</p>
+<pre><code>Returns an array tuple (boundary node indices, inner node indices)
+
+Input: 
+    Mesh::Abstract Mesh
+
+Output:
+    Tuple{Array{Int64,1},Array{Int64,1}}
 </code></pre>
 
 <p><a id='jInv.Mesh.getEdgeAverageMatrix-Tuple{jInv.Mesh.AbstractTensorMesh}' href='#jInv.Mesh.getEdgeAverageMatrix-Tuple{jInv.Mesh.AbstractTensorMesh}'>#</a>
