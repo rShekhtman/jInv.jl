@@ -1,6 +1,6 @@
 export TensorMesh3D, getTensorMesh3D
 export getCellCenteredGrid, getNodalGrid, getFaceGrids, getEdgeGrids
-export getCellCenteredAxes, getNodalAxes
+export getCellCenteredAxes, getNodalAxes,getBoundaryNodes
 export getVolume, getVolumeInv, getFaceArea, getFaceAreaInv, getLength, getLengthInv
 
 """
