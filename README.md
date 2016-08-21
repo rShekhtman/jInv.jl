@@ -39,8 +39,10 @@ Pkg.test("jInv")
 
 # Packages using jInv
 
-1. [`DivSigGrad.jl`](https://github.com/JuliaInv/DivSigGrad.jl) - Inverse conductivity problems
+1. [`DivSigGrad.jl`](https://github.com/JuliaInv/DivSigGrad.jl) - Inverse conductivity problems in statics
 2. [`FWI.jl`](https://github.com/JuliaInv/FWI.jl) - Full Waveform Inversion
+3. [`MaxwellFrequency`](https://github.com/JuliaInv/MaxwellFrequency) - Inversion for conductivity in Maxwell's equations
+4. [`EikonalInv.jl`](https://github.com/JuliaInv/EikonalInv.jl) - Inversion for slowness from travel time tomography 
 
 # Acknowledgements
 
