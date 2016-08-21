@@ -205,9 +205,9 @@ Number of faces:   [150,144,140] = 434
 Number of edges:   [168,175,180] = 523
 Number of nodes:   210
 Coordinate origin: [0.0,0.0,0.0]
-Domain size:       1.3916002796624147m x 2.7414044665456108m x 3.411414702169256m
-Minimum cell size: 0.11225575875268978m x 0.4185933816699485m x 0.04851897687428908m
-Maximum cell size: 0.6693966917217264m x 0.9056559925479055m x 0.9169656435270048m
+Domain size:       2.0116389685303226m x 2.783752603488735m x 2.6793010445072567m
+Minimum cell size: 0.023790742625263483m x 0.12491110831249008m x 0.028227460668269533m
+Maximum cell size: 0.9364315805231587m x 0.861634672482489m x 0.8083361182806987m
 ==== compare regular and tensor mesh ====
     test cell-centered axes...passed
     test nodal axes...passed
@@ -255,27 +255,27 @@ test interpLocal2Global
 testing sortpermFast
 testing uniqueidx
    test checkDerivative ...        h           E0          E1          O1          O2     OK?
-1.000e-01   8.808e-01   4.287e-01   0.000e+00   0.000e+00       0
-1.000e-02   1.267e-01   4.287e-03   8.422e-01   2.000e+00       1
-1.000e-03   1.305e-02   4.287e-05   9.870e-01   2.000e+00       1
-1.000e-04   1.309e-03   4.287e-07   9.987e-01   2.000e+00       1
-1.000e-05   1.310e-04   4.287e-09   9.999e-01   2.000e+00       1
-1.000e-06   1.310e-05   4.287e-11   1.000e+00   2.000e+00       1
-1.000e-07   1.310e-06   4.287e-13   1.000e+00   2.000e+00       1
-1.000e-08   1.310e-07   4.245e-15   1.000e+00   2.004e+00       1
-1.000e-09   1.310e-08   1.287e-16   1.000e+00   1.519e+00       1
-1.000e-10   1.310e-09   0.000e+00   1.000e+00   Inf     1
+1.000e-01   9.465e-01   5.908e-01   0.000e+00   0.000e+00       0
+1.000e-02   1.478e-01   5.908e-03   8.064e-01   2.000e+00       1
+1.000e-03   1.531e-02   5.908e-05   9.847e-01   2.000e+00       1
+1.000e-04   1.537e-03   5.908e-07   9.985e-01   2.000e+00       1
+1.000e-05   1.537e-04   5.908e-09   9.998e-01   2.000e+00       1
+1.000e-06   1.537e-05   5.908e-11   1.000e+00   2.000e+00       1
+1.000e-07   1.537e-06   5.907e-13   1.000e+00   2.000e+00       1
+1.000e-08   1.537e-07   5.895e-15   1.000e+00   2.001e+00       1
+1.000e-09   1.537e-08   0.000e+00   1.000e+00   Inf     1
+1.000e-10   1.537e-09   0.000e+00   1.000e+00   NaN     1
         h          E0          E1          O1          O2     OK?
-1.000e-01   4.470e-02   1.137e-03   0.000e+00   0.000e+00       0
-1.000e-02   4.424e-03   1.137e-05   1.004e+00   2.000e+00       1
-1.000e-03   4.420e-04   1.137e-07   1.000e+00   2.000e+00       1
-1.000e-04   4.419e-05   1.137e-09   1.000e+00   2.000e+00       1
-1.000e-05   4.419e-06   1.137e-11   1.000e+00   2.000e+00       1
-1.000e-06   4.419e-07   1.137e-13   1.000e+00   2.000e+00       1
-1.000e-07   4.419e-08   1.218e-15   1.000e+00   1.970e+00       1
-1.000e-08   4.419e-09   1.205e-16   1.000e+00   1.005e+00       1
-1.000e-09   4.419e-10   1.078e-16   1.000e+00   4.846e-02       1
-1.000e-10   4.419e-11   1.363e-16   1.000e+00   -1.021e-01      1
+1.000e-01   1.024e-01   6.217e-03   0.000e+00   0.000e+00       0
+1.000e-02   9.971e-03   6.217e-05   1.012e+00   2.000e+00       1
+1.000e-03   9.945e-04   6.217e-07   1.001e+00   2.000e+00       1
+1.000e-04   9.942e-05   6.217e-09   1.000e+00   2.000e+00       1
+1.000e-05   9.942e-06   6.217e-11   1.000e+00   2.000e+00       1
+1.000e-06   9.942e-07   6.217e-13   1.000e+00   2.000e+00       1
+1.000e-07   9.942e-08   6.206e-15   1.000e+00   2.001e+00       1
+1.000e-08   9.942e-09   2.065e-16   1.000e+00   1.478e+00       1
+1.000e-09   9.942e-10   1.769e-16   1.000e+00   6.711e-02       1
+1.000e-10   9.942e-11   5.410e-17   1.000e+00   5.145e-01       1
 passed
  Utils: All tests passed
  test module InverseSolve
@@ -297,123 +297,123 @@ checkDerivative of jInv.InverseSolve.wTVRegNodal
 checkDerivative of jInv.InverseSolve.logBarrier
 checkDerivative of jInv.InverseSolve.logBarrierSquared
 i.LS           F           R    alpha[1]       Jc/J0     #Active
-  1.0   1.53e+02    0.00e+00    1.00e+00    1.00e+00      0
-   .1   4.54e+00    5.44e+00            6.51e-02
-  2.0   4.54e+00    5.44e+00    1.00e+00    6.51e-02      1
-   .1   3.37e+00    5.97e+00            6.09e-02
-  3.0   3.37e+00    5.97e+00    1.00e+00    6.09e-02      1
-   .1   3.39e+00    5.94e+00            6.08e-02
-  4.0   3.39e+00    5.94e+00    1.00e+00    6.08e-02      1
-   .1   3.38e+00    5.94e+00            6.08e-02
-  5.0   3.38e+00    5.94e+00    1.00e+00    6.08e-02      1
-   .1   3.38e+00    5.94e+00            6.07e-02
-projGNCG iterated maxIter=5 times but reached only stepNorm of 0.03562767246433429 instead 0.0001.
+  1.0   1.60e+02    0.00e+00    1.00e+00    1.00e+00      0
+   .1   4.79e+00    5.31e+00            6.30e-02
+  2.0   4.79e+00    5.31e+00    1.00e+00    6.30e-02      3
+   .1   3.40e+00    5.93e+00            5.82e-02
+  3.0   3.40e+00    5.93e+00    1.00e+00    5.82e-02      2
+   .1   3.41e+00    5.90e+00            5.81e-02
+  4.0   3.41e+00    5.90e+00    1.00e+00    5.81e-02      2
+   .1   3.41e+00    5.90e+00            5.81e-02
+  5.0   3.41e+00    5.90e+00    1.00e+00    5.81e-02      2
+   .1   3.41e+00    5.90e+00            5.81e-02
+projGNCG iterated maxIter=5 times but reached only stepNorm of 0.00011646058415892835 instead 0.0001.
 i.LS           F           R    alpha[1]       Jc/J0     #Active
-  1.0   1.53e+02    0.00e+00    1.00e+00    1.00e+00      0
-   .1   4.54e+00    5.44e+00            6.51e-02
-  2.0   4.54e+00    5.44e+00    1.00e+00    6.51e-02      1
-   .1   3.37e+00    5.97e+00            6.09e-02
-  3.0   3.37e+00    5.97e+00    1.00e+00    6.09e-02      1
-   .1   3.39e+00    5.94e+00            6.08e-02
-  4.0   3.39e+00    5.94e+00    1.00e+00    6.08e-02      1
-   .1   3.38e+00    5.94e+00            6.08e-02
-  5.0   3.38e+00    5.94e+00    1.00e+00    6.08e-02      1
-   .1   3.38e+00    5.94e+00            6.07e-02
-projGNCG iterated maxIter=5 times but reached only stepNorm of 0.03562767246433429 instead 0.0001.
+  1.0   1.60e+02    0.00e+00    1.00e+00    1.00e+00      0
+   .1   4.79e+00    5.31e+00            6.30e-02
+  2.0   4.79e+00    5.31e+00    1.00e+00    6.30e-02      3
+   .1   3.40e+00    5.93e+00            5.82e-02
+  3.0   3.40e+00    5.93e+00    1.00e+00    5.82e-02      2
+   .1   3.41e+00    5.90e+00            5.81e-02
+  4.0   3.41e+00    5.90e+00    1.00e+00    5.81e-02      2
+   .1   3.41e+00    5.90e+00            5.81e-02
+  5.0   3.41e+00    5.90e+00    1.00e+00    5.81e-02      2
+   .1   3.41e+00    5.90e+00            5.81e-02
+projGNCG iterated maxIter=5 times but reached only stepNorm of 0.00011646058415892835 instead 0.0001.
  InverseSolve: All tests passed!
 i.LS           F           R    alpha[1]       Jc/J0     #Active
-  1.0   2.72e+01    0.00e+00    1.00e+00    1.00e+00      0
-   .1   1.69e+00    3.27e+00            1.82e-01
-  2.0   1.69e+00    3.27e+00    1.00e+00    1.82e-01      0
-   .1   1.42e+00    3.41e+00            1.78e-01
-  3.0   1.42e+00    3.41e+00    1.00e+00    1.78e-01      0
-   .1   1.41e+00    3.41e+00            1.78e-01
-  4.0   1.41e+00    3.41e+00    1.00e+00    1.78e-01      0
-   .1   1.41e+00    3.41e+00            1.78e-01
-  5.0   1.41e+00    3.41e+00    1.00e+00    1.78e-01      0
-   .1   1.41e+00    3.41e+00            1.78e-01
+  1.0   2.52e+01    0.00e+00    1.00e+00    1.00e+00      0
+   .1   1.75e+00    3.13e+00            1.94e-01
+  2.0   1.75e+00    3.13e+00    1.00e+00    1.94e-01      0
+   .1   1.45e+00    3.30e+00            1.89e-01
+  3.0   1.45e+00    3.30e+00    1.00e+00    1.89e-01      0
+   .1   1.46e+00    3.30e+00            1.89e-01
+  4.0   1.46e+00    3.30e+00    1.00e+00    1.89e-01      0
+   .1   1.46e+00    3.30e+00            1.89e-01
+  5.0   1.46e+00    3.30e+00    1.00e+00    1.89e-01      0
+   .1   1.46e+00    3.30e+00            1.89e-01
 projGNCG reached desired accuracy at iteration 5.
 i.LS           F           R    alpha[1]       Jc/J0     #Active
-  1.0   2.72e+01    0.00e+00    1.00e+00    1.00e+00      0
-   .1   1.69e+00    3.27e+00            1.82e-01
-  2.0   1.69e+00    3.27e+00    1.00e+00    1.82e-01      0
-   .1   1.42e+00    3.41e+00            1.78e-01
-  3.0   1.42e+00    3.41e+00    1.00e+00    1.78e-01      0
-   .1   1.41e+00    3.41e+00            1.78e-01
-  4.0   1.41e+00    3.41e+00    1.00e+00    1.78e-01      0
-   .1   1.41e+00    3.41e+00            1.78e-01
-  5.0   1.41e+00    3.41e+00    1.00e+00    1.78e-01      0
-   .1   1.41e+00    3.41e+00            1.78e-01
+  1.0   2.52e+01    0.00e+00    1.00e+00    1.00e+00      0
+   .1   1.75e+00    3.13e+00            1.94e-01
+  2.0   1.75e+00    3.13e+00    1.00e+00    1.94e-01      0
+   .1   1.45e+00    3.30e+00            1.89e-01
+  3.0   1.45e+00    3.30e+00    1.00e+00    1.89e-01      0
+   .1   1.46e+00    3.30e+00            1.89e-01
+  4.0   1.46e+00    3.30e+00    1.00e+00    1.89e-01      0
+   .1   1.46e+00    3.30e+00            1.89e-01
+  5.0   1.46e+00    3.30e+00    1.00e+00    1.89e-01      0
+   .1   1.46e+00    3.30e+00            1.89e-01
 projGNCG reached desired accuracy at iteration 5.
 i.LS           F           R    alpha[1]       Jc/J0
-  1.0   2.72e+01    0.00e+00    1.00e+00    1.00e+00
-   .1   1.69e+00    3.33e+00            1.85e-01
-  2.0   1.69e+00    3.33e+00    1.00e+00    1.85e-01
-   .1   1.42e+00    3.42e+00            1.78e-01
-  3.0   1.42e+00    3.42e+00    1.00e+00    1.78e-01
-   .1   1.47e+00    3.37e+00            1.78e-01
-  4.0   1.47e+00    3.37e+00    1.00e+00    1.78e-01
-   .1   1.47e+00    3.37e+00            1.78e-01
-  5.0   1.47e+00    3.37e+00    1.00e+00    1.78e-01
-   .1   1.47e+00    3.37e+00            1.78e-01
-barrierGNCG iterated maxIter=5 times but reached only stepNorm of 0.0004039216416031888 instead 0.0001.
+  1.0   2.52e+01    0.00e+00    1.00e+00    1.00e+00
+   .1   1.75e+00    3.14e+00            1.94e-01
+  2.0   1.75e+00    3.14e+00    1.00e+00    1.94e-01
+   .1   1.45e+00    3.30e+00            1.89e-01
+  3.0   1.45e+00    3.30e+00    1.00e+00    1.89e-01
+   .1   1.46e+00    3.29e+00            1.89e-01
+  4.0   1.46e+00    3.29e+00    1.00e+00    1.89e-01
+   .1   1.46e+00    3.29e+00            1.89e-01
+  5.0   1.46e+00    3.29e+00    1.00e+00    1.89e-01
+   .1   1.46e+00    3.29e+00            1.89e-01
+barrierGNCG reached desired accuracy at iteration 5.
 i.LS           F           R    alpha[1]       Jc/J0
-  1.0   2.72e+01    0.00e+00    1.00e+00    1.00e+00
-   .1   1.69e+00    3.33e+00            1.85e-01
-  2.0   1.69e+00    3.33e+00    1.00e+00    1.85e-01
-   .1   1.42e+00    3.42e+00            1.78e-01
-  3.0   1.42e+00    3.42e+00    1.00e+00    1.78e-01
-   .1   1.47e+00    3.37e+00            1.78e-01
-  4.0   1.47e+00    3.37e+00    1.00e+00    1.78e-01
-   .1   1.47e+00    3.37e+00            1.78e-01
-  5.0   1.47e+00    3.37e+00    1.00e+00    1.78e-01
-   .1   1.47e+00    3.37e+00            1.78e-01
-barrierGNCG iterated maxIter=5 times but reached only stepNorm of 0.0004039216416031888 instead 0.0001.
+  1.0   2.52e+01    0.00e+00    1.00e+00    1.00e+00
+   .1   1.75e+00    3.14e+00            1.94e-01
+  2.0   1.75e+00    3.14e+00    1.00e+00    1.94e-01
+   .1   1.45e+00    3.30e+00            1.89e-01
+  3.0   1.45e+00    3.30e+00    1.00e+00    1.89e-01
+   .1   1.46e+00    3.29e+00            1.89e-01
+  4.0   1.46e+00    3.29e+00    1.00e+00    1.89e-01
+   .1   1.46e+00    3.29e+00            1.89e-01
+  5.0   1.46e+00    3.29e+00    1.00e+00    1.89e-01
+   .1   1.46e+00    3.29e+00            1.89e-01
+barrierGNCG reached desired accuracy at iteration 5.
 Starting projGNCG minimization with alpha 1 of 3
 alpha = 100.0
 i.LS           F           R    alpha[1]       Jc/J0     #Active
-  1.0   2.72e+01    0.00e+00    1.00e+02    1.00e+00      0
-   .1   2.43e+01    1.41e+00            9.45e-01
-  2.0   2.43e+01    1.41e+00    1.00e+02    9.45e-01      0
-   .1   2.43e+01    1.41e+00            9.45e-01
-projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0014887462037553416 instead 0.0001.
-[27.17951309473637,24.258684543673425,24.259215389105595]
+  1.0   2.52e+01    0.00e+00    1.00e+02    1.00e+00      0
+   .1   2.26e+01    1.26e+00            9.47e-01
+  2.0   2.26e+01    1.26e+00    1.00e+02    9.47e-01      0
+   .1   2.26e+01    1.26e+00            9.47e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0011164852911661922 instead 0.0001.
+[25.213377650404993,22.61968608030176,22.620059046704213]
 Starting projGNCG minimization with alpha 2 of 3
 alpha = 10.0
 i.LS           F           R    alpha[1]       Jc/J0     #Active
-  1.0   2.43e+01    0.00e+00    1.00e+01    1.00e+00      0
-   .1   1.03e+01    5.33e+00            6.43e-01
-  2.0   1.03e+01    5.33e+00    1.00e+01    6.43e-01      0
-   .1   1.03e+01    5.33e+00            6.43e-01
-projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0015397957102291637 instead 0.0001.
-[24.259215389105595,10.272924102292528,10.275524806798767]
+  1.0   2.26e+01    0.00e+00    1.00e+01    1.00e+00      0
+   .1   9.99e+00    4.85e+00            6.56e-01
+  2.0   9.99e+00    4.85e+00    1.00e+01    6.56e-01      0
+   .1   9.99e+00    4.85e+00            6.56e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0025904268033866695 instead 0.0001.
+[22.620059046704213,9.989646855612985,9.992345992655455]
 iteratedTikhonov exiting after reaching desired misfit
 Starting projGNCG minimization with alpha 1 of 3
 alpha = 100.0
 i.LS           F           R    alpha[1]       Jc/J0     #Active
-  1.0   2.72e+01    0.00e+00    1.00e+02    1.00e+00      0
-   .1   2.43e+01    1.41e+00            9.45e-01
-  2.0   2.43e+01    1.41e+00    1.00e+02    9.45e-01      0
-   .1   2.43e+01    1.41e+00            9.45e-01
-projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0014887462037553416 instead 0.0001.
-[27.17951309473637,24.258684543673425,24.259215389105595]
+  1.0   2.52e+01    0.00e+00    1.00e+02    1.00e+00      0
+   .1   2.26e+01    1.26e+00            9.47e-01
+  2.0   2.26e+01    1.26e+00    1.00e+02    9.47e-01      0
+   .1   2.26e+01    1.26e+00            9.47e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0011164852911661922 instead 0.0001.
+[25.213377650404993,22.61968608030176,22.620059046704213]
 Starting projGNCG minimization with alpha 2 of 3
 alpha = 10.0
 i.LS           F           R    alpha[1]       Jc/J0     #Active
-  1.0   2.43e+01    0.00e+00    1.00e+01    1.00e+00      0
-   .1   1.03e+01    5.33e+00            6.43e-01
-  2.0   1.03e+01    5.33e+00    1.00e+01    6.43e-01      0
-   .1   1.03e+01    5.33e+00            6.43e-01
-projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0015397957102291637 instead 0.0001.
-[24.259215389105595,10.272924102292528,10.275524806798767]
+  1.0   2.26e+01    0.00e+00    1.00e+01    1.00e+00      0
+   .1   9.99e+00    4.85e+00            6.56e-01
+  2.0   9.99e+00    4.85e+00    1.00e+01    6.56e-01      0
+   .1   9.99e+00    4.85e+00            6.56e-01
+projGNCG iterated maxIter=2 times but reached only stepNorm of 0.0025904268033866695 instead 0.0001.
+[22.620059046704213,9.989646855612985,9.992345992655455]
 iteratedTikhonov exiting after reaching desired misfit
 ===  Example 2D DivSigGrad ====
-cg achieved desired tolerance at iteration 6. Residual norm is 9.12e-06.
-bcgstb achieved desired tolerance at iteration 3.5. Residual norm is 2.50e-06.
+cg achieved desired tolerance at iteration 7. Residual norm is 6.20e-06.
+bcgstb achieved desired tolerance at iteration 4. Residual norm is 2.75e-06.
 ===  Test for nonsymmetric matrices ====
 ===  Example 2D DivSigGrad ====
-blockCG achieved desired tolerance at iteration 6. Residual norm is 2.50e-05.
-blockBiCGSTB achieved desired tolerance at iteration 3.5. Residual norm is 1.78e-05.
+blockCG achieved desired tolerance at iteration 5. Residual norm is 6.60e-05.
+blockBiCGSTB achieved desired tolerance at iteration 3. Residual norm is 6.89e-05.
 ===  Test for nonsymmetric matrices ====
 ===  Test Julia Wrapper: Symmetric ====
 ===  Test Julia Wrapper: nonsymmetric matrices ====
@@ -477,5 +477,5 @@ INFO: jInv tests passed
 
 <!--
 MkDocs version : 0.15.3
-Build Date UTC : 2016-08-21 20:57:13.171141
+Build Date UTC : 2016-08-21 21:03:34.647732
 -->
