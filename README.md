@@ -6,6 +6,7 @@
 # jInv
 
 `jInv` is a flexible framework for PDE parameter estimation in Julia. It provides easy to extend core functions used in PDE-constrained inverse problems.
+Our goal is to solve parameter estimation problems efficiently and in parallel. For more details see (http://arxiv.org/abs/1606.07399)
 
 # Overview
 
