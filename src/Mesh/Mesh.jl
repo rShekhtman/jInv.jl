@@ -4,6 +4,7 @@ using Base.BLAS
 using jInv.Utils
 
 export AbstractMesh
+export AbstractTensorMesh
 abstract AbstractMesh
 abstract AbstractTensorMesh <: AbstractMesh
 
