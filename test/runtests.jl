@@ -35,6 +35,13 @@ catch
 	warn("LinearSolvers had test errors")
 end
 
+try 
+	include("Vis/runtests.jl")
+catch
+	allPassed = false
+	warn("Vis had test errors")
+end
+
 
 @test allPassed == true
 
