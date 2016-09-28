@@ -101,7 +101,16 @@ if hasPardiso
 		        return
 		else
 			set_phase!(param.Ainv,-1)
-			A = speye(2); x = ones(2);b = ones(2)
+			# Real or complex matrix type
+			if param.sym in [1, 2, -2, 11]
+				A = speye(2)
+				x = ones(2)
+				b = ones(2)
+			else
+				A = speye(Complex128, 2)
+				x = ones(Complex128, 2)
+				b = ones(Complex128, 2)
+			end
 			pardiso(param.Ainv,x,A,b)
 			param.Ainv = []
 		end
