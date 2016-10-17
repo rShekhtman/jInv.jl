@@ -43,7 +43,7 @@ function plotGrid(y,M;spacing=[1,1,1],color="b")
     end
 end
 
-plotGrid(M::AbstractMesh,kwargs...) = plotGrid(getNodalGrid(M),M,kwargs...)
+plotGrid(M::AbstractMesh; kwargs...) = plotGrid(getNodalGrid(M),M;kwargs...)
 """
 function p3
 	

@@ -19,5 +19,5 @@ function viewImage2D(I,M::AbstractTensorMesh;kwargs...)
 	end
 	I = reshape(I,tuple(M.n...))
 	x1,x2 = getNodalAxes(M)
-	pcolormesh(x1,x2,I',kwargs...)
+	pcolormesh(x1,x2,I';kwargs...)
 end
