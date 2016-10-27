@@ -1,5 +1,7 @@
 using Base.Test
 
+include("setupTests.jl")
+
 allPassed = true
 try 
 	include("Mesh/runtests.jl")

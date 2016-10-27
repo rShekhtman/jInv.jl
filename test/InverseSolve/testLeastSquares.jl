@@ -1,27 +1,4 @@
-@everywhere begin
-	using jInv.InverseSolve
-	using jInv.Mesh
-	using jInv.LinearSolvers
-	using jInv.ForwardShare
-	using Base.Test
-end
-
-type LSparam <: ForwardProbType
-	A::SparseMatrixCSC
-	Ainv
-end
-
-function jInv.ForwardShare.getData(m::Vector,pFor::LSparam)
-	return pFor.A*m,pFor
-end
-
-function jInv.ForwardShare.getSensMatVec(v::Vector,m::Vector,pFor::LSparam)
-	return pFor.A*v
-end
-
-function jInv.ForwardShare.getSensTMatVec(v::Vector,m::Vector,pFor::LSparam)
-	return pFor.A'*v
-end
+include("../setupTests.jl")
 
 # build domain and true image
 domain = [0.0 1.0 0.0 1.0]

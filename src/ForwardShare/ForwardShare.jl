@@ -62,12 +62,47 @@ module ForwardShare
 	"""
 	getSensTMatVec(v::Vector,m::Vector,param::ForwardProbType) = error("nyi")
 
-	export getSensTMatVec,getSensMatVec
+	"""
+	(m,n) = getSensMatSize(pFor)
+	
+	Returns size of sensitivity matrix where m is the number of data points
+	and n the number of parameters in the model. 
+	 
+	Input
+	
+		pFor - forward problem:: Union{ForwardProbType, Array, RemoteRef}
+	
+	This is problem dependent and should be implemented in the respective
+	packages. 
+	"""
+	getSensMatSize(pFor::ForwardProbType) = error("nyi")
+	
+	function getSensMatSize(pFor::RemoteRef)
+		if pFor.where != myid()
+			return remotecall_fetch(pFor.where,getSensMatSize,pFor)
+		else
+			return getSensMatSize(fetch(pFor))
+		end
+	end
+	
+	function getSensMatSize(pFor::Array)
+		n  = length(pFor)
+		sz = [0;0]
+		for k=1:n
+			(s1,s2) = getSensMatSize(pFor[k])
+			sz[2]=s2
+			sz[1]+=s1
+		end
+		return tuple(sz...)
+	end
+	
+	export getSensTMatVec,getSensMatVec, getSensMatSize
 
 	# # ===== Methods for parallelization =====
 	include("getDataParallel.jl")
 	include("prepareMesh2Mesh.jl")
 	include("interpLocalToGlobal.jl")
+	include("getSensMat.jl")
 
 	import jInv.Utils.clear!
 	function clear!(P::ForwardProbType;clearAinv::Bool=true,clearFields::Bool=true, clearMesh::Bool=false, clearSources::Bool=false, clearObs::Bool=false,clearAll::Bool=false)
