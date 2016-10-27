@@ -107,6 +107,7 @@ module InverseSolve
 	include("misfit.jl")
 	include("regularizers.jl")
 	include("projGNCG.jl")
+	include("projSD.jl")
 	include("projPCG.jl")
 	include("barrierGNCG.jl")
 	include("computeMisfit.jl")
