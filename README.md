@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/JuliaInv/jInv.jl.svg?branch=master)](https://travis-ci.org/JuliaInv/jInv.jl) 
+[![Build Status](https://travis-ci.org/JuliaInv/jInv.jl.svg?branch=master)](https://travis-ci.org/JuliaInv/jInv.jl)
 [![Coverage Status](https://coveralls.io/repos/github/JuliaInv/jInv.jl/badge.svg?branch=master)](https://coveralls.io/github/JuliaInv/jInv.jl?branch=master)
 [![Build status](https://ci.appveyor.com/api/projects/status/0pxgtmm08b0w6wgh?svg=true)](https://ci.appveyor.com/project/JuliaInv/jinv-jl-81lel)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://JuliaInv.github.io/jInv.jl/latest)
@@ -13,22 +13,22 @@ Our goal is to solve parameter estimation problems efficiently and in parallel. 
 jInv consists of five submodules:
 
 1. `ForwardShare` - methods for solving forward problems in parallel.
-2. `InverseSolve` - methods commonly used in inverse problems such as misfit functions, regularization and numerical optimization. 
+2. `InverseSolve` - methods commonly used in inverse problems such as misfit functions, regularization and numerical optimization.
 3. `Mesh` - regular and tensor meshes in 2D and 3D as well as differential operators.
 4. `LinearSolvers` - interfaces to sparse and (if installed) direct linear solvers that can be used for solving the discretized PDEs.
 5. `Utils` - utility functions
 
 # Requirements
 
-jInv is intended for use with Julia versions 0.4.x.
+jInv is intended for use with Julia versions 0.5.x.
 
-1. [`KrylovMethods.jl`](https://github.com/lruthotto/KrylovMethods.jl)  - iterative methods for solving (sparse) linear systems. 
+1. [`KrylovMethods.jl`](https://github.com/lruthotto/KrylovMethods.jl)  - iterative methods for solving (sparse) linear systems.
 
 Additional (optional) packages for higher performance. `jInv` detects automatically if these packages are installed and uses them by default.
 
-1. [`MUMPS.jl`](https://github.com/JuliaSparse/MUMPS.jl) - wrapper for MUMPS. Used as a direct PDE solver. 
+1. [`MUMPS.jl`](https://github.com/JuliaSparse/MUMPS.jl) - wrapper for MUMPS. Used as a direct PDE solver.
 2. [`ParSpMatVec.jl`](https://github.com/lruthotto/ParSpMatVec.jl) - shared memory implementation for sparse matrix vector products.
-3. ['Pardiso.jl'](https://github.com/JuliaSparse/Pardiso.jl) 
+3. ['Pardiso.jl'](https://github.com/JuliaSparse/Pardiso.jl)
 
 # Installation
 
@@ -43,7 +43,7 @@ Pkg.test("jInv")
 1. [`DivSigGrad.jl`](https://github.com/JuliaInv/DivSigGrad.jl) - Inverse conductivity problems in statics
 2. [`FWI.jl`](https://github.com/JuliaInv/FWI.jl) - Full Waveform Inversion
 3. [`MaxwellFrequency`](https://github.com/JuliaInv/MaxwellFrequency) - Inversion for conductivity in Maxwell's equations
-4. [`EikonalInv.jl`](https://github.com/JuliaInv/EikonalInv.jl) - Inversion for slowness from travel time tomography 
+4. [`EikonalInv.jl`](https://github.com/JuliaInv/EikonalInv.jl) - Inversion for slowness from travel time tomography
 
 # Acknowledgements
 
