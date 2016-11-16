@@ -144,7 +144,6 @@ s = [sx[:]; sy[:]; sz[:]]
 
 # normalize
 if normalize
-
 	if all(polygon[1,:] .== polygon[np+1,:])
 
 		# closed polygon: divide by enclosed area
@@ -161,7 +160,6 @@ if normalize
 		a *= 0.5
 
 	else
-
 		# open polygon: divide by length
 		a = 0.0
 		for ip = 1:np
@@ -174,7 +172,7 @@ if normalize
 	end
 
 	s /= a
-
+	
 end
 
 return s

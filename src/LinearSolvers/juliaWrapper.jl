@@ -1,7 +1,7 @@
 export JuliaSolver,getJuliaSolver,copySolver
 
 import Base.\
-function \{T1,T2}(A::Base.SparseArrays.UMFPACK.UmfpackLU{T1},R::SparseMatrixCSC{T2}) 
+function \{T1,T2}(A::Base.SparseArrays.UMFPACK.UmfpackLU{T1},R::SparseMatrixCSC{T2})
 	
 	n,nrhs = size(R)
 	X = zeros(promote_type(T1,T2),n,nrhs)	
