@@ -14,7 +14,7 @@ Fields:
 	doClear - flag for deleting preconditioner
 	nthreads - number of threads for spmatvecs
 	sym      - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
-	isTranspose - if true, transpose(A) is provided to solver, else A is proved to solver
+	isTranspose - if true, transpose(A) is provided to solver, else A is provided to solver
 		      default=false, use isTranspose=true for efficiency with caution
 		      note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
 
@@ -90,11 +90,11 @@ function solveLinearSystem!(A,B,X,param::IterativeSolver,doTranspose=0)
 		if param.PC==:ssor
 			OmInvD = 1./diag(A);
 			x      = zeros(eltype(A),size(B,1))
-			M(r)   = (x[:]=0.0; tic(); x=ssorPrecTrans!(A,x,r,OmInvD); param.timePC+=toq(); return x);
+			M = r -> (x[:]=0.0; tic(); x=ssorPrecTrans!(A,x,r,OmInvD); param.timePC+=toq(); return x);
 			param.Ainv= M
 		elseif param.PC==:jac
 			OmInvD = 1./diag(A)
-			M(r)   = (tic(); x=r.*OmInvD; param.timePC+=toq(); return x); 
+			M = r -> (tic(); x=r.*OmInvD; param.timePC+=toq(); return x); 
 			param.Ainv= M
 		else 
 			error("Iterativesolver: preconditioner $(param.PC) not implemented.")
@@ -107,16 +107,16 @@ function solveLinearSystem!(A,B,X,param::IterativeSolver,doTranspose=0)
 	doTranspose = (param.isTranspose) ? mod(doTranspose+1,2) : doTranspose
 	if hasParSpMatVec
 		if (param.sym==1) ||  ((param.sym != 1) && (doTranspose == 1)) 
-			Af(x) = (y[:]=0.0; tic(); ParSpMatVec.Ac_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y,param.nthreads); param.timeMV+=toq(); return y)
+			Af = x -> (y[:]=0.0; tic(); ParSpMatVec.Ac_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y,param.nthreads); param.timeMV+=toq(); return y)
 		elseif (param.sym != 1) && (doTranspose == 0)
-			Af(x) = (y[:]=0.0; tic(); ParSpMatVec.A_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y,param.nthreads); param.timeMV+=toq(); return y)
+			Af = x -> (y[:]=0.0; tic(); ParSpMatVec.A_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y,param.nthreads); param.timeMV+=toq(); return y)
 		end
 			
 	else
 		if (param.sym==1) ||  ((param.sym != 1) && (doTranspose == 1)) 
-			Af(x) = (y[:]=0.0; tic(); Ac_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y); param.timeMV+=toq(); return y)
+			Af = x -> (y[:]=0.0; tic(); Ac_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y); param.timeMV+=toq(); return y)
 		elseif (param.sym != 1) && (doTranspose == 0)
-			Af(x) = (y[:]=0.0; tic(); A_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y); param.timeMV+=toq(); return y)
+			Af = x -> (y[:]=0.0; tic(); A_mul_B!(one(eltype(A)),A,x,zero(eltype(A)),y); param.timeMV+=toq(); return y)
 		end
 	end
 	

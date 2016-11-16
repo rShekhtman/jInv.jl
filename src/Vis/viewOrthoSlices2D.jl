@@ -21,8 +21,8 @@ function viewOrthoSlices2D(I,Mesh::AbstractTensorMesh;slices=round(Int64,Mesh.n/
   
     #  create big image
     I   = reshape(I,tuple(Mesh.n...));
-    Ixz = squeeze(I[:,slices[2],:],2);   # xz view
-    Iyz = squeeze(I[slices[1],:,:],1); # yz view
+    Ixz = I[:,slices[2],:];   # xz view
+    Iyz = I[slices[1],:,:]; # yz view
     Ixy = I[:,:,slices[3]]; # xy view
     
     Ibl = flipdim(Ixy,2)

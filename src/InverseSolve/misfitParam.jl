@@ -2,27 +2,27 @@ export MisfitParam,getMisfitParam
 
 """
 type jInv.InverseSolve.MisfitParam
-		
+
 Type storing information about one term in the misfit
-	
+
 F(m) = sum_i^n phi_i(pFor(model(m)),dobs,Wd)
-	
+
 Fields:
-	
+
 	pFor::ForwardProbType  - forward problem
 	Wd                     - inverse standard deviation
 	dobs                   - observed data
 	misfit::Function       - misfit function
 	modelfun::Function     - model function (evaluated locally)
 	gloc	               - mapping from inverse to forward mesh (including active cells projection).
-	   
+
 Constructors:
 
-getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0)) 
+getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0))
 
-getMisfitParam(pForRFs::Array{RemoteRef{Channel{Any}}}, Wd::Array, dobs::Array, misfit::Function, 
+getMisfitParam(pForRFs::Array{RemoteChannel}, Wd::Array, dobs::Array, misfit::Function,
 							Iact,sigmaBack::Vector,
-							Mesh2MeshRFs::Union{Array{RemoteRef{Channel{Any}}},Array{Float64}}=ones(length(pForRFs)),
+							Mesh2MeshRFs::Union{Array{RemoteChannel},Array{Float64}}=ones(length(pForRFs)),
 							modelfun::Function=identityMod,fname="")
 
 """
@@ -32,38 +32,38 @@ type MisfitParam
 	dobs
 	misfit::Function
 	modelfun::Function
-	gloc	
+	gloc
 end
 
 """
 function jInv.InverseSolve.getMisfitParam
-		
-Required Input:	
-		
-Input for a call: 
-	getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0)) 
-	
+
+Required Input:
+
+Input for a call:
+	getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0))
+
 	pFor::ForwardProbType  - forward problem
 	Wd                     - inverse standard deviation of data
 	dobs                   - observed data
-	misfit::Function       - Misfit function 
-	modelfun::Function     - model function. If all misfits have same model function, 
+	misfit::Function       - Misfit function
+	modelfun::Function     - model function. If all misfits have same model function,
 							 put modelfun in inverseParam and identityMod here for efficiency.
-	gloc                   - mapping from inverse to forward mesh (default: identity). See globalToLocal.jl 
-	
+	gloc                   - mapping from inverse to forward mesh (default: identity). See globalToLocal.jl
+
 Input for a call:
-	getMisfitParam(pForRFs::Array{RemoteRef{Channel{Any}}}, Wd::Array, dobs::Array, misfit::Function, 
-							Iact,sigmaBack::Vector, Mesh2MeshRFs::Union{Array{RemoteRef{Channel{Any}}},Array{Float64}}=ones(length(pForRFs)),
+	getMisfitParam(pForRFs::Array{RemoteChannel}, Wd::Array, dobs::Array, misfit::Function,
+							Iact,sigmaBack::Vector, Mesh2MeshRFs::Union{Array{RemoteChannel},Array{Float64}}=ones(length(pForRFs)),
 							modelfun::Function=identityMod,fname="")
-							
-	pForRFs::Array{RemoteRef{Channel{Any}}}			  		- Array of remote references for forward problem parameters on each worker.
+
+	pForRFs::Array{RemoteChannel}			  		- Array of remote references for forward problem parameters on each worker.
 	Wd::Array								- Array of inverse standard deviation for the data on each worker.
 	dobs::Array								- Array of observed data for each worker.
-	misfit::Function							- Misfit function 
+	misfit::Function							- Misfit function
 	Iact							        	- Projector to active cells.
-	sigmaBack::Vector							- Background model ("frozen" cells).					
-	Mesh2MeshRFs::Union{Array{RemoteRef{Channel{Any}}},Array{Float64}}	- mapping from inverse to forward mesh (default: identity) 
-	modelfun::Function=identityMod 						- model function. If all misfits have same model function, 
+	sigmaBack::Vector							- Background model ("frozen" cells).
+	Mesh2MeshRFs::Union{Array{RemoteChannel},Array{Float64}}	- mapping from inverse to forward mesh (default: identity)
+	modelfun::Function=identityMod 						- model function. If all misfits have same model function,
 										  put modelfun in inverseParam and identityMod here for efficiency.
 	fname="" 								- (optional)
 
@@ -73,24 +73,24 @@ function getMisfitParam(pFor::ForwardProbType, Wd, dobs, misfit::Function, model
 	return MisfitParam(pFor,Wd,dobs,misfit,modelfun,gloc);
 end
 
-function getMisfitParam(pForRFs::Array{RemoteRef{Channel{Any}}}, Wd::Array, dobs::Array, misfit::Function, 
+function getMisfitParam(pForRFs::Array{RemoteChannel}, Wd::Array, dobs::Array, misfit::Function,
 							Iact,sigmaBack::Vector,
-							Mesh2MeshRFs::Union{Array{RemoteRef{Channel{Any}}},Array{Float64}}=ones(length(pForRFs)),
+							Mesh2MeshRFs::Union{Array{RemoteChannel},Array{Future},Array{Float64}}=ones(length(pForRFs)),
 							modelfun::Function=identityMod,fname="")
-	pMis     		   = Array(RemoteRef{Channel{Any}},length(pForRFs));
-	# the next references are for not to broadcast Iact and sigmaBackground 
-	IactRFs            = Array(RemoteRef{Channel{Any}},maximum(workers()));
-	sigmaBackgroundRFs = Array(RemoteRef{Channel{Any}},maximum(workers()));
-	
+	pMis     		   = Array(RemoteChannel,length(pForRFs));
+	# the next references are for not to broadcast Iact and sigmaBackground
+	IactRFs            = Array(Future,maximum(workers()));
+	sigmaBackgroundRFs = Array(Future,maximum(workers()));
+
 	@sync begin
 		for p=workers()
 			@async begin
 				# communicate Iact and sigmaBack
-				IactRFs[p]            = remotecall_wait(p,identity,Iact)            # send active cells projection matrix
-				sigmaBackgroundRFs[p] = remotecall_wait(p,identity,sigmaBack) # send background conductivity
+				IactRFs[p]            = remotecall_wait(identity,p,Iact)            # send active cells projection matrix
+				sigmaBackgroundRFs[p] = remotecall_wait(identity,p,sigmaBack) # send background conductivity
 				for idx=1:length(pForRFs)
 					if p==pForRFs[idx].where
-						pMis[idx] = remotecall_wait(p,getMisfitParam,pForRFs[idx],Wd[idx],dobs[idx],misfit,IactRFs[p],sigmaBackgroundRFs[p],Mesh2MeshRFs[idx],modelfun,fname);
+						pMis[idx] = initRemoteChannel(getMisfitParam,p,pForRFs[idx],Wd[idx],dobs[idx],misfit,IactRFs[p],sigmaBackgroundRFs[p],Mesh2MeshRFs[idx],modelfun,fname);
 					end
 				end
 			end
@@ -99,21 +99,21 @@ function getMisfitParam(pForRFs::Array{RemoteRef{Channel{Any}}}, Wd::Array, dobs
 	return pMis;
 end
 
-function getMisfitParam(pForRF::RemoteRef{Channel{Any}}, Wd, dobs, misfit::Function,
-							Iact::RemoteRef{Channel{Any}},sigmaBack::RemoteRef{Channel{Any}},
-							Mesh2MeshRF::Union{RemoteRef{Channel{Any}},AbstractFloat} = 1.0,
+function getMisfitParam(pForRF::RemoteChannel, Wd, dobs, misfit::Function,
+							Iact::Future,sigmaBack::Future,
+							Mesh2MeshRF::Union{RemoteChannel,Future,AbstractFloat} = 1.0,
 							modelfun::Function=identityMod,fname="")
 	# Single worker version of getMisfitParam.
 	worker = pForRF.where;
 	if !isa(Mesh2MeshRF,AbstractFloat)
-		Mesh2Mesh 	= take!(Mesh2MeshRF);
+		Mesh2Mesh 	= fetch(Mesh2MeshRF);
 		if worker!=Mesh2MeshRF.where
 			error("getMisfitParam::Mesh2Mesh and pFor not on the same worker");
 		end
 	else
 		Mesh2Mesh = Mesh2MeshRF;
 	end
-	pFor 		= take!(pForRF);
+	pFor 		= fetch(pForRF);
 	Iact 		= fetch(Iact);
 	sigmaBack 	= fetch(sigmaBack);
 	Wd              = fetch(Wd);

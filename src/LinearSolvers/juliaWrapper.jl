@@ -1,7 +1,7 @@
 export JuliaSolver,getJuliaSolver,copySolver
 
 import Base.\
-function \{T1,T2}(A::Base.SparseMatrix.UMFPACK.UmfpackLU{T1},R::SparseMatrixCSC{T2}) 
+function \{T1,T2}(A::Base.SparseArrays.UMFPACK.UmfpackLU{T1},R::SparseMatrixCSC{T2})
 	
 	n,nrhs = size(R)
 	X = zeros(promote_type(T1,T2),n,nrhs)	
@@ -90,22 +90,21 @@ function solveLinearSystem!(A::SparseMatrixCSC,B,X,param::JuliaSolver,doTranspos
 		param.facTime+=toq()
 		param.nFac+=1
 	end
-	
+
 	tic()
 	U = param.Ainv\B;
 	param.solveTime+=toq()
 	param.nSolve+=1
-	
-	return U, param		
+
+	return U, param
 end # function solveLinearSystem
 			
-import jInv.Utils.clear!
 function clear!(param::JuliaSolver)
 	param.Ainv = [];
 	param.isTransposed = 0;
 	param.doClear = 0;
 end
-	
+
 function copySolver(Ainv::JuliaSolver)
 	return getJuliaSolver(sym = Ainv.sym,doClear = Ainv.doClear);
 end

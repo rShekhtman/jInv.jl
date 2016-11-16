@@ -1,3 +1,9 @@
+import jInv.InverseSolve
+import jInv.Mesh
+import jInv.LinearSolvers
+import jInv.ForwardShare
+import jInv.Utils
+import Base.Test
 @everywhere begin
 	using jInv.InverseSolve
 	using jInv.Mesh
@@ -16,8 +22,12 @@ function jInv.ForwardShare.getSensMatSize(pFor::LSparam)
 	return size(pFor.A)
 end
 
-function jInv.ForwardShare.getData(m::Vector,pFor::LSparam)
-	return pFor.A*m,pFor
+function jInv.ForwardShare.getData(m::Vector,pFor::LSparam,doClear::Bool=false)
+	  d = pFor.A*m
+	  if doClear
+	    clear!(pFor)
+          end
+	  return d,pFor
 end
 
 function jInv.ForwardShare.getSensMatVec(v::Vector,m::Vector,pFor::LSparam)

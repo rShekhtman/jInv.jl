@@ -40,14 +40,14 @@ function getSensMat(w::Vector,pFor::ForwardProbType)
 	return J
 end
 
-function getSensMat(w,pFor::RemoteRef)
+function getSensMat(w,pFor::RemoteChannel)
 	if pFor.where != myid()
-		return remotecall_fetch(getSensMat,w,pFor)
+		return remotecall_fetch(getSensMat,pFor.where,w,pFor)
 	end
 	return getSensMat(fetch(w),fetch(pFor))
 end
 
-getSensMat(w::RemoteRef,pFor::ForwardProbType) = getSensMat(fetch(w),pFor)
+getSensMat(w::Future,pFor::ForwardProbType) = getSensMat(fetch(w),pFor)
 
 function getSensMat(m,pFor::Array,workerList=workers())
 	
@@ -59,18 +59,18 @@ function getSensMat(m,pFor::Array,workerList=workers())
 		error("getSensMat: specified workers do not exist!")
 	end
 	
-	mRef = Array{RemoteRef{Channel{Any}}}(length(workerList))
+	mRef = Array(Future,maximum(workers()))
 	
 	@sync begin
 		for p=workerList
 			@async begin
-				mRef[p] = remotecall(p,identity,m)
+				mRef[p] = remotecall(identity,p,m)
 				while true
 					idx = nextidx()
 					if idx > length(pFor)
 						break
 					end
-					S[idx]    = remotecall_fetch(p,getSensMat,mRef[p],pFor[idx])
+					S[idx]    = remotecall_fetch(getSensMat,p,mRef[p],pFor[idx])
 				end
 			end
 		end

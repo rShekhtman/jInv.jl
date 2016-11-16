@@ -12,13 +12,15 @@ pFor   = LSparam(A[2],[])
 # parallel with dynamic scheduling
 pForp  = [pFor1; pFor2];
 # remote references
-pForRef    = Array{RemoteRef{Channel{Any}}}(2)
+pForRef    = Array{RemoteChannel}(2)
 i1     = (1:round(Int64,size(A[3],1)/2))
 i2     = (round(Int64,size(A[3],1)/2)+1:size(A[3],1))
 A1     = A[3][i1,:]
 A2     = A[3][i2,:]
-pForRef[1] = @spawn LSparam(A1,[])
-pForRef[2] = @spawn LSparam(A2,[])
+workerList = workers()
+nw         = length(workerList)
+pForRef[1] = initRemoteChannel(LSparam,workerList[1%nw+1],A1,[])
+pForRef[2] = initRemoteChannel(LSparam,workerList[2%nw+1],A2,[])
 
 pFors = (pForp,pFor,pForRef)
 

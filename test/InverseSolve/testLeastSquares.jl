@@ -7,7 +7,7 @@ Minv   = getRegularMesh(domain,n)
 xc     = getCellCenteredGrid(Minv)
 xtrue = sin(2*pi*xc[:,1]).*sin(pi*xc[:,2])
 
-# get noisy data 
+# get noisy data
 A     = speye(Minv.nc)
 ids   = sort(rand(1:Minv.nc,round(Int64,Minv.nc*.8)))
 A     = A[ids,:]
@@ -29,13 +29,15 @@ bd2          = bdata[i2]
 Wd1          = Wd[i1]
 Wd2          = Wd[i2]
 
-pMisRefs    = Array{RemoteRef{Channel{Any}}}(2)
-pMisRefs[1] = @spawn getMisfitParam(pFor1,Wd1,bd1,SSDFun,fMod,gl1) 
-pMisRefs[2] = @spawn getMisfitParam(pFor2,Wd2,bd2,SSDFun,fMod,gl2) 
+pMisRefs    = Array{RemoteChannel}(2)
+workerList  = workers()
+nw          = nworkers()
+pMisRefs[1] = initRemoteChannel(getMisfitParam,workerList[1%nw+1],pFor1,Wd1,bd1,SSDFun,fMod,gl1)
+pMisRefs[2] = initRemoteChannel(getMisfitParam,workerList[2%nw+1],pFor2,Wd2,bd2,SSDFun,fMod,gl2)
 
 pMis    = Array{MisfitParam}(2)
-pMis[1] = getMisfitParam(pFor1,Wd1,bd1,SSDFun,fMod,gl1) 
-pMis[2] = getMisfitParam(pFor2,Wd2,bd2,SSDFun,fMod,gl2) 
+pMis[1] = getMisfitParam(pFor1,Wd1,bd1,SSDFun,fMod,gl1)
+pMis[2] = getMisfitParam(pFor2,Wd2,bd2,SSDFun,fMod,gl2)
 
 # setup pInv
 alpha        = 1.

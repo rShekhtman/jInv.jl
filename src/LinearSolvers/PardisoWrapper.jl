@@ -14,7 +14,7 @@ Fields:
 	nSolve  - number of solves
 	solveTime - cumulative time for solves
 
-Example: 
+Example:
 
 	Ainv = getjInvPardisoSolver()
 """
@@ -33,13 +33,13 @@ end
 
 # See if Pardiso is installed and include code for it.
 
-	
+
 if hasPardiso
-		
+
 	function getjInvPardisoSolver(Ainv=[],doClear=1,ooc=0,sym=11,nProcs=1)
 		return jInvPardisoSolver(Ainv,doClear,ooc,sym,0,0.0,0,0.0,1,nProcs)
 	end
-	
+
 	function solveLinearSystem!(A,B,X,param::jInvPardisoSolver,doTranspose=0)
 		if param.doClear == 1
 			clear!(param)
@@ -54,14 +54,14 @@ if hasPardiso
 			param.facTime+=toq()
 			param.nFac+=1
 		end
-	   
+
 		tic()
 		# Since pardiso requires CSR matrices as input,
 		# and Julia sparse matrices are CSC,
 		# we need to tell pardiso to solve transposed
 		# system when we want untransposed solve and
 		#vice versa
-		if (param.sym in [1, 3, 11, 13]) && (doTranspose == 0) 
+		if (param.sym in [1, 3, 11, 13]) && (doTranspose == 0)
 		  set_iparm!(param.Ainv, 12, 2)
 		else
 		  set_iparm!(param.Ainv, 12, 0)
@@ -70,10 +70,10 @@ if hasPardiso
 		pardiso(param.Ainv,X,A,full(B))
 		param.solveTime+=toq()
 		param.nSolve+=1
-	
-		return X, param		
+
+		return X, param
 	end # function solveLinearSystem MKLPardisoSolver
-	
+
 	function pardisoSetup(param::jInvPardisoSolver,A::SparseMatrixCSC)
 			set_phase!(param.Ainv,12) #Perform analysis and numerical fac.
 			set_matrixtype!(param.Ainv,param.sym) #Set matrix type
@@ -83,19 +83,18 @@ if hasPardiso
 			if param.ooc != 0
 			  set_iparm!(param.Ainv, 60, 2)
 			end
-			
+
 			# Pardiso only needs upper triangular part of
 			# symmetric matrices. We take lower triangular
 			# part due to CSC vs CSR conflict.
 			if param.sym in [2, 4, -2, -4, 6]
 			  Apard = tril(A)
-			else 
+			else
 			  Apard = A
 			end
 			return param,Apard
 	end
 			
-	import jInv.Utils.clear!
 	function clear!(param::jInvPardisoSolver)
 		if param.Ainv==[]
 		        return
@@ -115,11 +114,11 @@ if hasPardiso
 			param.Ainv = []
 		end
 	end
-	
+
 	function copySolver(Ainv::jInvPardisoSolver)
 		return jInvPardisoSolver(Ainv.Ainv,Ainv.doClear,
 		                         Ainv.ooc,Ainv.sym,0,0.0,0
 		                         ,0.0,1,Ainv.nProcs);
 	end
-		
+
 end

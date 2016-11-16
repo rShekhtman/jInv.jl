@@ -9,18 +9,18 @@ function prepareMesh2Mesh(pF::ForwardProbType, Minv::AbstractMesh, compact::Bool
 		Ps = SparseMatrixCSC(P.m,P.n,round(UInt32,P.colptr),round(UInt32,P.rowval),P.nzval)
 	end
 	return Ps
-	
+
 end
 
-function prepareMesh2Mesh(pFor::RemoteRef{Channel{Any}}, MinvRef::RemoteRef{Channel{Any}}, compact::Bool=true)
+function prepareMesh2Mesh(pFor::RemoteChannel, MinvRef::Future, compact::Bool=true)
 	pF   = fetch(pFor)
 	Minv = fetch(MinvRef)
 	return prepareMesh2Mesh(pF, Minv, compact)
 end
 
-function prepareMesh2Mesh(pFor::Array{RemoteRef{Channel{Any}}},Minv::AbstractMesh,compact::Bool=true)
+function prepareMesh2Mesh(pFor::Array{RemoteChannel},Minv::AbstractMesh,compact::Bool=true)
 
-	Mesh2Mesh = Array(RemoteRef{Channel{Any}},length(pFor))
+	Mesh2Mesh = Array(RemoteChannel,length(pFor))
 
 	# find out which workers are involved
 	workerList = []
@@ -29,15 +29,15 @@ function prepareMesh2Mesh(pFor::Array{RemoteRef{Channel{Any}}},Minv::AbstractMes
 	end
 	workerList = unique(workerList)
 	# send sigma to all workers
-	MinvRef = Array(RemoteRef{Channel{Any}},maximum(workers()))
-	
+	MinvRef = Array(Future,maximum(workers()))
+
 	@sync begin
 		for p=workerList
 			@async begin
-				MinvRef[p] = remotecall_wait(p,identity,Minv)   # send model to workers
+				MinvRef[p] = remotecall_wait(identity,p,Minv)   # send model to workers
 				for idx=1:length(pFor)
 					if p==pFor[idx].where
-						Mesh2Mesh[idx] = remotecall_wait(p,prepareMesh2Mesh,pFor[idx],MinvRef[p],compact)
+						Mesh2Mesh[idx] = initRemoteChannel(prepareMesh2Mesh,p,pFor[idx],MinvRef[p],compact)
 					end
 				end
 			end

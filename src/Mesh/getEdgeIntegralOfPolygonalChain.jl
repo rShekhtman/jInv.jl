@@ -7,27 +7,27 @@ export getEdgeIntegralOfPolygonalChain,getStraightLineCurrentIntegral
 
         s = getEdgeIntegralPolygonalChain(mesh,polygon)
         s = getEdgeIntegralPolygonalChain(mesh,polygon,normalize)
-        
+
         Compute the integral of a piecewise linear edge grid basis projected onto
         the edges of a polygonal chain. This function can be used to evaluate the
         source term of a line current carried by the polygonal chain in electromagnetic
         modelling.
-        
+
         The piecewise linear edge grid basis consists of the functions
           phix_i (i = 1 ... numXEdges)
           phiy_i (i = 1 ... numYEdges)
           phiz_i (i = 1 ... numZEdges)
         where phix_i, phiy_i, phiz_i = 1 at the i-th x/y/z-directed edge
           and phix_i, phiy_i, phiz_i = 0 at all other edges.
-        
+
         INPUT
         mesh ...... Tensor mesh
         polygon ... vertices of polygonal chain as numVertices x 3 array
         normalize . divide line integral by length of integration path (boolean, optional)
-        
+
         OUTPUT
         s ......... source vector
-        
+
         For a closed current loop, specify polygon such that
         polygon[1,:] == polygon[end,:]
 """
@@ -110,7 +110,7 @@ for ip = 1:np
     tc = 0.5 * (t[1:nq] + t[2:nq+1])
 
     for iq = 1:nq
-            
+
         cx = ax + tc[iq] * dx
         cy = ay + tc[iq] * dy
         cz = az + tc[iq] * dz
@@ -131,12 +131,12 @@ for ip = 1:np
         byloc = ay + t[iq+1] * dy - y[iy]
         bzloc = az + t[iq+1] * dz - z[iz]
         # integrate
-        sxloc,syloc,szloc = getStraightLineCurrentIntegral(hxloc,hyloc,hzloc,axloc,ayloc,azloc,bxloc,byloc,bzloc)            
+        sxloc,syloc,szloc = getStraightLineCurrentIntegral(hxloc,hyloc,hzloc,axloc,ayloc,azloc,bxloc,byloc,bzloc)
 
         # integrate
-        sx[ix,[iy,iy+1],[iz,iz+1]] = sx[ix,[iy,iy+1],[iz,iz+1]] + reshape(sxloc, (1, 2, 2))
-        sy[[ix,ix+1],iy,[iz,iz+1]] = sy[[ix,ix+1],iy,[iz,iz+1]] + reshape(syloc, (2, 1, 2))
-        sz[[ix,ix+1],[iy,iy+1],iz] = sz[[ix,ix+1],[iy,iy+1],iz] + reshape(szloc, (2, 2, 1))
+        sx[ix,[iy,iy+1],[iz,iz+1]] = sx[ix,[iy,iy+1],[iz,iz+1]] + reshape(sxloc, (2, 2))
+        sy[[ix,ix+1],iy,[iz,iz+1]] = sy[[ix,ix+1],iy,[iz,iz+1]] + reshape(syloc, (2, 2))
+        sz[[ix,ix+1],[iy,iy+1],iz] = sz[[ix,ix+1],[iy,iy+1],iz] + reshape(szloc, (2, 2))
     end
 end
 
@@ -144,9 +144,8 @@ s = [sx[:]; sy[:]; sz[:]]
 
 # normalize
 if normalize
-	
 	if all(polygon[1,:] .== polygon[np+1,:])
-		
+
 		# closed polygon: divide by enclosed area
 		a  = 0.0
 		px = polygon[2:np,1] .- polygon[1,1]
@@ -159,9 +158,8 @@ if normalize
 			a += sqrt(cx * cx + cy * cy + cz * cz)
 		end
 		a *= 0.5
-		
+
 	else
-		
 		# open polygon: divide by length
 		a = 0.0
 		for ip = 1:np
@@ -170,22 +168,22 @@ if normalize
 			dz = polygon[ip+1,3] - polygon[ip,3]
 			a += sqrt(dx * dx + dy * dy + dz * dz)
 		end
-		
+
 	end
-	
+
 	s /= a
 	
 end
 
 return s
 
-end    
+end
 
 """
         function jInv.Mesh.getStraightLineCurrentIntegral
-        
+
         [sx,sy,sz] = getStraightLineCurrentIntegral(hx,hy,hz,ax,ay,az,bx,by,bz)
-        
+
         Compute integral int(W . J dx^3) in brick of size hx x hy x hz
         where W denotes the 12 local bilinear edge basis functions
         and where J prescribes a unit line current
@@ -199,19 +197,19 @@ function getStraightLineCurrentIntegral(hx,hy,hz,ax,ay,az,bx,by,bz)
   ly = by - ay
   lz = bz - az
   l  = sqrt(lx^2 + ly^2 + lz^2)
-  
+
   if l == 0
     sx = zeros(4,1)
     sy = zeros(4,1)
     sz = zeros(4,1)
     return
   end
-  
+
   # linear interpolation between a and b
   x(t)=ax + t * lx  #0 <= t <= 1
   y(t)=ay + t * ly
   z(t)=az + t * lz
-  
+
   # edge basis functions
   wx(t)=[
     (1. - y(t) / hy) * (1. - z(t) / hz)
@@ -228,11 +226,11 @@ function getStraightLineCurrentIntegral(hx,hy,hz,ax,ay,az,bx,by,bz)
     (    x(t) / hx) * (1. - y(t) / hy)
     (1. - x(t) / hx) * (    y(t) / hy)
     (    x(t) / hx) * (    y(t) / hy)]
-  
+
   # integration using Simpson's rule
   sx = (wx(0.) + 4. * wx(0.5) + wx(1.)) * (lx / 6.)
   sy = (wy(0.) + 4. * wy(0.5) + wy(1.)) * (ly / 6.)
   sz = (wz(0.) + 4. * wz(0.5) + wz(1.)) * (lz / 6.)
 
   return sx, sy, sz
-end 
+end

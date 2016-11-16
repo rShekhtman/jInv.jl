@@ -92,11 +92,11 @@ function solveLinearSystem!(A,B,X,param::BlockIterativeSolver,doTranspose=0)
 		if param.PC==:ssor
 			OmInvD = 1./diag(A);
 			Xt      = zeros(n,nrhs)
-			M(R)   = (Xt[:]=0.0; tic(); Xt=ssorPrecTrans!(A,Xt,R,OmInvD); param.timePC+=toq(); return Xt);
+			M = R -> (Xt[:]=0.0; tic(); Xt=ssorPrecTrans!(A,Xt,R,OmInvD); param.timePC+=toq(); return Xt);
 			param.Ainv= M
 		elseif param.PC==:jac
 			OmInvD = 1./diag(A)
-			M(R)   = (tic(); Xt=R.*OmInvD; param.timePC+=toq(); return Xt); 
+			M = R -> (tic(); Xt=R.*OmInvD; param.timePC+=toq(); return Xt); 
 			param.Ainv= M
 		else 
 			error("PCGsolver: preconditioner $(param.PC) not implemented.")
@@ -112,16 +112,16 @@ function solveLinearSystem!(A,B,X,param::BlockIterativeSolver,doTranspose=0)
 	doTranspose = (param.isTranspose) ? mod(doTranspose+1,2) : doTranspose
 	if hasParSpMatVec
 		if (param.sym==1) ||  ((param.sym != 1) && (doTranspose == 1)) 
-			Af(X) = (tic(); ParSpMatVec.Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
+			Af = X -> (tic(); ParSpMatVec.Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
 		elseif (param.sym != 1) && (doTranspose == 0)
-			Af(X) = (tic(); ParSpMatVec.A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
+			Af = X -> (tic(); ParSpMatVec.A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y,param.nthreads); param.timeMV+=toq(); return Y)
 		end
 			
 	else
 		if (param.sym==1) ||  ((param.sym != 1) && (doTranspose == 1)) 
-			Af(X) = (tic(); Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
+			Af = X -> (tic(); Ac_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
 		elseif (param.sym != 1) && (doTranspose == 0)
-			Af(X) = (tic(); A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
+			Af = X -> (tic(); A_mul_B!(one(eltype(A)),A,X,zero(eltype(A)),Y); param.timeMV+=toq(); return Y)
 		end
 	end
 	X[:]=0.0	

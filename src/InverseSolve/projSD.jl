@@ -37,7 +37,7 @@ function updateHis!(iter::Int64,His::projSDhis,Jc::Real,Fc,Dc,Rc::Real,alpha::Re
 	His.alphas[iter+1]        = alpha
 	His.Active[iter+1]        = nActive
 	His.stepNorm[iter+1]      = stepNorm
-	His.timeMisfit[iter+1,:] += timeMisfit'
+	His.timeMisfit[iter+1,:] += timeMisfit
 	His.timeReg[iter+1]      += timeReg
 end
 
@@ -149,7 +149,7 @@ function  projSD(mc,pInv::InverseParam,pMis; proj=x->min(max(x,pInv.boundsLow),p
 			else
 				Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sigt,false,indCredit)
 			end
-			His.timeMisfit[iter+1,:]+=tMis'
+			His.timeMisfit[iter+1,:]+=tMis
 			
 			tic()
 			R,dR,d2R = computeRegularizer(pInv.regularizer,mt,pInv.mref,pInv.MInv,alpha) 

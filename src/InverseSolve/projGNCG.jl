@@ -40,39 +40,39 @@ function updateHis!(iter::Int64,His::projGNCGhis,Jc::Real,Fc,Dc,Rc::Real,alpha::
 	His.alphas[iter+1]        = alpha
 	His.Active[iter+1]        = nActive
 	His.stepNorm[iter+1]      = stepNorm
-	His.timeMisfit[iter+1,:] += timeMisfit'
+	His.timeMisfit[iter+1,:] += timeMisfit
 	His.timeReg[iter+1]      += timeReg
 end
 
-function dummy(mc,Dc,iter,pInv,pMis) 
-# this function does nothing and is used as a default for dumpResults(). 
+function dummy(mc,Dc,iter,pInv,pMis)
+# this function does nothing and is used as a default for dumpResults().
 end;
 
 
 
 """
 	mc,Dc,outerFlag = projGNCG(mc,pInv::InverseParam,pMis, indFor = [], dumpResults::Function = dummy)
-	
+
 	(Projected) Gauss-NewtonCG
-	
+
 	Input:
-	
+
 		mc::Vector          - intial guess for model
 		pInv::InverseParam  - parameter for inversion
 		pMis                - misfit terms
 		indCredit           - indices of forward problems to work on
 		dumpResults			- A function pointer for saving the results throughout the iterations.
-							- We assume that dumpResults is dumpResults(mc,Dc,iter,pInv,pMis), 
-							- where mc is the recovered model, Dc is the predicted data. 
+							- We assume that dumpResults is dumpResults(mc,Dc,iter,pInv,pMis),
+							- where mc is the recovered model, Dc is the predicted data.
 							- If dumpResults is not given, nothing is done (dummy() is called).
 		out::Int            - flag for output (-1: no output, 1: final status, 2: residual norm at each iteration)
-							
+
 	Output:
 		mc                  - final model
 		Dc                  - data
 		outerFlag           - flag for convergence
 		His                 - iteration history
-	
+
 """
 function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function = dummy,out::Int=2)
 
@@ -84,15 +84,15 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 	low         = pInv.boundsLow
 	high        = pInv.boundsHigh
 	alpha       = pInv.alpha
-	
+
 	His = getProjGNCGhis(maxIter,pcgMaxIter)
 	#---------------------------------------------------------------------------
 	#  Initialization.
 	#---------------------------------------------------------------------------
-	
+
 	Active = (mc .<=low) | (mc.>=high)  # Compute active set
-	
-	
+
+
 	## evaluate function and derivatives
 	sig,dsig = pInv.modelfun(mc)
 	if isempty(indCredit)
@@ -101,17 +101,17 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 		Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sig,pMis,true,indCredit)
 	end
 	dF = dsig'*dF
-	
-	
+
+
 	# compute regularizer
 	tic()
-	R,dR,d2R = computeRegularizer(pInv.regularizer,mc,pInv.mref,pInv.MInv,alpha) 
-	tReg = toq()    
-	
+	R,dR,d2R = computeRegularizer(pInv.regularizer,mc,pInv.mref,pInv.MInv,alpha)
+	tReg = toq()
+
 	# objective function
 	Jc  = F  + R
 	gc  = dF + dR
-	
+
 	F0 = F; J0 = Jc
 	############################################################################
 	##  Outer iteration.                                                        #
@@ -119,47 +119,47 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 	iter = 0
 	outerFlag = -1; stepNorm=0.0
 
-	outStr = @sprintf("%4s\t%08s\t%08s\t%08s\t%08s\t%08s\n", 
+	outStr = @sprintf("%4s\t%08s\t%08s\t%08s\t%08s\t%08s\n",
 					  	"i.LS", "F", "R","alpha[1]","Jc/J0","#Active")
 	updateHis!(0,His,Jc,F,Dc,R,alpha[1],countnz(Active),0.0,tMis,tReg)
-	
+
 	if out>=2; print(outStr); end
 	f = open("jInv.out", "w")
 	write(f, outStr)
 	close(f)
-	
+
 	while outerFlag == -1
-		
+
 		iter += 1
-		outStr = @sprintf("%3d.0\t%3.2e\t%3.2e\t%3.2e\t%3.2e\t%3d\n", 
+		outStr = @sprintf("%3d.0\t%3.2e\t%3.2e\t%3.2e\t%3.2e\t%3d\n",
 		         iter, F, R,alpha[1],Jc/J0,countnz(Active))
 		if out>=2; print(outStr); end
 		f = open("jInv.out", "a")
 		write(f, outStr)
 		close(f)
 
-		
+
 		#  Set up Hessian and preconditioner.
 		if isempty(indCredit)
-			Hs(x) = dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x; 
+			Hs = x -> dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x;
 		else
-			Hs(x) = dsig'*HessMatVec(dsig*x,pMis,sig,d2F,indDebit) + d2R*x;
+			Hs = x -> dsig'*HessMatVec(dsig*x,pMis,sig,d2F,indDebit) + d2R*x;
 		end
-		
-		
+
+
 		pInv.HesPrec.setupPrec(Hs, d2R,pInv.HesPrec.param);
-		
+
 		PC(x) = pInv.HesPrec.applyPrec(Hs,d2R,x,pInv.HesPrec.param);
-		
+
 		##  inner CG iterations.
 		tic()
 		delm,hisPCG = projPCG(Hs,gc,Active,PC,pcgTol,pcgMaxIter)
 		His.timePCG[iter+1]+= toq()
 		push!(His.hisPCG,hisPCG)
 
-		# scale step 
+		# scale step
 		if maximum(abs(delm)) > maxStep; delm = delm./maximum(abs(delm))*maxStep; end
-		
+
 		# take gradient direction in the active cells
 		ga = -gc[mc .== low]
 		if !isempty(ga)
@@ -171,24 +171,24 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 			if maximum(abs(ga)) > maximum(abs(delm)); ga = ga./maximum(abs(ga))*maximum(abs(delm)); end
 			delm[mc .== high] = ga
 		end
-		
+
 		## Begin projected Armijo line search
 		muLS = 1; lsIter = 1; mt = zeros(size(mc)); Jt = Jc
 		while true
 			mt = mc + muLS*delm
 			mt[mt.<low]  = low[mt.<low]
 			mt[mt.>high] = high[mt.>high]
-			## evaluate function 
+			## evaluate function
 			sigt, = pInv.modelfun(mt)
 			if isempty(indCredit)
 				Dc,F,dF,d2F,pMis,tMis = computeMisfit(sigt,pMis,false)
 			else
 				Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sigt,false,indCredit)
 			end
-			His.timeMisfit[iter+1,:]+=tMis'
-			
+			His.timeMisfit[iter+1,:]+=tMis
+
 			tic()
-			R,dR,d2R = computeRegularizer(pInv.regularizer,mt,pInv.mref,pInv.MInv,alpha) 
+			R,dR,d2R = computeRegularizer(pInv.regularizer,mt,pInv.mref,pInv.MInv,alpha)
 			His.timeReg[iter+1] += toq()
 			# objective function
 			Jt  = F  + R
@@ -196,7 +196,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 				println(@sprintf( "   .%d\t%3.2e\t%3.2e\t\t\t%3.2e",
 			           lsIter, F,       R,       Jt/J0))
 			end
-			
+
 			if Jt < Jc
 			    break
 			end
@@ -207,19 +207,19 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 			end
 		end
 		## End Line search
-		
-		## Check for termination 
+
+		## Check for termination
 		stepNorm = norm(mt-mc,Inf)
 		mc = mt
 		Jc = Jt
-		
+
 		sig, dsig = pInv.modelfun(mc)
-		
+
 		Active = (mc .<=low) | (mc.>=high)  # Compute active set
-		  
-		#  Check stopping criteria for outer iteration. 
+
+		#  Check stopping criteria for outer iteration.
 		updateHis!(iter,His,Jc,F,Dc,R,alpha[1],countnz(Active),stepNorm,tMis,tReg)
-	
+
 		dumpResults(mc,Dc,iter,pInv,pMis);
 		if stepNorm < stepTol
 			outerFlag = 1
@@ -235,14 +235,14 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 			dF = computeGradMisfit(sig,Dcp,pMis,indDebit)
 		end
 		His.timeGradMisfit[iter+1]+=toq()
-		
+
 		dF = dsig'*dF
 		gc = dF + dR
-		
-		
-		
+
+
+
 	end # while outer_flag == 0
-	
+
 	if out>=1
 		if outerFlag==-1
 			println("projGNCG iterated maxIter=$maxIter times but reached only stepNorm of $(stepNorm) instead $(stepTol)." )
@@ -252,9 +252,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 			println("projGNCG reached desired accuracy at iteration $iter.")
 		end
 	end
-	
-	
+
+
 	return mc,Dc,outerFlag,His
 end  # Optimization code
-
-
