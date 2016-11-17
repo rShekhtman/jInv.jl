@@ -103,8 +103,8 @@ function getRegularMesh(domain,n)
 	h     = vec((domain[2:2:end]-domain[1:2:end])./n)
 	dim   = round(Int64,length(domain)/2)
 	if dim==1
-		nf = (n[1]+1)
-		ne = (n[1]+1)
+		nf = [(n[1]+1)]
+		ne = [(n[1]+1)]
 	elseif dim==2
 		nf = [(n[1]+1)*n[2]; n[1]*(n[2]+1);]
 		ne = [n[1]*(n[2]+1); (n[1]+1)*n[2];  ]
