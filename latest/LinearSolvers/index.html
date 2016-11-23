@@ -7,20 +7,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="JuliaInv">
-  
-  <title>LinearSolvers - jInv.jl</title>
-  
-
   <link rel="shortcut icon" href="../img/favicon.ico">
-
-  
+  <title>LinearSolvers - jInv.jl</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
   <link rel="stylesheet" href="../css/highlight.css">
   <link href="../assets/Documenter.css" rel="stylesheet">
-
   
   <script>
     // Current page data
@@ -31,11 +25,7 @@
   
   <script src="../js/jquery-2.1.1.min.js"></script>
   <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script> 
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-  <script src="../assets/mathjaxhelper.js"></script>
-
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
   
 </head>
 
@@ -55,7 +45,7 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        <ul class="current">
+	<ul class="current">
           
             <li>
     <li class="toctree-l1 ">
@@ -105,6 +95,13 @@
           
             <li>
     <li class="toctree-l1 ">
+        <a class="" href="../Vis/">Vis</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
         <a class="" href="../Utils/">Utils</a>
         
     </li>
@@ -142,9 +139,8 @@
     <li>LinearSolvers</li>
     <li class="wy-breadcrumbs-aside">
       
-        
-          <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github"> Edit on GitHub</a>
-        
+        <a href="https://github.com/JuliaInv/jInv.jl/edit/master/docs/LinearSolvers.md"
+          class="icon icon-github"> Edit on GitHub</a>
       
     </li>
   </ul>
@@ -180,6 +176,7 @@ isTranspose - if true, transpose(A) is provided to solver, else A is proved to s
 </code></pre>
 
 <p>Example getBlockIterativeSolver()</p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/LinearSolvers/blockIterativeWrapper.jl#L3-L25' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.LinearSolvers.IterativeSolver' href='#jInv.LinearSolvers.IterativeSolver'>#</a>
 <strong><code>jInv.LinearSolvers.IterativeSolver</code></strong> &mdash; <em>Type</em>.</p>
 <p>type jInv.LinearSolvers.IterativeSolver &lt;: AbstractSolver</p>
@@ -193,7 +190,7 @@ out     - flag for output
 doClear - flag for deleting preconditioner
 nthreads - number of threads for spmatvecs
 sym      - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
-isTranspose - if true, transpose(A) is provided to solver, else A is proved to solver
+isTranspose - if true, transpose(A) is provided to solver, else A is provided to solver
           default=false, use isTranspose=true for efficiency with caution
           note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
 </code></pre>
@@ -202,6 +199,26 @@ isTranspose - if true, transpose(A) is provided to solver, else A is proved to s
 <pre><code>getIterativeSolver(cg)
 </code></pre>
 
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/LinearSolvers/iterativeWrapper.jl#L3-L26' class='documenter-source'>source</a><br></p>
+<p><a id='jInv.LinearSolvers.JuliaSolver' href='#jInv.LinearSolvers.JuliaSolver'>#</a>
+<strong><code>jInv.LinearSolvers.JuliaSolver</code></strong> &mdash; <em>Type</em>.</p>
+<p>type jInv.LinearSolvers.JuliaSolver&lt;: AbstractSolver</p>
+<p>Fields:</p>
+<pre><code>Ainv         - holds factorization (LU or Cholesky)
+sym          - 0=unsymmetric, 1=symm. pos def, 2=general symmetric
+isTransposed - flag whether A comes transposed or not
+doClear      - flag to clear factorization
+facTime      - cumulative time for factorizations
+nSolve       - number of solves
+solveTime    - cumnulative time for solves
+nFac         - number of factorizations performed
+</code></pre>
+
+<p>Example: </p>
+<pre><code>Ainv = getJuliaSolver()
+</code></pre>
+
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/LinearSolvers/juliaWrapper.jl#L14-L31' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.LinearSolvers.MUMPSsolver' href='#jInv.LinearSolvers.MUMPSsolver'>#</a>
 <strong><code>jInv.LinearSolvers.MUMPSsolver</code></strong> &mdash; <em>Type</em>.</p>
 <p>type MUMPSsolver</p>
@@ -216,10 +233,11 @@ nSolve  - number of solves
 solveTime - cumnulative time for solves
 </code></pre>
 
-<p>Example: </p>
+<p>Example:</p>
 <pre><code>Ainv = getMUMPSsolver()
 </code></pre>
 
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/LinearSolvers/mumpsWrapper.jl#L3-L20' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.LinearSolvers.jInvPardisoSolver' href='#jInv.LinearSolvers.jInvPardisoSolver'>#</a>
 <strong><code>jInv.LinearSolvers.jInvPardisoSolver</code></strong> &mdash; <em>Type</em>.</p>
 <p>type jInvPardisoSolver</p>
@@ -234,10 +252,11 @@ nSolve  - number of solves
 solveTime - cumulative time for solves
 </code></pre>
 
-<p>Example: </p>
+<p>Example:</p>
 <pre><code>Ainv = getjInvPardisoSolver()
 </code></pre>
 
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/LinearSolvers/PardisoWrapper.jl#L3-L20' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.LinearSolvers.getBlockIterativeSolver-Tuple{Any}' href='#jInv.LinearSolvers.getBlockIterativeSolver-Tuple{Any}'>#</a>
 <strong><code>jInv.LinearSolvers.getBlockIterativeSolver</code></strong> &mdash; <em>Method</em>.</p>
 <p>function jInv.LinearSolvers.getBlockIterativeSolver</p>
@@ -268,6 +287,7 @@ isTranspose    - if true, transpose(A) is provided to solver, else A is proved t
                   note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
 </code></pre>
 
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/LinearSolvers/blockIterativeWrapper.jl#L43-L73' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.LinearSolvers.getIterativeSolver-Tuple{Function}' href='#jInv.LinearSolvers.getIterativeSolver-Tuple{Function}'>#</a>
 <strong><code>jInv.LinearSolvers.getIterativeSolver</code></strong> &mdash; <em>Method</em>.</p>
 <p>function jInv.LinearSolvers.getIterativeSolver</p>
@@ -298,6 +318,20 @@ isTranspose    - if true, transpose(A) is provided to solver, else A is proved t
                   default=false, use isTranspose=true for efficiency with caution
                   note that A_mul_B! is slower than Ac_mul_B for SparseMatrixCSC
 </code></pre>
+
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/LinearSolvers/iterativeWrapper.jl#L44-L75' class='documenter-source'>source</a><br></p>
+<p><a id='jInv.LinearSolvers.getJuliaSolver-Tuple{}' href='#jInv.LinearSolvers.getJuliaSolver-Tuple{}'>#</a>
+<strong><code>jInv.LinearSolvers.getJuliaSolver</code></strong> &mdash; <em>Method</em>.</p>
+<p>function jInv.LinearSolvers.getJuliaSolver</p>
+<p>Constructor for JuliaSolver</p>
+<p>Optional Keyword Arguments</p>
+<pre><code>Ainv = []
+sym = 0
+isTransposed = 0
+doClear = 0
+</code></pre>
+
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/LinearSolvers/juliaWrapper.jl#L45-L56' class='documenter-source'>source</a><br></p>
               
             </div>
           </div>
@@ -327,10 +361,10 @@ isTranspose    - if true, transpose(A) is provided to solver, else A is proved t
       </div>
 
     </section>
-
+    
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" style="cursor: pointer">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -343,6 +377,9 @@ isTranspose    - if true, transpose(A) is provided to solver, else A is proved t
       
     </span>
 </div>
+    <script src="../js/theme.js"></script>
+      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script src="../assets/mathjaxhelper.js"></script>
 
 </body>
 </html>

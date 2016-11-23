@@ -8,7 +8,7 @@
   
   <meta name="author" content="JuliaInv">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Utils - jInv.jl</title>
+  <title>Vis - jInv.jl</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -18,9 +18,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Utils";
-    var mkdocs_page_input_path = "Utils.md";
-    var mkdocs_page_url = "/Utils/";
+    var mkdocs_page_name = "Vis";
+    var mkdocs_page_input_path = "Vis.md";
+    var mkdocs_page_url = "/Vis/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -83,24 +83,24 @@
 <li>
           
             <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../Vis/">Vis</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Vis</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#jinvvis">jInv.Vis</a></li>
+                
+                    <li><a class="toctree-l4" href="#list-of-types-and-methods">List of types and methods</a></li>
+                
+            
+            </ul>
         
     </li>
 <li>
           
             <li>
-    <li class="toctree-l1 current">
-        <a class="current" href="./">Utils</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#jinvutils">jInv.Utils</a></li>
-                
-                    <li><a class="toctree-l4" href="#list-of-methods">List of methods</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../Utils/">Utils</a>
         
     </li>
 <li>
@@ -134,10 +134,10 @@
     
       
     
-    <li>Utils</li>
+    <li>Vis</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/JuliaInv/jInv.jl/edit/master/docs/Utils.md"
+        <a href="https://github.com/JuliaInv/jInv.jl/edit/master/docs/Vis.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -147,18 +147,11 @@
           <div role="main">
             <div class="section">
               
-                <p><a id='jInv.Utils-1'></a></p>
-<h1 id="jinvutils">jInv.Utils</h1>
-<p>The <code>Utils</code> submodule provides some basic utility functions used in many parts of jInv. For example, it provides derivative testing and methods for clearing variables. </p>
-<p><a id='List-of-methods-1'></a></p>
-<h2 id="list-of-methods">List of methods</h2>
-<p><a id='jInv.Utils.initRemoteChannel-Tuple{Union{Function,Type},Int64,Vararg{Any,N}}' href='#jInv.Utils.initRemoteChannel-Tuple{Union{Function,Type},Int64,Vararg{Any,N}}'>#</a>
-<strong><code>jInv.Utils.initRemoteChannel</code></strong> &mdash; <em>Method</em>.</p>
-<p>function ref = initRemoteChannel(f,pid,args...)</p>
-<p>Runs the function f with arguments args on worker</p>
-<p>input:         func::Union{Function,Type} – function or type constructor         pid::Int64 – worker that will run f and store result        args::varargs – Arguments of f. These must be available on worker pid</p>
-<p>output:         ref::RemoteChannel – Reusable reference to output of f.</p>
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/bdd8301dcaa2efc6e28c2fcfedfa1206dcbb7a08/src/Utils/initRemoteChannel.jl#L3-L16' class='documenter-source'>source</a><br></p>
+                <p><a id='jInv.Vis-1'></a></p>
+<h1 id="jinvvis">jInv.Vis</h1>
+<p>Submodule for visualization of functions or meshes based on PyPlot. </p>
+<p><a id='List-of-types-and-methods-1'></a></p>
+<h2 id="list-of-types-and-methods">List of types and methods</h2>
               
             </div>
           </div>
@@ -166,10 +159,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../About/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../Utils/" class="btn btn-neutral float-right" title="Utils">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../Vis/" class="btn btn-neutral" title="Vis"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ForwardShare/" class="btn btn-neutral" title="ForwardShare"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -197,10 +190,10 @@
           <a href="https://github.com/JuliaInv/jInv.jl" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../Vis/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../ForwardShare/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../About/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../Utils/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

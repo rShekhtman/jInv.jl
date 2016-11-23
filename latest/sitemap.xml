@@ -3,56 +3,64 @@
 
     
     <url>
-     <loc>None/</loc>
-     <lastmod>2016-09-02</lastmod>
+     <loc>/</loc>
+     <lastmod>2016-11-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>None/Mesh/</loc>
-     <lastmod>2016-09-02</lastmod>
+     <loc>/Mesh/</loc>
+     <lastmod>2016-11-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>None/LinearSolvers/</loc>
-     <lastmod>2016-09-02</lastmod>
+     <loc>/LinearSolvers/</loc>
+     <lastmod>2016-11-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>None/InverseSolve/</loc>
-     <lastmod>2016-09-02</lastmod>
+     <loc>/InverseSolve/</loc>
+     <lastmod>2016-11-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>None/ForwardShare/</loc>
-     <lastmod>2016-09-02</lastmod>
+     <loc>/ForwardShare/</loc>
+     <lastmod>2016-11-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>None/Utils/</loc>
-     <lastmod>2016-09-02</lastmod>
+     <loc>/Vis/</loc>
+     <lastmod>2016-11-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
     <url>
-     <loc>None/About/</loc>
-     <lastmod>2016-09-02</lastmod>
+     <loc>/Utils/</loc>
+     <lastmod>2016-11-23</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>/About/</loc>
+     <lastmod>2016-11-23</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
