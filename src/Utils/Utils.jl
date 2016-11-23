@@ -22,20 +22,38 @@ module Utils
 	function clear!(R::RemoteChannel)
 		p = take!(R)
 		p = clear!(p)
+		put!(R,p);
+		return R;
 	end
 
 	function clear!(F::Future)
 		p = fetch(F)
 		p = clear!(p)
-  end
+		put!(F,p);
+		return F;
+	end
 
-	function clear!(PF::Union{Array{RemoteChannel},Array{Future}})
+	function clear!(PF::Array{RemoteChannel})
 		@sync begin
 			for p=workers()
 				@async begin
 					for i=1:length(PF)
 						if p==PF[i].where
-							remotecall(clear!, p, PF[i])
+							PF[i] = initRemoteChannel(clear!, p, PF[i])
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	function clear!(PF::Array{Future})
+		@sync begin
+			for p=workers()
+				@async begin
+					for i=1:length(PF)
+						if p==PF[i].where
+							PF[i] = remotecall(clear!, p, PF[i])
 						end
 					end
 				end
@@ -48,9 +66,9 @@ module Utils
 		return Array(T,ntuple((i)->0, N))
 	end
 
-	function clear!{T}(x::Vector{T})
-		return Array(T,0)
-	end
+	# function clear!{T}(x::Vector{T})
+		# return Array(T,0)
+	# end
 
 	function clear!{T}(A::SparseMatrixCSC{T})
 		return spzeros(0,0);
