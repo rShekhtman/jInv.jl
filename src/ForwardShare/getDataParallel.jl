@@ -3,7 +3,7 @@ export getData
 
 
 function getData(sigma::Future,pFor::RemoteChannel,
-                 Mesh2Mesh::Union{Future,SparseMatrixCSC,AbstractFloat},
+                 Mesh2Mesh::Union{RemoteChannel, Future,SparseMatrixCSC,AbstractFloat},
                  doClear::Bool=false)
 	#=
 		load a forward problem from RemoteRef
@@ -19,7 +19,7 @@ end
 
 function getData(sigma::Vector,pFor::ForwardProbType,Mesh2Mesh::Union{SparseMatrixCSC,AbstractFloat},
                  doClear::Bool=false)
-                 
+
 	# get mesh 2 mesh interpolation matrix
 	sig = interpGlobalToLocal(sigma,Mesh2Mesh)
 	dobs,pFor   = getData(sig,pFor,doClear)
@@ -27,7 +27,7 @@ function getData(sigma::Vector,pFor::ForwardProbType,Mesh2Mesh::Union{SparseMatr
 	return Dobs,pFor
 end
 
-function getData{FPT<:ForwardProbType,T<:Union{Future,SparseMatrixCSC,AbstractFloat}}(
+function getData{FPT<:ForwardProbType,T<:Union{Future,RemoteChannel,SparseMatrixCSC,AbstractFloat}}(
                  sigma::Vector,
                  pFor::Array{FPT},
                  Mesh2Mesh::Array{T}=ones(length(pFor)),
@@ -63,7 +63,7 @@ function getData{FPT<:ForwardProbType,T<:Union{Future,SparseMatrixCSC,AbstractFl
 	return Dobs,pFor
 end
 
-function getData{T<:Union{Future,SparseMatrixCSC,AbstractFloat}}(
+function getData{T<:Union{RemoteChannel,Future,SparseMatrixCSC,AbstractFloat}}(
                  sigma::Vector,
                  pFor::Array{RemoteChannel},
                  Mesh2Mesh::Array{T}=ones(length(pFor)),
