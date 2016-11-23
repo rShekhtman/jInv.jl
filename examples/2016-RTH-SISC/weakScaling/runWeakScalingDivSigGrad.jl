@@ -69,7 +69,7 @@ function main()
 	out = parsed_args["out"]
 	
 	# set number of threads for openblac
-	blas_set_num_threads(nthreads)
+	set_num_threads(nthreads)
 	
 	solver = parsed_args["solver"]
 	

@@ -8,7 +8,7 @@ This page collects contributors, funding, and outcomes of the jInv project. Plea
 1. [Eldad Haber (University of British Columbia)](http://www.math.ubc.ca/~haber/)
 1. [Lars Ruthotto (Emory University)](http://www.mathcs.emory.edu/~lruthot/)
 1. Eran Treister (Ben Gurion University)
-1. Samy Wu (Emory University)
+1. Samy Wu Fung (Emory University)
 
 ## Acknowledgements
 

@@ -116,7 +116,7 @@ if invertDC
 	
 	if nworkers()>1
 		# Julia sets BLAS #threads to be 1 if workers are used.
-		blas_set_num_threads(nworkers());
+		set_num_threads(nworkers());
 	end
 	pFor,Sources,Receivers,Wd,dobsDC,dobs0 = setupDivSigGrad(redoSetup,redoData,Mfwd,Ainv,Mesh2Mesh,sigtrue,sigref);
 	Wt   = 1./(mean(abs(vec(dobsDC)))/2+abs(dobsDC));

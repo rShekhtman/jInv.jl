@@ -26,6 +26,6 @@ pages:
   - LinearSolvers: LinearSolvers.md
   - InverseSolve: InverseSolve.md
   - ForwardShare: ForwardShare.md
+  - Vis: Vis.md
   - Utils: Utils.md
   - About: About.md
-  

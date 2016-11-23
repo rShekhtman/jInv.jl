@@ -3,18 +3,18 @@ export plotGrid
 
 """
 function plotGrid
-	
+
 	plots nodal and cell-centered grids
-	
+
 	Requirement: PyPlot must be installed.
-	
+
 	Usage:
-		
+
 	plotGrid(M::AbstractTensorMesh) - plots nodal grid M
-	plotGrid(x,M)         - plots grid defined by x (nodal or cc)
-	
+	plotGrid(x,M)                   - plots grid defined by x (nodal or cc)
+
 	Keyword arguments:
-	
+
 	spacing::Vector     - spacing between lines, default=[1,1,1]
 	color               - color of lines, default="b"
 """
@@ -44,11 +44,12 @@ function plotGrid(y,M;spacing=[1,1,1],color="b")
 end
 
 plotGrid(M::AbstractMesh; kwargs...) = plotGrid(getNodalGrid(M),M;kwargs...)
+
 """
 function p3
-	
+
 	helper function for plotGrid
-	
+
 """
 function p3(y1,y2,y3,m,order,s,color)
     m  = m[order];

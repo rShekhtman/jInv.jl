@@ -60,7 +60,7 @@ function main()
 	nsources = parsed_args["nsources"]
 	
 	# set number of threads for openbla to one for Eikonal
-	@everywhere blas_set_num_threads(1)
+	@everywhere set_num_threads(1)
 	
 	domain  = [0;13.5;0;13.5;0;4.2]
 	n       = [n1;n2;n3]

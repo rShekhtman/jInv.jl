@@ -1,17 +1,16 @@
 export viewImage2D
 
 """
-function jInv.Vis.viewImage2D
-	
-visualizes 2D image on mesh
+	function jInv.Vis.viewImage2D
 
-Input:
+	visualizes 2D image on mesh
 
-I - image data 
-M - 2 dimensional AbstractTensorMesh
+	Input:
 
-kwargs get piped to pcolormesh
+	I - image data
+	M - 2 dimensional AbstractTensorMesh
 
+	kwargs get piped to pcolormesh
 """
 function viewImage2D(I,M::AbstractTensorMesh;kwargs...)
 	if M.dim!=2
