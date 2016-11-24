@@ -1,4 +1,4 @@
-function setupTravelTimeTomography(filenamePrefix::ASCIIString, Minv,Iact,sback,modFun)
+function setupTravelTimeTomography(filenamePrefix::String, Minv,Iact,sback,modFun)
 ###########################################################
 ### Read receivers and sources files
 RCVfile = string(filenamePrefix,"_rcvMap.dat");

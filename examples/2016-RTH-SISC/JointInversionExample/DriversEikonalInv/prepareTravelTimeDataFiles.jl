@@ -1,4 +1,4 @@
-function prepareTravelTimeDataFiles(m,Minv::RegularMesh,mref,boundsHigh,boundsLow,filenamePrefix::ASCIIString,pad::Int64,jump::Int64,offset::Int64)
+function prepareTravelTimeDataFiles(m,Minv::RegularMesh,mref,boundsHigh,boundsLow,filenamePrefix::String,pad::Int64,jump::Int64,offset::Int64)
 ### Here we generate data files for sources and receivers. This can be replaced with real sources/receivers files.
 ########################## m is in Velocity here. ###################################
 
@@ -23,7 +23,7 @@ close(file);
 return;
 end
 
-function prepareTravelTimeDataFiles(m, Minv::RegularMesh, filenamePrefix::ASCIIString,dataFullFilename::ASCIIString, offset::Int64,HO::Bool)
+function prepareTravelTimeDataFiles(m, Minv::RegularMesh, filenamePrefix::String,dataFullFilename::String, offset::Int64,HO::Bool)
 
 ########################## m is in Velocity here. ###################################
 
