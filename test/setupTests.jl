@@ -18,6 +18,9 @@ type LSparam <: ForwardProbType
 	Ainv
 end
 
+function jInv.ForwardShare.getNumberOfData(pFor::LSparam)
+	return size(pFor.A,1)
+end
 function jInv.ForwardShare.getSensMatSize(pFor::LSparam)
 	return size(pFor.A)
 end

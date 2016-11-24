@@ -6,21 +6,23 @@
 # jInv
 
 `jInv` is a flexible framework for PDE parameter estimation in Julia. It provides easy to extend core functions used in PDE-constrained inverse problems.
-Our goal is to solve parameter estimation problems efficiently and in parallel. For more details see (http://arxiv.org/abs/1606.07399)
+Our goal is to solve parameter estimation problems efficiently and in parallel. For more details see (http://arxiv.org/abs/1606.07399).
+
 
 # Overview
 
-jInv consists of five submodules:
+jInv consists of six submodules:
 
 1. `ForwardShare` - methods for solving forward problems in parallel.
-2. `InverseSolve` - methods commonly used in inverse problems such as misfit functions, regularization and numerical optimization.
-3. `Mesh` - regular and tensor meshes in 2D and 3D as well as differential operators.
-4. `LinearSolvers` - interfaces to sparse and (if installed) direct linear solvers that can be used for solving the discretized PDEs.
-5. `Utils` - utility functions
+1. `InverseSolve` - methods commonly used in inverse problems such as misfit functions, regularization and numerical optimization.
+1. `Mesh` - regular and tensor meshes in 2D and 3D as well as differential operators.
+1. `LinearSolvers` - interfaces to sparse and (if installed) direct linear solvers that can be used for solving the discretized PDEs.
+1. `Vis` - visualization based on PyPlot.
+1. `Utils` - utility functions
 
 # Requirements
 
-jInv is intended for use with Julia versions 0.5.x.
+jInv is intended for use with Julia versions 0.5. and requires:
 
 1. [`KrylovMethods.jl`](https://github.com/lruthotto/KrylovMethods.jl)  - iterative methods for solving (sparse) linear systems.
 
@@ -30,6 +32,9 @@ Additional (optional) packages for higher performance. `jInv` detects automatica
 2. [`ParSpMatVec.jl`](https://github.com/lruthotto/ParSpMatVec.jl) - shared memory implementation for sparse matrix vector products.
 3. ['Pardiso.jl'](https://github.com/JuliaSparse/Pardiso.jl)
 
+The mesh module in jInv features regular and tensor meshes but can also be extended by
+1. [`JOcTree`](https://github.com/JuliaInv/JOcTree) - efficient spatially adaptive meshes
+
 # Installation
 
 In julia type:
@@ -38,12 +43,18 @@ Pkg.clone("https://github.com/JuliaInv/jInv.jl","jInv")
 Pkg.test("jInv")
 ```
 
+# Examples
+
+Some inversion examples can be found in the `examples` folder. 
+
 # Packages using jInv
 
+jInv provides generic methods for PDE parameter estimation problems. In order to use it for applications, some methods need to be extended by specifying solvers of the forward problem, sensitivity matrix vector products, etc. This should be organized in small modules. Currently implemented are the following PDE models:
+
 1. [`DivSigGrad.jl`](https://github.com/JuliaInv/DivSigGrad.jl) - Inverse conductivity problems in statics
-2. [`FWI.jl`](https://github.com/JuliaInv/FWI.jl) - Full Waveform Inversion
-3. [`MaxwellFrequency`](https://github.com/JuliaInv/MaxwellFrequency) - Inversion for conductivity in Maxwell's equations
-4. [`EikonalInv.jl`](https://github.com/JuliaInv/EikonalInv.jl) - Inversion for slowness from travel time tomography
+1. [`FWI.jl`](https://github.com/JuliaInv/FWI.jl) - Full Waveform Inversion
+1. [`MaxwellFrequency`](https://github.com/JuliaInv/MaxwellFrequency) - Inversion for conductivity in Maxwell's equations
+1. [`EikonalInv.jl`](https://github.com/JuliaInv/EikonalInv.jl) - Inversion for slowness from travel time tomography
 
 # Acknowledgements
 

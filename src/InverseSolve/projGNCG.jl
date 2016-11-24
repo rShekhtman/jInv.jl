@@ -1,13 +1,39 @@
 export projGNCG
 
+"""
+	function projGrad
+
+	Projects gradient, i.e.,
+
+					 | gc[i],  				xl[i] < x[i] < xh[i]
+	gc[i]  = | max(gc[i],0)	 	xc[i] == xh[i]
+					 | min(gc[i],0)   xc[i] == xl[i]
+
+
+	Input:
+
+		gc 				  - gradient vector
+		mc 				  - model
+		boundsLow   - lower bounds
+		boundsHigh  - upper bounds
+"""
+function projGrad(gc,mc,boundsLow,boundsHigh)
+	pgc = gc[:]
+	pgc[mc.==boundsLow] = min(gc[mc.==boundsLow],0)
+	pgc[mc.==boundsHigh] = max(gc[mc.==boundsHigh],0)
+	return pgc
+end
+
 type projGNCGhis
 	Jc::Array
+	dJ::Array
 	F::Array
 	Dc::Array
 	Rc::Array
 	alphas::Array
 	Active::Array
 	stepNorm::Array
+	lsIter::Array
 	timeMisfit::Array
 	timeReg::Array
 	timePCG::Array
@@ -17,31 +43,35 @@ end
 
 function getProjGNCGhis(maxIter,maxIterCG)
 	Jc = zeros(maxIter+1)
-	F = zeros(maxIter+1)
+	dJ = zeros(maxIter+1)
+	F  = zeros(maxIter+1)
 	Dc = []
 	Rc = zeros(maxIter+1)
 	alphas = zeros(maxIter+1)
 	Active = zeros(maxIter+1)
 	stepNorm = zeros(maxIter+1)
+	lsIter = zeros(Int,maxIter+1)
 	timeMisfit = zeros(maxIter+1,4)
 	timeReg = zeros(maxIter+1)
 	timePCG = zeros(maxIter+1,1)
 	hisPCG = []
 	timeGradMisfit = zeros(maxIter+1,2)
 
-	return projGNCGhis(Jc,F,Dc,Rc,alphas,Active,stepNorm,timeMisfit,timeReg,timePCG,hisPCG,timeGradMisfit)
+	return projGNCGhis(Jc,dJ,F,Dc,Rc,alphas,Active,stepNorm,lsIter,timeMisfit,timeReg,timePCG,hisPCG,timeGradMisfit)
 end
 
-function updateHis!(iter::Int64,His::projGNCGhis,Jc::Real,Fc,Dc,Rc::Real,alpha::Real,nActive::Int64,stepNorm::Real,timeMisfit::Vector,timeReg::Real)
+function updateHis!(iter::Int64,His::projGNCGhis,Jc::Real,dJ::Real,Fc,Dc,Rc::Real,alpha::Real,nActive::Int64,stepNorm::Real,lsIter::Int,timeMisfit::Vector,timeReg::Real)
 	His.Jc[iter+1]            = Jc
+	His.dJ[iter+1]            = dJ
 	His.F[iter+1]             = Fc
 	push!(His.Dc,Dc)
 	His.Rc[iter+1]            = Rc
 	His.alphas[iter+1]        = alpha
 	His.Active[iter+1]        = nActive
 	His.stepNorm[iter+1]      = stepNorm
+	His.lsIter[iter+1]        = lsIter
 	His.timeMisfit[iter+1,:] += timeMisfit
-	His.timeReg[iter+1]      += timeReg
+	His.timeReg[iter+1]      += timeReg[]
 end
 
 function dummy(mc,Dc,iter,pInv,pMis)
@@ -121,7 +151,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 
 	outStr = @sprintf("%4s\t%08s\t%08s\t%08s\t%08s\t%08s\n",
 					  	"i.LS", "F", "R","alpha[1]","Jc/J0","#Active")
-	updateHis!(0,His,Jc,F,Dc,R,alpha[1],countnz(Active),0.0,tMis,tReg)
+	updateHis!(0,His,Jc,norm(projGrad(gc,mc,low,high)),F,Dc,R,alpha[1],countnz(Active),0.0,-1,tMis,tReg)
 
 	if out>=2; print(outStr); end
 	f = open("jInv.out", "w")
@@ -218,7 +248,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 		Active = (mc .<=low) | (mc.>=high)  # Compute active set
 
 		#  Check stopping criteria for outer iteration.
-		updateHis!(iter,His,Jc,F,Dc,R,alpha[1],countnz(Active),stepNorm,tMis,tReg)
+		updateHis!(iter,His,Jc,-1.0,F,Dc,R,alpha[1],countnz(Active),stepNorm,lsIter,tMis,tReg)
 
 		dumpResults(mc,Dc,iter,pInv,pMis);
 		if stepNorm < stepTol
@@ -239,6 +269,7 @@ function  projGNCG(mc,pInv::InverseParam,pMis;indCredit=[],dumpResults::Function
 		dF = dsig'*dF
 		gc = dF + dR
 
+		His.dJ[iter+1] = norm(projGrad(gc,mc,low,high))
 
 
 	end # while outer_flag == 0

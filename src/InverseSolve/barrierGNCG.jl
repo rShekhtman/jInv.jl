@@ -33,14 +33,14 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 	high        = pInv.boundsHigh
 	alpha       = pInv.alpha
 	mref 		= pInv.mref;
-	
+
 	His = getProjGNCGhis(maxIter,pcgMaxIter)
 	#---------------------------------------------------------------------------
 	#  Initialization.
 	#---------------------------------------------------------------------------
-	
+
 	# Active 	= convert(BitArray,zeros(Bool,length(mc)));  # Compute zero active set
-	
+
 	# logBarrierReg(m,mref,M) = logBarrier(m,mref,M,low,high,epsilon);
 	logBarrierReg(m,mref,M) = logBarrierSquared(m,mref,M,low,high,epsilon);
 	regularizer 	 		= [pInv.regularizer;logBarrierReg];
@@ -48,7 +48,7 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 	mref 			 		= zeros(size(mref,1),size(mref,2)+1);
 	mref[:,1:size(mref,2)-1] 	= pInv.mref;
 
-	
+
 	#########################################
 	## evaluate function and derivatives
 	sig,dsig = pInv.modelfun(mc)
@@ -58,16 +58,16 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 		Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sig,pMis,true,indCredit)
 	end
 	dF = dsig'*dF
-	
-	
+
+
 	# compute regularizer
 	tic()
-	R,dR,d2R = computeRegularizer(regularizer,mc,mref,pInv.MInv,alpha) 
+	R,dR,d2R = computeRegularizer(regularizer,mc,mref,pInv.MInv,alpha)
 	tReg = toq()
 	# objective function
 	Jc  = F  + R
 	gc  = dF + dR
-	
+
 	F0 = F; J0 = Jc
 	############################################################################
 	##  Outer iteration.                                                        #
@@ -75,57 +75,57 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 	iter = 0
 	outerFlag = -1; stepNorm=0.0
 
-	outStr = @sprintf("%4s\t%08s\t%08s\t%08s\t%08s\n", 
+	outStr = @sprintf("%4s\t%08s\t%08s\t%08s\t%08s\n",
 					  	"i.LS", "F", "R","alpha[1]","Jc/J0")
-	updateHis!(0,His,Jc,F,Dc,R,alpha[1],0,0.0,tMis,tReg)
-	
+	updateHis!(0,His,Jc,norm(gc),F,Dc,R,alpha[1],0,0.0,-1,tMis,tReg)
+
 	if out>=2; print(outStr); end
 	f = open("jInv.out", "w")
 	write(f, outStr)
 	close(f)
-	
+
 	while outerFlag == -1
-	
+
 		iter += 1
-		outStr = @sprintf("%3d.0\t%3.2e\t%3.2e\t%3.2e\t%3.2e\n", 
+		outStr = @sprintf("%3d.0\t%3.2e\t%3.2e\t%3.2e\t%3.2e\n",
 		         iter, F, R,alpha[1],Jc/J0)
 		if out>=2; print(outStr); end
 		f = open("jInv.out", "a")
 		write(f, outStr)
 		close(f)
 
-		
+
 		#  Set up Hessian and preconditioner.
 		if isempty(indCredit)
-			Hs = x -> dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x; 
+			Hs = x -> dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x;
 		else
 			Hs = x -> dsig'*HessMatVec(dsig*x,pMis,sig,d2F,indDebit) + d2R*x;
 		end
-		
-		
+
+
 		pInv.HesPrec.setupPrec(Hs, d2R,pInv.HesPrec.param);
-		
+
 		PC(x) = pInv.HesPrec.applyPrec(Hs,d2R,x,pInv.HesPrec.param);
-		
-		
-		
+
+
+
 		##  inner CG iterations.
 		tic()
 		delm,hisPCG = KrylovMethods.cg(Hs,-gc, tol=pcgTol, maxIter=pcgMaxIter, M=PC,out=0)[1:2];
 		His.timePCG[iter+1]+= toq()
 		push!(His.hisPCG,hisPCG)
 
-		# scale step 
+		# scale step
 		if maximum(abs(delm)) > maxStep; delm = delm./maximum(abs(delm))*maxStep; end
-		
+
 		delm = shrinkStep(mc,delm,low,high,out);
-		
+
 		## Begin Armijo line search
 		muLS = 1.0; lsIter = 1; mt = zeros(size(mc)); Jt = Jc
 		while true
 			mt = mc + muLS*delm
-			
-			## evaluate function 
+
+			## evaluate function
 			sigt, = pInv.modelfun(mt)
 			if isempty(indCredit)
 				Dc,F,dF,d2F,pMis,tMis = computeMisfit(sigt,pMis,false)
@@ -133,9 +133,9 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 				Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sigt,false,indCredit)
 			end
 			His.timeMisfit[iter+1,:]+=tMis
-			
+
 			tic()
-			R,dR,d2R = computeRegularizer(regularizer,mt,mref,pInv.MInv,alpha) 
+			R,dR,d2R = computeRegularizer(regularizer,mt,mref,pInv.MInv,alpha)
 			His.timeReg[iter+1] += toq()
 			# objective function
 			Jt  = F  + R
@@ -143,7 +143,7 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 				println(@sprintf( "   .%d\t%3.2e\t%3.2e\t\t\t%3.2e",
 			           lsIter, F,       R,       Jt/J0))
 			end
-			
+
 			if Jt < Jc
 			    break
 			end
@@ -154,18 +154,18 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 			end
 		end
 		## End Line search
-		
-		## Check for termination 
+
+		## Check for termination
 		stepNorm = norm(mt-mc,Inf)
 		mc = mt
 		Jc = Jt
-		
+
 		sig, dsig = pInv.modelfun(mc)
-		 
-		#  Check stopping criteria for outer iteration. 
-		updateHis!(iter,His,Jc,F,Dc,R,alpha[1],0,stepNorm,tMis,tReg)
-		
-		
+
+		#  Check stopping criteria for outer iteration.
+		updateHis!(iter,His,Jc,-1.,F,Dc,R,alpha[1],0,stepNorm,lsIter,tMis,tReg)
+
+
 		dumpResults(mc,Dc,iter,pInv,pMis);
 		if stepNorm < stepTol
 			outerFlag = 1
@@ -173,7 +173,7 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 		elseif iter >= maxIter
 			break
 		end
-		
+
 		# Evaluate gradient
 		tic()
 		if isempty(indCredit)
@@ -182,14 +182,14 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 			dF = computeGradMisfit(sig,Dcp,pMis,indDebit)
 		end
 		His.timeGradMisfit[iter+1]+=toq()
-		
+
 		dF = dsig'*dF
 		gc = dF + dR
-		
-		
-		
+
+
+		His.dJ[iter+1] = norm(gc)
 	end # while outer_flag == 0
-	
+
 	if out>=1
 		if outerFlag==-1
 			println("barrierGNCG iterated maxIter=$maxIter times but reached only stepNorm of $(stepNorm) instead $(stepTol)." )
@@ -199,9 +199,7 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 			println("barrierGNCG reached desired accuracy at iteration $iter.")
 		end
 	end
-	
-	
+
+
 	return mc,Dc,outerFlag,His
 end  # Optimization code
-
-

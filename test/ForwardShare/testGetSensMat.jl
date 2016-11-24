@@ -26,12 +26,18 @@ pFors = (pForp,pFor,pForRef)
 
 for k=1:length(pFors)
 	print("\ttest getSensMatVec for pFor as $(typeof(pFors[k]))...")
-	
+
+	(mt,nt) = getSensMatSize(pFors[k])
+	nd      = getNumberOfData(pFors[k])
 	(m,n) = size(A[k])
-	
+
+	@test mt==nd
+	@test m==mt
+	@test nt==n
+
 	At = getSensMat(randn(n),pFors[k])
-	
+
 	@test norm(At-A[k],Inf)/norm(A[k],Inf) < 1e-14
-	
+
 	print("passed!\n")
 end
