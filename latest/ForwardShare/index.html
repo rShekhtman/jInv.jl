@@ -152,11 +152,32 @@
 <p>The <code>ForwardShare</code> submodule provides methods that are useful for different forward problems such as mesh-to-mesh interpolation, parallelization, etc. </p>
 <p><a id='List-of-types-and-methods-1'></a></p>
 <h2 id="list-of-types-and-methods">List of types and methods</h2>
+<p><a id='jInv.ForwardShare.adjointTest-Tuple{Any,jInv.ForwardShare.ForwardProbType}' href='#jInv.ForwardShare.adjointTest-Tuple{Any,jInv.ForwardShare.ForwardProbType}'>#</a>
+<strong><code>jInv.ForwardShare.adjointTest</code></strong> &mdash; <em>Method</em>.</p>
+<p>function jInv.adjointTest</p>
+<p>automatic adjoint test for forward problems. If sensitivity matrix is m x n then this method generates vector v,m of lengths n and m, respectively and computes</p>
+<p>err = abs(dot(v,JTw) - dot(w,Jv))  / abs(dot(w,Jv))</p>
+<p>Input:</p>
+<pre><code>sig::Vector           - current model
+pFor::ForwardProbType - forward problem
+</code></pre>
+
+<p>Optional Inputs:</p>
+<pre><code>out::Bool            - controls verbosity (default=false)
+tol::Real            - tol on relative error (default=1e-10)
+</code></pre>
+
+<p>Output: </p>
+<pre><code>passed              - true/false depending whether test passed or not
+err                 - absolute error
+</code></pre>
+
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7553da94d273ebf555f765fc872ab5bf0aff804b/src/ForwardShare/testing.jl#L21-L44' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.ForwardShare.getNumberOfData-Tuple{jInv.ForwardShare.ForwardProbType}' href='#jInv.ForwardShare.getNumberOfData-Tuple{jInv.ForwardShare.ForwardProbType}'>#</a>
 <strong><code>jInv.ForwardShare.getNumberOfData</code></strong> &mdash; <em>Method</em>.</p>
 <p>nd = getNumberOfData(pFor)</p>
 <p>Returns number of data in forward problem</p>
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/5818ce59cae275cbd4c4929c68347e11798f8eaf/src/ForwardShare/ForwardShare.jl#L116-L120' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7553da94d273ebf555f765fc872ab5bf0aff804b/src/ForwardShare/ForwardShare.jl#L116-L120' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.ForwardShare.getSensMat-Tuple{Array{T,1},jInv.ForwardShare.ForwardProbType}' href='#jInv.ForwardShare.getSensMat-Tuple{Array{T,1},jInv.ForwardShare.ForwardProbType}'>#</a>
 <strong><code>jInv.ForwardShare.getSensMat</code></strong> &mdash; <em>Method</em>.</p>
 <p>S = function getSensMat(...)</p>
@@ -173,7 +194,7 @@ S = getSensMat(m,[pFor1;pFor2])   # multiple pFor's
 S = getSensMat(m,pForRef)         # pFor as remote reference
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/5818ce59cae275cbd4c4929c68347e11798f8eaf/src/ForwardShare/getSensMat.jl#L3-L21' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7553da94d273ebf555f765fc872ab5bf0aff804b/src/ForwardShare/getSensMat.jl#L3-L21' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.ForwardShare.getSensMatSize-Tuple{jInv.ForwardShare.ForwardProbType}' href='#jInv.ForwardShare.getSensMatSize-Tuple{jInv.ForwardShare.ForwardProbType}'>#</a>
 <strong><code>jInv.ForwardShare.getSensMatSize</code></strong> &mdash; <em>Method</em>.</p>
 <p>(m,n) = getSensMatSize(pFor)</p>
@@ -183,17 +204,17 @@ S = getSensMat(m,pForRef)         # pFor as remote reference
 </code></pre>
 
 <p>This is problem dependent and should be implemented in the respective packages.</p>
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/5818ce59cae275cbd4c4929c68347e11798f8eaf/src/ForwardShare/ForwardShare.jl#L82-L94' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7553da94d273ebf555f765fc872ab5bf0aff804b/src/ForwardShare/ForwardShare.jl#L82-L94' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.ForwardShare.getSensMatVec-Tuple{Array{T,1},Array{T,1},jInv.ForwardShare.ForwardProbType}' href='#jInv.ForwardShare.getSensMatVec-Tuple{Array{T,1},Array{T,1},jInv.ForwardShare.ForwardProbType}'>#</a>
 <strong><code>jInv.ForwardShare.getSensMatVec</code></strong> &mdash; <em>Method</em>.</p>
 <p>Jv  = getSensMatVec(v::Vector,m::Vector,param::ForwardProbType)</p>
 <p>Computes matrix-vector product with the Jacobian.</p>
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/5818ce59cae275cbd4c4929c68347e11798f8eaf/src/ForwardShare/ForwardShare.jl#L65-L70' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7553da94d273ebf555f765fc872ab5bf0aff804b/src/ForwardShare/ForwardShare.jl#L65-L70' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.ForwardShare.getSensTMatVec-Tuple{Array{T,1},Array{T,1},jInv.ForwardShare.ForwardProbType}' href='#jInv.ForwardShare.getSensTMatVec-Tuple{Array{T,1},Array{T,1},jInv.ForwardShare.ForwardProbType}'>#</a>
 <strong><code>jInv.ForwardShare.getSensTMatVec</code></strong> &mdash; <em>Method</em>.</p>
 <p>JTv  = getSensMatVec(v::Vector,m::Vector,param::ForwardProbType)</p>
 <p>Computes matrix-vector product with the transpose of Jacobian. Implementation depends on forward problem.</p>
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/5818ce59cae275cbd4c4929c68347e11798f8eaf/src/ForwardShare/ForwardShare.jl#L73-L79' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7553da94d273ebf555f765fc872ab5bf0aff804b/src/ForwardShare/ForwardShare.jl#L73-L79' class='documenter-source'>source</a><br></p>
               
             </div>
           </div>
