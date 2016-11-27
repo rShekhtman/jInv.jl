@@ -1,4 +1,4 @@
-export checkDerivative
+export checkDerivative, getRandomTestDirection
 
 function getRandomTestDirection(x0::Float64)
 	return randn()

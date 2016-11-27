@@ -144,6 +144,7 @@ module ForwardShare
 	include("prepareMesh2Mesh.jl")
 	include("interpLocalToGlobal.jl")
 	include("getSensMat.jl")
+	include("testing.jl")
 
 	import jInv.Utils.clear!
 	function clear!(P::ForwardProbType;clearAinv::Bool=true,clearFields::Bool=true, clearMesh::Bool=false, clearSources::Bool=false, clearObs::Bool=false,clearAll::Bool=false)
@@ -163,6 +164,9 @@ module ForwardShare
 			clear!(P.Ainv)
 		end
 	end
+
+	
+	
 
 
 end
