@@ -8,58 +8,39 @@ using  FWI
 using  ForwardHelmholtz
 using  Multigrid
 #############################################################################################################
-modelDir = "../BenchmarkModels";
 
-dataDir = pwd();
 include("Drivers/readModelAndGenerateMeshMref.jl");
 include("Drivers/prepareFWIDataFiles.jl");
 include("Drivers/setupFWI.jl");
 
 plotting = false;
-large = false
 
 if plotting
 	using  PyPlot
 end
 #############################################################################################################
+modelDir = pwd();
 dataDir = pwd();
 resultsDir = pwd();
 ########################################################################################################
-matfile   = matread("../3Dseg12812864.mat")
-m         = matfile["VELc"]*1e-3
-m         = reshape(m,(128,128,64));
+m = readdlm(string(modelDir,"/SEGmodel2Dsalt.dat"));
+m = m*1e-3;
+m = m';
 
-dim     	 = 3;
-if large==false
-	pad     	 = 10;
-	ABLPad 		 = pad + 8;
-	newSize 	 = [145,145,70];
-	omega   	 = [0.5,0.75,1.25,1.75]*2*pi;
-	jumpSrc 	 = 16;
-	### FOR A QUICK RUN USE THIS INSTEAD OF THE THREE LINES ABOVE:
-	# newSize 	 = [65,65,33];
-	# omega   	 = [0.5]*2*pi;
-	# jumpSrc 	 = 8;
-	maxBatchSize     = 27;
-else
-	pad     	 = 20;
-	ABLPad 		 = pad + 5;
-	newSize 	 = [236,236,120];
-	omega   	 = [0.5,0.8,1.2,1.8,2.5]*2*pi;
-	jumpSrc 	 = 25;
-	maxBatchSize = 25;
-end
+newSize       = [256,128];
+pad     	     = 10;
+ABLPad 		     = pad + 8;
+jumpSrc 	 	 = 5
+maxBatchSize     = 256;
+omega   	 = [0.5,0.75,1.25,1.75]*2*pi;
 
-
-
-offset  = ceil(Int64,(newSize[1]*(16.0/13.5)));
+offset  = ceil(Int64,(newSize[1]*(10.0/13.5)));
 println("Offset is: ",offset)
-domain = [0.0,13.5,0.0,13.5,0.0,4.2];
+domain = [0.0,13.5,0.0,4.2];
 
 (m,Minv,mref,boundsHigh,boundsLow) = readModelAndGenerateMeshMref(m,pad,newSize,domain);
 
-useFilesForFields = true;
-
+useFilesForFields = false;
 
 # ###################################################################################################################
 dataFilenamePrefix = string(dataDir,"/DATA_SEG",tuple((Minv.n+1)...));
@@ -83,32 +64,13 @@ if plotting
 	M_t = 0;
 end
 
-######################## ITERATIVE SOLVER #############################################
-if large==true && dim == 3
-	levels      = 3;
-	numCores 	= 24;
-	blas_set_num_threads(numCores);
-	maxIter     = 50;
-	relativeTol = 1e-5;
-	relaxType   = "SPAI";
-	relaxParam  = 1.0;
-	relaxPre 	= 2;
-	relaxPost   = 2;
-	cycleType   ='W';
-	coarseSolveType = "MUMPS";
-	MG = getMGparam(levels,numCores,maxIter,relativeTol,relaxType,relaxParam,relaxPre,relaxPost,cycleType,coarseSolveType,0.0,0.0,Minv);
-	shift = 0.15;
-	Ainv = getShiftedLaplacianMultigridSolver(Minv, MG,shift);
-end
 ######################## DIRECT SOLVER #################################################
-if large == false
-	numCores 	= 16;
-	blas_set_num_threads(numCores);
-	Ainv = getMUMPSsolver([],0,0,2);
-	# Ainv = getJuliaSolver();
-	# Ainv = getPARsolver([],0,0,6);
-end
 
+numCores 	= 16;
+BLAS.set_num_threads(numCores);
+Ainv = getMUMPSsolver([],0,0,2);
+# Ainv = getJuliaSolver();
+# Ainv = getPARsolver([],0,0,6);
 
 ##########################################################################################
 

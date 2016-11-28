@@ -1,5 +1,5 @@
 
-export plotModel
+export plotModel, cutBoundaryLayer
 
 
 
@@ -69,6 +69,23 @@ if Vis.hasPyPlot
 end
 return;
 end
+
+"""
+function cutBoundaryLayer
+
+	Removes the boundary layer from the model and returns the cut model and a corresponding new mesh. 
+	Used mostly for plotting - sometimes we prefer not to show the boundary of the model.
+	
+	The "boundary" here is all the boundaries of the regular domain except the top surface. 
+	
+
+	Parameters:
+	m 				:: model. 2D or 3D Array.
+	M_regular		:: A corresponding regular mesh.
+	pad			    :: The thickness of the layer in cells.
+	
+"""
+
 
 function cutBoundaryLayer(m::Array{Float64},M_regular,pad::Int64)
 if pad<=0
