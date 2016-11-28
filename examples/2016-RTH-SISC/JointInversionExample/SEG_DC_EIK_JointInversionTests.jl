@@ -1,8 +1,4 @@
 using MAT # include only on main worker
-plotting = true;
-if plotting
-	using PyPlot
-end
 using Base.Test
 using DivSigGrad
 using jInv.InverseSolve
@@ -10,13 +6,19 @@ using jInv.Mesh
 using jInv.LinearSolvers
 using jInv.ForwardShare
 using jInv.Utils
+using jInv.Vis
 using EikonalInv
+
+plotting = true;
+if plotting
+	using PyPlot
+end
 
 @everywhere begin
 	include("DriversDC/velToConductMod.jl");
 end
 
-include("DriversEikonalInv/plotModel.jl");
+
 include("DriversEikonalInv/readModelAndGenerateMeshMref.jl");
 include("DriversEikonalInv/prepareTravelTimeDataFiles.jl");
 include("DriversEikonalInv/setupTravelTimeTomography.jl");
@@ -79,7 +81,7 @@ function dumpResults(mc,Dc,iter,pInv,pMis)
 		clf();
 	end
 	file = string(filenamePrefix,Minv.n,iter,".dat");
-	plotModel(mDc,plotting,false,[],0,[minimum(boundsLow),maximum(boundsHigh)],file);
+	plotModel(mDc,false,[],0,[minimum(boundsLow),maximum(boundsHigh)],file);
 	writedlm(file,convert(Array{Float16},mDc[:]));
 end
 dumpResults(mref,[],"ref",[],[]);

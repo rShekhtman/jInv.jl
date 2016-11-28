@@ -70,7 +70,7 @@ end
 return;
 end
 
-function cutBoundaryLayer(m::Array{Float64},M_regular::RegularMesh,pad::Int64)
+function cutBoundaryLayer(m::Array{Float64},M_regular,pad::Int64)
 if pad<=0
 	return m,M_regular;
 end
