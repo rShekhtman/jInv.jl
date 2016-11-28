@@ -4,6 +4,7 @@ module jInv.Vis
 Visualization tools for jInv
 
 """
+
 module Vis
 	hasPyPlot = false
 	try
@@ -17,8 +18,10 @@ module Vis
 	using jInv.Mesh
 	
 	if hasPyPlot
-		include("plotGrid.jl")
-		include("viewImage2D.jl")
-		include("viewOrthoSlices2D.jl")
+		include("plotGrid.jl");
+		include("viewImage2D.jl");
+		include("viewOrthoSlices2D.jl");
+		include("plotModel.jl");
 	end
+	export hasPyPlot
 end
