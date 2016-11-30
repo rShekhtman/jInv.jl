@@ -161,7 +161,7 @@
 sigLocalFast = interpGlobalToLocal(sigGlobal,gloc.PForInv,gloc.sigmaBack)
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/globalToLocal.jl#L7-L32' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/globalToLocal.jl#L7-L32' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.InverseParam' href='#jInv.InverseSolve.InverseParam'>#</a>
 <strong><code>jInv.InverseSolve.InverseParam</code></strong> &mdash; <em>Type</em>.</p>
 <pre><code>type jInv.InverseSolve.InverseParam
@@ -194,7 +194,7 @@ Example:
     pInv = getInverseParam(Minv,modelfun,regularizer,alpha,mref)
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/InverseSolve.jl#L21-L50' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/InverseSolve.jl#L21-L50' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.MisfitParam' href='#jInv.InverseSolve.MisfitParam'>#</a>
 <strong><code>jInv.InverseSolve.MisfitParam</code></strong> &mdash; <em>Type</em>.</p>
 <p>type jInv.InverseSolve.MisfitParam</p>
@@ -212,7 +212,7 @@ gloc                   - mapping from inverse to forward mesh (including active 
 <p>Constructors:</p>
 <p>getMisfitParam(pFor,Wd,dobs,misfit,model,gloc=getGlobalToLocal(1.0))</p>
 <p>getMisfitParam(pForRFs::Array{RemoteChannel}, Wd::Array, dobs::Array, misfit::Function,                             Iact,sigmaBack::Vector,                             Mesh2MeshRFs::Union{Array{RemoteChannel},Array{Float64}}=ones(length(pForRFs)),                             modelfun::Function=identityMod,fname="")</p>
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/misfitParam.jl#L3-L28' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/misfitParam.jl#L3-L28' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.HuberFun' href='#jInv.InverseSolve.HuberFun'>#</a>
 <strong><code>jInv.InverseSolve.HuberFun</code></strong> &mdash; <em>Function</em>.</p>
 <pre><code>mis,dmis,d2mis = HuberFun(dc,dobs,Wd,C)
@@ -233,13 +233,13 @@ Output:
     d2mis       -  diagonal of Hessian
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/misfit.jl#L44-L62' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/misfit.jl#L44-L62' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.SSDFun-Tuple{Array{Complex{Float64},N},Array{Complex{Float64},N},Array{Complex{Float64},N}}' href='#jInv.InverseSolve.SSDFun-Tuple{Array{Complex{Float64},N},Array{Complex{Float64},N},Array{Complex{Float64},N}}'>#</a>
 <strong><code>jInv.InverseSolve.SSDFun</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>For complex data misfit is computed as 0.5*|real(dc)-(dobs)|_Wd^2 +  0.5*|complex(dc)-complex(dobs)|_W^2
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/misfit.jl#L28-L30' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/misfit.jl#L28-L30' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.SSDFun-Tuple{Array{Float64,N},Array{Float64,N},Array{Float64,N}}' href='#jInv.InverseSolve.SSDFun-Tuple{Array{Float64,N},Array{Float64,N},Array{Float64,N}}'>#</a>
 <strong><code>jInv.InverseSolve.SSDFun</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>mis,dmis,d2mis = SSDFun(dc,dobs,Wd)
@@ -257,7 +257,7 @@ Output:
     d2mis       -  diagonal of Hessian
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/misfit.jl#L3-L18' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/misfit.jl#L3-L18' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.boundMod-Tuple{Any}' href='#jInv.InverseSolve.boundMod-Tuple{Any}'>#</a>
 <strong><code>jInv.InverseSolve.boundMod</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>sigma,dsigma = boundMod(m;boundLow=0.0,boundHigh=1.0)
@@ -267,7 +267,7 @@ maps model parameter to conductivity via
     sigma = 0.5*(boundHigh-boundLow) * (tanh(m)+1.0 ) + boundLow
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/models.jl#L34-L41' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/models.jl#L34-L41' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.computeMisfit' href='#jInv.InverseSolve.computeMisfit'>#</a>
 <strong><code>jInv.InverseSolve.computeMisfit</code></strong> &mdash; <em>Function</em>.</p>
 <pre><code>Dc,F,dF,d2F = computeMisfit(...)
@@ -277,7 +277,7 @@ Computes misfit for PDE parameter estimation problem.
 computeMisfit has several options.
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/computeMisfit.jl#L4-L10' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/computeMisfit.jl#L4-L10' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.diffusionReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}' href='#jInv.InverseSolve.diffusionReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}'>#</a>
 <strong><code>jInv.InverseSolve.diffusionReg</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rc,dR,d2R = diffusionReg(m,mref,M,Iact=1.0)
@@ -297,7 +297,7 @@ Output
     d2R   - Hessian
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/regularizers.jl#L28-L44' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/regularizers.jl#L28-L44' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.expMod-Tuple{Any}' href='#jInv.InverseSolve.expMod-Tuple{Any}'>#</a>
 <strong><code>jInv.InverseSolve.expMod</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>sigma,dsigma = expMod(model)
@@ -307,7 +307,7 @@ maps model parameter to conductivity via
 sigma(m) = exp(m)
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/models.jl#L4-L11' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/models.jl#L4-L11' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.fMod-Tuple{Any}' href='#jInv.InverseSolve.fMod-Tuple{Any}'>#</a>
 <strong><code>jInv.InverseSolve.fMod</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>sigma,dsigma = fMod(model;f::Function=identity,df::Function=m-&gt;speye(length(m)))
@@ -317,7 +317,7 @@ maps model parameter to conductivity via
 sigma(m) = f(m) and dsigma(m) = sdiag(df(m))
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/models.jl#L16-L23' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/models.jl#L16-L23' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.getInverseParam-Tuple{Any,Any,Any,Any,Any,Array{T,1},Array{T,1}}' href='#jInv.InverseSolve.getInverseParam-Tuple{Any,Any,Any,Any,Any,Array{T,1},Array{T,1}}'>#</a>
 <strong><code>jInv.InverseSolve.getInverseParam</code></strong> &mdash; <em>Method</em>.</p>
 <p>function jInv.InverseSolve.getInverseParam(...)</p>
@@ -340,7 +340,7 @@ minUpdate::Real=1e-4  - stopping criteria
 maxIter::Int=10       - maximum number of iterations
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/InverseSolve.jl#L67-L89' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/InverseSolve.jl#L67-L89' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.getMisfitParam' href='#jInv.InverseSolve.getMisfitParam'>#</a>
 <strong><code>jInv.InverseSolve.getMisfitParam</code></strong> &mdash; <em>Function</em>.</p>
 <p>function jInv.InverseSolve.getMisfitParam</p>
@@ -368,7 +368,7 @@ modelfun::Function=identityMod                      - model function. If all mis
 fname=&quot;&quot;                                - (optional)
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/misfitParam.jl#L38-L70' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/misfitParam.jl#L38-L70' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.iteratedTikhonov-Tuple{Any,jInv.InverseSolve.InverseParam,Any,Any,Any,Any}' href='#jInv.InverseSolve.iteratedTikhonov-Tuple{Any,jInv.InverseSolve.InverseParam,Any,Any,Any,Any}'>#</a>
 <strong><code>jInv.InverseSolve.iteratedTikhonov</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>mc,DC = iteratedTikhonov(mc,pInv::InverseParam,pMis,nAlpha,alphaFac,
@@ -401,7 +401,7 @@ Output:
                              - alpha value.
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/iteratedTikhonov.jl#L3-L32' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/iteratedTikhonov.jl#L3-L32' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.logBarrier' href='#jInv.InverseSolve.logBarrier'>#</a>
 <strong><code>jInv.InverseSolve.logBarrier</code></strong> &mdash; <em>Function</em>.</p>
 <pre><code>Rc,dR,d2R = logBarrier(m::Vector, z::Vector, M::AbstractMesh,low::Vector,high::Vector, epsilon)
@@ -426,7 +426,7 @@ Output
     d2g   - Hessian (diagonal matrix). Second derivative is not continous.
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/regularizers.jl#L260-L281' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/regularizers.jl#L260-L281' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.logBarrierSquared' href='#jInv.InverseSolve.logBarrierSquared'>#</a>
 <strong><code>jInv.InverseSolve.logBarrierSquared</code></strong> &mdash; <em>Function</em>.</p>
 <pre><code>Rc,dR,d2R = logBarrierSquared(m::Vector, z::Vector, M::AbstractMesh,low::Vector,high::Vector, epsilon)
@@ -451,7 +451,7 @@ Output
     d2g   - Gauss Newton Hessian approximation (diagonal matrix). Second derivative approx is continous.
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/regularizers.jl#L317-L338' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/regularizers.jl#L317-L338' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.projGNCG-Tuple{Any,jInv.InverseSolve.InverseParam,Any}' href='#jInv.InverseSolve.projGNCG-Tuple{Any,jInv.InverseSolve.InverseParam,Any}'>#</a>
 <strong><code>jInv.InverseSolve.projGNCG</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>mc,Dc,outerFlag = projGNCG(mc,pInv::InverseParam,pMis, indFor = [], dumpResults::Function = dummy)
@@ -477,7 +477,7 @@ Output:
     His                 - iteration history
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/projGNCG.jl#L83-L106' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/projGNCG.jl#L83-L106' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.projPCG-Tuple{Function,Array{T,1},BitArray,Function,Real,Int64}' href='#jInv.InverseSolve.projPCG-Tuple{Function,Array{T,1},BitArray,Function,Real,Int64}'>#</a>
 <strong><code>jInv.InverseSolve.projPCG</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>dm = projPCG(H,g,Active,Precond,cgTol,maxIter)
@@ -496,7 +496,7 @@ Input:
     maxIter             - maximum number of iterations
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/projPCG.jl#L3-L18' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/projPCG.jl#L3-L18' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.projSD-Tuple{Any,jInv.InverseSolve.InverseParam,Any}' href='#jInv.InverseSolve.projSD-Tuple{Any,jInv.InverseSolve.InverseParam,Any}'>#</a>
 <strong><code>jInv.InverseSolve.projSD</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>mc,Dc,outerFlag = projSD(mc,pInv::InverseParam,pMis, indFor = [], dumpResults::Function = dummy)
@@ -526,7 +526,7 @@ Output:
     His                 - iteration history
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/projSD.jl#L49-L76' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/projSD.jl#L49-L76' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.smallnessReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}' href='#jInv.InverseSolve.smallnessReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}'>#</a>
 <strong><code>jInv.InverseSolve.smallnessReg</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rc,dR,d2R = smallnessReg(m,mref,M,Iact=1.0)
@@ -546,7 +546,7 @@ Output
     d2R   - Hessian
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/regularizers.jl#L58-L74' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/regularizers.jl#L58-L74' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.wTVReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}' href='#jInv.InverseSolve.wTVReg-Tuple{Array{T,1},Any,jInv.Mesh.AbstractMesh}'>#</a>
 <strong><code>jInv.InverseSolve.wTVReg</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rc,dR,d2R = wTVReg(m,mref,M,Iact,C=[])
@@ -567,7 +567,7 @@ Output
     d2R   - Hessian
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/regularizers.jl#L127-L144' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/regularizers.jl#L127-L144' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.wdiffusionRegNodal-Tuple{Array{T,1},Array{T,1},jInv.Mesh.AbstractMesh}' href='#jInv.InverseSolve.wdiffusionRegNodal-Tuple{Array{T,1},Array{T,1},jInv.Mesh.AbstractMesh}'>#</a>
 <strong><code>jInv.InverseSolve.wdiffusionRegNodal</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>Rc,dR,d2R = wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
@@ -587,7 +587,7 @@ Output
     d2R   - Hessian
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/regularizers.jl#L171-L187' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/regularizers.jl#L171-L187' class='documenter-source'>source</a><br></p>
 <p><a id='jInv.InverseSolve.projGrad-Tuple{Any,Any,Any,Any}' href='#jInv.InverseSolve.projGrad-Tuple{Any,Any,Any,Any}'>#</a>
 <strong><code>jInv.InverseSolve.projGrad</code></strong> &mdash; <em>Method</em>.</p>
 <pre><code>function projGrad
@@ -607,7 +607,7 @@ Input:
     boundsHigh  - upper bounds
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/7392cf5961f2a581086359fc845f8523dc285813/src/InverseSolve/projGNCG.jl#L3-L19' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/JuliaInv/jInv.jl/tree/f0c45423f3e08ce657f031ed9b065c2533f67f22/src/InverseSolve/projGNCG.jl#L3-L19' class='documenter-source'>source</a><br></p>
               
             </div>
           </div>
