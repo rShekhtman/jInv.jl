@@ -11,19 +11,19 @@ writeSrcRcvLocFile(RCVfile,Minv,ABLpad,1);
 	
 dataFullFilenamePrefix = string(filenamePrefix,"_freq");
 gamma = prepareFWIDataFiles2(m, Minv, filenamePrefix,dataFullFilenamePrefix,omega,waveCoef,pad,ABLpad,offset,workerList,maxBatchSize,Ainv);	
-dataFullFilenamePrefix = string(filenamePrefix,"_travelTime");
 
 file = matopen(string(filenamePrefix,"_PARAM.mat"), "w");
 write(file,"boundsLow",boundsLow);
 write(file,"boundsHigh",boundsHigh);
 write(file,"mref",mref);
-write(file,"MinvOmega",Minv.domain);
-write(file,"MinvN",Minv.n);
+write(file,"domain",Minv.domain);
+write(file,"n",Minv.n);
 write(file,"gamma",gamma);
 write(file,"pad",pad);
 write(file,"omega",omega);
 write(file,"waveCoef",waveCoef);
-close(file);			
+close(file);
+return gamma;	
 end
 
 
@@ -95,16 +95,6 @@ batch = min(size(Q,2),maxBatchSize);
 nsrc = size(Q,2);
 nrcv = size(P,2);
 
-# Dobs1 = fetch(D[1]);
-# Dobs2 = fetch(D[2]);
-
-# figure()
-# imshow(real(log(Dobs1))')
-# figure()
-# imshow(real(log(Dobs2))')
-
-# figure()
-# imshow(imag(Dobs2 - Dobs1./(Dobs2 + Dobs1))',clim = [-1;1]); colorbar()
 
 for k = 1:length(omega)
 	I = contDiv[k] : contDiv[k+1] - 1 
