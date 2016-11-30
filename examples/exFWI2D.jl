@@ -167,15 +167,14 @@ alpha = 1e-10;
 pcgTol = 1e-1;
 maxit = 8;
 
-HesPrec = getSSORCGRegularizationPreconditioner(1.0,1e-5,1000);
+HesPrec = getExactSolveRegularizationPreconditioner();
 
 pInv = getInverseParam(Minv,modfun,regfun,alpha,mref[:],boundsLow,boundsHigh,
                          maxStep=maxStep,pcgMaxIter=cgit,pcgTol=pcgTol,
 						 minUpdate=1e-3, maxIter = maxit,HesPrec=HesPrec);
-mc = copy(mref[:]); # Setting a starting guess.
 
 # Run one sweep of a frequency continuation procedure.
-mc,Dc = freqCont(mc, pInv, pMis,contDiv, 3, "",dump,"Joint",1,1,"projGN");
+mc,Dc = freqCont(copy(mref[:]), pInv, pMis,contDiv, 3, "",dump,"Joint",1,1,"projGN");
 
 
 
