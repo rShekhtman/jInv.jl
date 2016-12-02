@@ -16,8 +16,10 @@ export viewOrthoSlices2D
 		axis      - show axis label (useful to clarify how image is presented)
 		linewidth - width of dividing lines
 		color     - color of dividing lines
+		cmap      - colormap
+		vmin/vmax - specify intensity range
 """
-function viewOrthoSlices2D(I,Mesh::AbstractTensorMesh;slices=round(Int64,Mesh.n/2),axis=false,linewidth=2,color="w")
+function viewOrthoSlices2D(I,Mesh::AbstractTensorMesh;slices=round(Int64,Mesh.n/2),axis=false,linewidth=2,color="w",cmap="jet",vmin=minimum(I),vmax=maximum(I))
 
     #  create big image
     I   = reshape(I,tuple(Mesh.n...));
@@ -38,7 +40,7 @@ function viewOrthoSlices2D(I,Mesh::AbstractTensorMesh;slices=round(Int64,Mesh.n/
 
     domain = [x[1] x[end] y[1] y[end] z[1] z[end]]
     # plot image
-    pcolormesh(xa,ya,flipdim(I',1),hold=true)
+    pcolormesh(xa,ya,flipdim(I',1),hold=true,cmap=cmap,vmin=vmin,vmax=vmax)
 
     # add labels to clarify axis
     axis && xlabel("|-- x -- | -- z -- |")
