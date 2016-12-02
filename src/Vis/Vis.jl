@@ -22,6 +22,7 @@ module Vis
 		include("viewImage2D.jl");
 		include("viewOrthoSlices2D.jl");
 		include("plotModel.jl");
+		include("viewSlice2D.jl");
 	end
 	export hasPyPlot
 end
