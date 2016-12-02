@@ -7,11 +7,9 @@ using  EikonalInv
 using  MAT
 using  FWI
 using  ForwardHelmholtz
+using  PyPlot
 #############################################################################################################
-plotting = true;
-if plotting
-	using  PyPlot
-end
+
 
 ####################################################################################################################################
 ####################################################################################################################################
@@ -140,7 +138,34 @@ pMis = getMisfitParam(pFor, Wd, dobs, misfun, Iact,mback);
 # Set up Inversion #################################################################################
 ########################################################################################################
 
-function dump(mc,Dc,iter,pInv,PMis,resultsFilename="")
+
+
+## models are usually given in velocity (km/sec). We invert here for the slowness, which is 1/v.
+mref 				= velocityToSlow(mref)[1];
+t    				= copy(boundsLow);
+boundsLow 			= velocityToSlow(boundsHigh)[1];
+boundsHigh 			= velocityToSlow(t)[1]; t = 0;
+modfun 				= slowToSlowSquared;
+
+
+maxStep				=0.05*maximum(boundsHigh);
+
+regparams 			= [1.0,1.0,1.0,1e-5];
+cgit 				= 8; 
+alpha 				= 1e-10;
+pcgTol 				= 1e-1;
+maxit 				= 8;
+HesPrec 			= getExactSolveRegularizationPreconditioner();
+regfun(m,mref,M) 	= wdiffusionRegNodal(m,mref,M,Iact=Iact,C=regparams);
+
+
+pInv = getInverseParam(Minv,modfun,regfun,alpha,mref[:],boundsLow,boundsHigh,
+                         maxStep=maxStep,pcgMaxIter=cgit,pcgTol=pcgTol,
+						 minUpdate=1e-3, maxIter = maxit,HesPrec=HesPrec);
+
+						 
+plotting = true;			 
+function plotIntermediateResults(mc,Dc,iter,pInv,PMis,resultsFilename="")
 	# Models are usually shown in velocity.
 	fullMc = slowSquaredToVelocity(reshape(Iact*pInv.modelfun(mc)[1] + mback,tuple((pInv.MInv.n+1)...)))[1];
 	if plotting
@@ -149,32 +174,23 @@ function dump(mc,Dc,iter,pInv,PMis,resultsFilename="")
 		plotModel(fullMc,false,[],0,[1.5,4.8]);
 	end
 end
-
-## models are usually given in velocity (km/sec). We invert here for the slowness squared, which is 1/v^2.
-mref 		= velocityToSlow(mref)[1];
-t    		= copy(boundsLow);
-boundsLow 	= velocityToSlow(boundsHigh)[1];
-boundsHigh 	= velocityToSlow(t)[1]; t = 0;
-modfun 		= slowToSlowSquared;
-
-
-maxStep=0.05*maximum(boundsHigh);
-
-regparams = [1.0,1.0,1.0,1e-5];
-regfun(m,mref,M) = wdiffusionRegNodal(m,mref,M,Iact=Iact,C=regparams);
-cgit = 8; 
-alpha = 1e-10;
-pcgTol = 1e-1;
-maxit = 8;
-
-HesPrec = getExactSolveRegularizationPreconditioner();
-
-pInv = getInverseParam(Minv,modfun,regfun,alpha,mref[:],boundsLow,boundsHigh,
-                         maxStep=maxStep,pcgMaxIter=cgit,pcgTol=pcgTol,
-						 minUpdate=1e-3, maxIter = maxit,HesPrec=HesPrec);
-
+						 
 # Run one sweep of a frequency continuation procedure.
-mc,Dc = freqCont(copy(mref[:]), pInv, pMis,contDiv, 3, "",dump,"Joint",1,1,"projGN");
+mc,Dc,flag,His = freqCont(copy(mref[:]), pInv, pMis,contDiv, 4, "",plotIntermediateResults,"Joint",1,1,"projGN");
 
+subplot(1,3,1)
+semilogy(His.F,"-o")
+xlabel("PGNCG iterations")
+title("misfit")
+
+subplot(1,3,2)
+semilogy(His.Rc,"-o")
+xlabel("PGNCG iterations")
+title("regularizer");
+
+subplot(1,3,3)
+semilogy(His.dJ,"-o")
+xlabel("PGNCG iterations")
+title("norm of proj grad");
 
 
