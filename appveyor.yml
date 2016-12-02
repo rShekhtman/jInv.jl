@@ -1,6 +1,6 @@
 environment:
   matrix:
-  - JULIAVERSION: "stable/win64"
+  - JULIAVERSION: "julialang/bin/winnt/x64/0.5/julia-0.5-latest-win64.exe"
 
 install:
 # Download most recent Julia Windows binary
