@@ -2,6 +2,7 @@ using  jInv.Mesh
 using  jInv.Utils
 using  jInv.LinearSolvers
 using  jInv.InverseSolve
+using  jInv.Vis
 using  EikonalInv
 using  MAT
 using  FWI
@@ -15,9 +16,13 @@ include("Drivers/readModelAndGenerateMeshMref.jl");
 include("Drivers/prepareFWIDataFiles.jl");
 include("Drivers/setupFWI.jl");
 
-plotting = false;
-large = false
+plotting        = false;
+large           = false
+iterativeSolver = true;
+## WorkersFWI can be enlarged here, but note to change numCores in the solvers section such that #workers and #cores make sense in your system. 
+## Each worker will use numCores cores for its computations. 
 
+workersFWI 		= [workers()[1]]; 
 if plotting
 	using  PyPlot
 end
@@ -29,7 +34,6 @@ matfile   = matread("../3Dseg12812864.mat")
 m         = matfile["VELc"]*1e-3
 m         = reshape(m,(128,128,64));
 
-dim     	 = 3;
 if large==false
 	pad     	 = 10;
 	ABLPad 		 = pad + 8;
@@ -37,9 +41,9 @@ if large==false
 	omega   	 = [0.5,0.75,1.25,1.75]*2*pi;
 	jumpSrc 	 = 16;
 	### FOR A QUICK RUN USE THIS INSTEAD OF THE THREE LINES ABOVE:
-	# newSize 	 = [65,65,33];
-	# omega   	 = [0.5]*2*pi;
-	# jumpSrc 	 = 8;
+	newSize 	 = [65,65,33];
+	omega   	 = [0.5]*2*pi;
+	jumpSrc 	 = 8;
 	maxBatchSize     = 27;
 else
 	pad     	 = 20;
@@ -84,10 +88,10 @@ if plotting
 end
 
 ######################## ITERATIVE SOLVER #############################################
-if large==true && dim == 3
+if iterativeSolver==true
 	levels      = 3;
 	numCores 	= 24;
-	blas_set_num_threads(numCores);
+	BLAS.set_num_threads(numCores);
 	maxIter     = 50;
 	relativeTol = 1e-5;
 	relaxType   = "SPAI";
@@ -96,14 +100,12 @@ if large==true && dim == 3
 	relaxPost   = 2;
 	cycleType   ='W';
 	coarseSolveType = "MUMPS";
-	MG = getMGparam(levels,numCores,maxIter,relativeTol,relaxType,relaxParam,relaxPre,relaxPost,cycleType,coarseSolveType,0.0,0.0,Minv);
+	MG = getMGparam(levels,numCores,maxIter,relativeTol,relaxType,relaxParam,relaxPre,relaxPost,cycleType,coarseSolveType,0.0,0.0);
 	shift = 0.15;
 	Ainv = getShiftedLaplacianMultigridSolver(Minv, MG,shift);
-end
-######################## DIRECT SOLVER #################################################
-if large == false
+else   ######################## DIRECT SOLVER #################################################
 	numCores 	= 16;
-	blas_set_num_threads(numCores);
+	BLAS.set_num_threads(numCores);
 	Ainv = getMUMPSsolver([],0,0,2);
 	# Ainv = getJuliaSolver();
 	# Ainv = getPARsolver([],0,0,6);
@@ -115,7 +117,7 @@ end
 println("omega*maximum(h): ",omega*maximum(Minv.h)*sqrt(maximum(1./(boundsLow.^2))));
 
 # This is a list of workers for FWI. Ideally they should be on different machines.
-workersFWI = [workers()[1]];
+
 println("The workers that we allocate for FWI are:");
 println(workersFWI)
 
@@ -172,9 +174,12 @@ pInv = getInverseParam(Minv,modfun,regfun,alpha,mref[:],boundsLow,boundsHigh,
                          maxStep=maxStep,pcgMaxIter=cgit,pcgTol=pcgTol,
 						 minUpdate=1e-3, maxIter = maxit,HesPrec=HesPrec);
 mc = copy(mref[:]);
-mc,Dc = freqCont(mc, pInv, pMis,contDiv, 2, resultsFilename,dump,"Joint",1,1,"projGN");
-mc,Dc = freqCont(mc, pInv, pMis,contDiv, 2, resultsFilename,dump,"Joint",2,2,"projGN");
-mc,Dc = freqCont(mc, pInv, pMis,contDiv, 2, resultsFilename,dump,"Joint",3,3,"projGN");
+mc,Dc,His = freqCont(mc, pInv, pMis,contDiv, 2, resultsFilename,dump,"Joint",1,1,"projGN");
+# matwrite("lrSEG-res1.mat",Dict("mc"=>mc,"His"=>His))
+mc,Dc,His = freqCont(mc, pInv, pMis,contDiv, 2, resultsFilename,dump,"Joint",2,2,"projGN");
+# matwrite("lrSEG-res2.mat",Dict("mc"=>mc,"His"=>His))
+mc,Dc,His = freqCont(mc, pInv, pMis,contDiv, 2, resultsFilename,dump,"Joint",3,3,"projGN");
+# matwrite("lrSEG-res3.mat",Dict("mc"=>mc,"His"=>His))
 ##############################################################################################
 
 
