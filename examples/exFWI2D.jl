@@ -179,17 +179,17 @@ end
 mc,Dc,flag,His = freqCont(copy(mref[:]), pInv, pMis,contDiv, 4, "",plotIntermediateResults,"Joint",1,1,"projGN");
 
 subplot(1,3,1)
-semilogy(His.F,"-o")
+semilogy(His[end].F,"-o")
 xlabel("PGNCG iterations")
 title("misfit")
 
 subplot(1,3,2)
-semilogy(His.Rc,"-o")
+semilogy(His[end].Rc,"-o")
 xlabel("PGNCG iterations")
 title("regularizer");
 
 subplot(1,3,3)
-semilogy(His.dJ,"-o")
+semilogy(His[end].dJ,"-o")
 xlabel("PGNCG iterations")
 title("norm of proj grad");
 

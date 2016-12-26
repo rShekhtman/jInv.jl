@@ -79,8 +79,9 @@ Q = Q.*1/(norm(Minv.h)^2);
 println("We have ",size(Q,2)," sources");
 # compute observed data
 
-gamma = getABL(Minv,true,ones(Int64,Minv.dim)*ABLpad,1.0);
-attenuation = 0.01;
+ABLamp = getMaximalFrequency(1./(minimum(m).^2),Minv);
+gamma = getABL(Minv,true,ones(Int64,Minv.dim)*ABLpad,ABLamp);
+attenuation = 0.01*ABLamp;
 gamma += attenuation; # adding Attenuation.
 
 println("~~~~~~~ Getting data FWI: ~~~~~~~");

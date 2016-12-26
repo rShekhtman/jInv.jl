@@ -12,8 +12,8 @@ using  Multigrid
 modelDir = "../BenchmarkModels";
 
 dataDir = pwd();
-include("Drivers/readModelAndGenerateMeshMref.jl");
-include("Drivers/prepareFWIDataFiles.jl");
+include("../../ex2DFWI/readModelAndGenerateMeshMref.jl");
+include("../../ex2DFWI/prepareFWIDataFiles.jl");
 include("Drivers/setupFWI.jl");
 
 plotting        = false;
