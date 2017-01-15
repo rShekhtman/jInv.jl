@@ -102,7 +102,8 @@ if iterativeSolver==true
 	coarseSolveType = "MUMPS";
 	MG = getMGparam(levels,numCores,maxIter,relativeTol,relaxType,relaxParam,relaxPre,relaxPost,cycleType,coarseSolveType,0.0,0.0);
 	shift = 0.15;
-	Ainv = getShiftedLaplacianMultigridSolver(Minv, MG,shift);
+	Hparam = HelmholtzParam(Minv,zeros(0),zeros(0),0.0,true,true);
+	Ainv = getShiftedLaplacianMultigridSolver(Hparam, MG,shift);
 else   ######################## DIRECT SOLVER #################################################
 	numCores 	= 16;
 	BLAS.set_num_threads(numCores);
