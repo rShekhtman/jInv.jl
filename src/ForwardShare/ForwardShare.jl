@@ -149,7 +149,7 @@ module ForwardShare
 	import jInv.Utils.clear!
 	function clear!(P::ForwardProbType;clearAinv::Bool=true,clearFields::Bool=true, clearMesh::Bool=false, clearSources::Bool=false, clearObs::Bool=false,clearAll::Bool=false)
 		if clearAll || clearMesh
-			Utils.clear!(P.M)
+			P.M = clear!(P.M)
 		end
 		if clearAll || clearSources
 			P.Sources = clear!(P.Sources)
@@ -158,15 +158,20 @@ module ForwardShare
 			P.Obs     = clear!(P.Obs)
 		end
 		if clearAll || clearFields
+		if any(fieldnames(P) .== :Fields) 
 			P.Fields = clear!(P.Fields)
 		end
-		if clearAll || clearAinv
-			clear!(P.Ainv)
-		end
+
+	end
+
+	if clearAll || clearAinv
+	if any(fieldnames(P) .== :Ainv) 
+	   clear!(P.Ainv)
+	end
 	end
 
 	
-	
+end
 
 
 end
