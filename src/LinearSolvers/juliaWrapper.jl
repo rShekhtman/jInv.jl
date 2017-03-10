@@ -1,15 +1,24 @@
 export JuliaSolver,getJuliaSolver,copySolver
 
+type jInvLUfact
+	L::LowerTriangular
+	U::UpperTriangular
+	p::Array{Int}
+	q::Array{Int}
+	R::Diagonal
+end
+
+function getjInvLUfact(A::Base.SparseArrays.UMFPACK.UmfpackLU)
+	(L,U,p,q,R) = A[:(:)];
+	jInvLUfact(LowerTriangular(L),UpperTriangular(U),p,q,Diagonal(R))
+end
+
 import Base.\
-function \{T1,T2}(A::Base.SparseArrays.UMFPACK.UmfpackLU{T1},R::SparseMatrixCSC{T2})
-	
-	n,nrhs = size(R)
-	X = zeros(promote_type(T1,T2),n,nrhs)	
-	for k=1:nrhs
-		X[:,k] = A\full(vec(R[:,k]))
-	end
+function \(A::jInvLUfact,B)	
+	X = zeros(eltype(one(eltype(B))./one(eltype(A.L))),size(B))	
+	X[A.q,:] = A.U\(A.L\((A.R * B)[A.p,:]))
 	return X
-end 
+end
 
 """
 type jInv.LinearSolvers.JuliaSolver<: AbstractSolver
@@ -83,9 +92,8 @@ function solveLinearSystem!(A::SparseMatrixCSC,B,X,param::JuliaSolver,doTranspos
 		else
 			if param.sym!=0 && !isreal(A)
 				warn("jInv.JuliaSolver: using lufact for complex matrix")
-			end
-			
-		  param.Ainv = lufact(A)
+			end			
+		  param.Ainv = getjInvLUfact(lufact(A))
 		end
 		param.facTime+=toq()
 		param.nFac+=1
