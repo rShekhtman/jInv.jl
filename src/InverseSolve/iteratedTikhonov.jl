@@ -32,17 +32,17 @@ export iteratedTikhonov
 """
 
 function iteratedTikhonov(mc,pInv::InverseParam,pMis,nAlpha,alphaFac,
-                          targetMisfit;indCredit=[],dumpResults::Function=dummy)
+                          targetMisfit;indCredit=[],dumpResults::Function=dummy,solveGN=projPCG)
 
   iter = 0
   tikhonovFlag = -1
-  hist = projGNCGhis[]
+  hist = GNhis[]
   Dc = []
   while iter < nAlpha 
     iter += 1
     println("Starting projGNCG minimization with alpha $iter of $nAlpha")
     println("alpha = $(pInv.alpha)")
-    mc,Dc,GNflag,GNhist = projGNCG(mc,pInv,pMis,dumpResults=dumpResults)
+    mc,Dc,GNflag,GNhist = projGN(mc,pInv,pMis,dumpResults=dumpResults)
     push!(hist,GNhist)
     pInv.mref  = mc
     pInv.alpha = pInv.alpha/alphaFac

@@ -1,114 +1,37 @@
-export projGN
-export projGNhis
+export projGN, projGNCG
 export normalEqGN
 
 
-type projGNhis
-	Jc::Array
-	dJ::Array
-	F::Array
-	Dc::Array
-	Rc::Array
-	alphas::Array
-	Active::Array
-	stepNorm::Array
-	lsIter::Array
-	timeMisfit::Array
-	timeReg::Array
-	timePCG::Array
-	hisLinSol::Array
-	timeLinSol::Array
-	timeGradMisfit::Array
-end
-
-function getProjGNhis(maxIter,maxIterCG)
-	Jc = zeros(maxIter+1)
-	dJ = zeros(maxIter+1)
-	F  = zeros(maxIter+1)
-	Dc = []
-	Rc = zeros(maxIter+1)
-	alphas = zeros(maxIter+1)
-	Active = zeros(maxIter+1)
-	stepNorm = zeros(maxIter+1)
-	lsIter = zeros(Int,maxIter+1)
-	timeMisfit = zeros(maxIter+1,4)
-	timeReg = zeros(maxIter+1)
-	timePCG = zeros(maxIter+1,1)
-	hisLinSol = []
-	timeLinSol = zeros(maxIter+1,1)
-	timeGradMisfit = zeros(maxIter+1,2)
-
-	return projGNhis(Jc,dJ,F,Dc,Rc,alphas,Active,stepNorm,lsIter,timeMisfit,timeReg,timePCG,hisLinSol,timeLinSol,timeGradMisfit)
-end
-
-function updateHis!(iter::Int64,His::projGNhis,Jc::Real,dJ::Real,Fc,Dc,Rc::Real,alpha::Real,nActive::Int64,stepNorm::Real,lsIter::Int,timeMisfit::Vector,timeReg::Real)
-	His.Jc[iter+1]            = Jc
-	His.dJ[iter+1]            = dJ
-	His.F[iter+1]             = Fc
-	push!(His.Dc,Dc)
-	His.Rc[iter+1]            = Rc
-	His.alphas[iter+1]        = alpha
-	His.Active[iter+1]        = nActive
-	His.stepNorm[iter+1]      = stepNorm
-	His.lsIter[iter+1]        = lsIter
-	His.timeMisfit[iter+1,:] += timeMisfit
-	His.timeReg[iter+1]      += timeReg[]
-end
-
-function projPCG(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
-		
-		#  Set up Hessian and preconditioner.
-		Hs(x) = dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x; 
-		#  build preconditioner
-		pInv.HesPrec.setupPrec(Hs, d2R,pInv.HesPrec.param);
-		PC(x) = pInv.HesPrec.applyPrec(Hs,d2R,x,pInv.HesPrec.param);		
-		# call projPCG and return
-		return projPCG(Hs,gc,Active,PC,pInv.pcgTol,pInv.pcgMaxIter)
-end
-
 """
-function normalEqGN(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
+	function projGrad
 
-explicitly builds normal equation, projects it and solves it. 
+	Projects gradient, i.e.,
 
-Inputs:
+					 | gc[i],  				xl[i] < x[i] < xh[i]
+	gc[i]  = | max(gc[i],0)	 	xc[i] == xh[i]
+					 | min(gc[i],0)   xc[i] == xl[i]
 
-	gc        - gradient
-	pMis      - misfit params
-	pInv      - inverse param
-	sig,dsig  - current model and derivative
-	d2F,d2R   - Hessians os misfit and regularizer
-	Active    - indicator of active set
 
-Outputs:
+	Input:
 
-	dm        - search direction
-	times     - array containing time to build and solve Hessian
+		gc 				  - gradient vector
+		mc 				  - model
+		boundsLow   - lower bounds
+		boundsHigh  - upper bounds
 """
-function normalEqGN(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
-	if all(Active)
-		return 0*gc,[0.0;0.0]
-	end
-	# get Hessian of misfit
-	tic();
-	Hm = getHessian(sig,pMis,d2F)
-	timeBuild = toq();
-	
-	# build overall Hessian
-	H  = dsig'*Hm*dsig + d2R
-	
-	# remove Active constraints
-	tic()
-	Hr = H[!Active,!Active]
-	gr = gc[!Active]
-	dr = -(Hr\gr)
-	timeSolve=toq();
-	dm = 0*gc
-	dm[!Active] = dr
-	
-	# solve and return
-	return dm,[timeBuild;timeSolve]
+function projGrad(gc,mc,boundsLow,boundsHigh)
+	pgc = gc[:]
+	pgc[mc.==boundsLow] = min(gc[mc.==boundsLow],0)
+	pgc[mc.==boundsHigh] = max(gc[mc.==boundsHigh],0)
+	return pgc
 end
+
+
+function dummy(mc,Dc,iter,pInv,pMis)
+# this function does nothing and is used as a default for dumpResults().
+end;
+
+
 	
 """
 	mc,Dc,outerFlag = projGN(mc,pInv::InverseParam,pMis, indFor = [], dumpResults::Function = dummy)
@@ -147,7 +70,7 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 	high        = pInv.boundsHigh
 	alpha       = pInv.alpha
 	
-	His = getProjGNhis(maxIter,pcgMaxIter)
+	His = getGNhis(maxIter,pcgMaxIter)
 	#---------------------------------------------------------------------------
 	#  Initialization.
 	#---------------------------------------------------------------------------
@@ -307,3 +230,4 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 end  # Optimization code
 
 
+projGNCG = projGN

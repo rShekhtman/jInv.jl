@@ -46,12 +46,12 @@ boundsLow    = minimum(xtrue)*ones(Minv.nc)
 boundsHigh   = maximum(xtrue)*ones(Minv.nc)
 sigmaBack    = zeros(Minv.nc)
 
-print("\t== test projGNCG...")
+print("\t== test projGN...")
 pInv         = getInverseParam(Minv,fMod,diffusionReg,alpha,x0,boundsLow,boundsHigh)
 pInv.maxIter = 5
-x1, = projGNCG(x0,pInv,pMis)
+x1, = projGN(x0,pInv,pMis)
 pInv.maxIter = 5
-x2, = projGNCG(x0,pInv,pMisRefs,out=1)
+x2, = projGN(x0,pInv,pMisRefs,out=1)
 @test norm(x1-x2)/norm(x1) < 1e-12
 @test all(x1.>=boundsLow)
 @test all(x2.>=boundsLow)
@@ -81,8 +81,8 @@ targetMisfit = 20.0
 x1,Dc,flag1,     = iteratedTikhonov(x0,pInv,pMis,nAlpha,alphaFac,targetMisfit)
 pInv.alpha = 100.
 pInv.mref  = x0
-x2,Dc,flag2,hist = iteratedTikhonov(x0,pInv,pMisRefs,nAlpha,alphaFac,targetMisfit)
-@test typeof(hist) <: Array{InverseSolve.projGNCGhis}
+x2,Dc,flag2,hist = iteratedTikhonov(x0,pInv,pMisRefs,nAlpha,alphaFac,targetMisfit,solveGN=normalEqGN)
+@test typeof(hist) <: Array{InverseSolve.GNhis}
 @test norm(x1-x2)/norm(x1) < 1e-12
 @test all(x1.>=boundsLow)
 @test all(x2.>=boundsLow)

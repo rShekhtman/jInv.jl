@@ -94,10 +94,10 @@ sigmaBack    = zeros(Minv.nc)
 #  solve with automatic distribution
 pInv         = getInverseParam(Minv,fMod,diffusionReg,alpha,x0,boundsLow,boundsHigh)
 pInv.maxIter = 5
-x1, = projGNCG(x0,pInv,pMis)
+x1, = projGN(x0,pInv,pMis)
 
 pInv.maxIter = 5
-x2, = projGNCG(x0,pInv,pMisRefs)
+x2, = projGN(x0,pInv,pMisRefs)
 @test norm(x1-x2)/norm(x1) < 1e-12
 
 clear!(pMisRefs);

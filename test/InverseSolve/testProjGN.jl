@@ -43,12 +43,12 @@ boundsLow    = -.5*ones(Minv.nc)
 boundsHigh   = 0.5*ones(Minv.nc)
 sigmaBack    = zeros(Minv.nc)
 
-print("\t== compare with projGNCG...")
+print("\t== compare with projGN...")
 pInv         = getInverseParam(Minv,fMod,diffusionReg,alpha,x0,boundsLow,boundsHigh)
 pInv.maxIter = 5
-x1t, = projGNCG(copy(x0),pInv,pMis)
+x1t, = projGN(copy(x0),pInv,pMis)
 pInv.maxIter = 5
-x2t, = projGNCG(copy(x0),pInv,pMisRefs,out=1)
+x2t, = projGN(copy(x0),pInv,pMisRefs,out=1)
 @test norm(x1t-x2t)/norm(x1t) < 1e-12
 @test all(x1t.>=boundsLow)
 @test all(x2t.>=boundsLow)

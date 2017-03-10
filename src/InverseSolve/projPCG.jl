@@ -60,3 +60,14 @@ function projPCG(H::Function,gc::Vector,Active::BitArray,Precond::Function,cgTol
 
 	return delm,his[1:cgiter,:]
 end
+
+function projPCG(gc::Vector,pMis,pInv,sig::Vector,dsig,d2F,d2R,Active)
+		
+		#  Set up Hessian and preconditioner.
+		Hs(x) = dsig'*HessMatVec(dsig*x,pMis,sig,d2F) + d2R*x; 
+		#  build preconditioner
+		pInv.HesPrec.setupPrec(Hs, d2R,pInv.HesPrec.param);
+		PC(x) = pInv.HesPrec.applyPrec(Hs,d2R,x,pInv.HesPrec.param);		
+		# call projPCG and return
+		return projPCG(Hs,gc,Active,PC,pInv.pcgTol,pInv.pcgMaxIter)
+end

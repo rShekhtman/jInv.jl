@@ -34,7 +34,7 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 	alpha       = pInv.alpha
 	mref 		= pInv.mref;
 
-	His = getProjGNCGhis(maxIter,pcgMaxIter)
+	His = getGNhis(maxIter,pcgMaxIter)
 	#---------------------------------------------------------------------------
 	#  Initialization.
 	#---------------------------------------------------------------------------
@@ -111,9 +111,10 @@ function  barrierGNCG(mc,pInv::InverseParam,pMis;rho = 10.0,epsilon = 0.1*(pInv.
 
 		##  inner CG iterations.
 		tic()
-		delm,hisPCG = KrylovMethods.cg(Hs,-gc, tol=pcgTol, maxIter=pcgMaxIter, M=PC,out=0)[1:2];
-		His.timePCG[iter+1]+= toq()
-		push!(His.hisPCG,hisPCG)
+		delm,hisLinSol = KrylovMethods.cg(Hs,-gc, tol=pcgTol, maxIter=pcgMaxIter, M=PC,out=0)[1:2];
+		His.timeLinSol[iter+1]+= toq()
+		push!(His.hisLinSol,hisLinSol)
+		
 
 		# scale step
 		if maximum(abs(delm)) > maxStep; delm = delm./maximum(abs(delm))*maxStep; end
