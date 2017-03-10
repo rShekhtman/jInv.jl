@@ -55,9 +55,6 @@ function updateHis!(iter::Int64,His::projGNhis,Jc::Real,dJ::Real,Fc,Dc,Rc::Real,
 	His.timeReg[iter+1]      += timeReg[]
 end
 
-
-
-import jInv.InverseSolve.projPCG
 function projPCG(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
 		
 		#  Set up Hessian and preconditioner.
@@ -69,6 +66,25 @@ function projPCG(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
 		return projPCG(Hs,gc,Active,PC,pInv.pcgTol,pInv.pcgMaxIter)
 end
 
+"""
+function normalEqGN(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
+
+explicitly builds normal equation, projects it and solves it. 
+
+Inputs:
+
+	gc        - gradient
+	pMis      - misfit params
+	pInv      - inverse param
+	sig,dsig  - current model and derivative
+	d2F,d2R   - Hessians os misfit and regularizer
+	Active    - indicator of active set
+
+Outputs:
+
+	dm        - search direction
+	times     - array containing time to build and solve Hessian
+"""
 function normalEqGN(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
 	if all(Active)
 		return 0*gc,[0.0;0.0]
@@ -110,6 +126,7 @@ end
 							- where mc is the recovered model, Dc is the predicted data. 
 							- If dumpResults is not given, nothing is done (dummy() is called).
 		out::Int            - flag for output (-1: no output, 1: final status, 2: residual norm at each iteration)
+		solveGN             - solver for GN system, default: projPCG, other options: normalEqGN
 							
 	Output:
 		mc                  - final model
@@ -285,8 +302,7 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 			println("projGN reached desired accuracy at iteration $iter.")
 		end
 	end
-	
-	
+		
 	return mc,Dc,outerFlag,His
 end  # Optimization code
 
