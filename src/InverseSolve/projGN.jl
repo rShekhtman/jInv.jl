@@ -49,7 +49,9 @@ end;
 							- where mc is the recovered model, Dc is the predicted data. 
 							- If dumpResults is not given, nothing is done (dummy() is called).
 		out::Int            - flag for output (-1: no output, 1: final status, 2: residual norm at each iteration)
-		solveGN             - solver for GN system, default: projPCG, other options: normalEqGN
+		solveGN::Function   - solver for GN system, default: projPCG, other options: normalEqGN
+		                      The interface for this method is: 
+							            dm,his = solveGN(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
 							
 	Output:
 		mc                  - final model
@@ -59,7 +61,7 @@ end;
 	
 """
 function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
-	dumpResults::Function = dummy,out::Int=2,solveGN=projPCG)
+	dumpResults::Function = dummy,out::Int=2,solveGN::Function=projPCG)
 
 	maxIter     = pInv.maxIter      #  Max. no. iterations.
 	pcgMaxIter  = pInv.pcgMaxIter   #  Max cg iters.

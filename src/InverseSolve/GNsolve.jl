@@ -19,7 +19,7 @@ Outputs:
 	dm        - search direction
 	times     - array containing time to build and solve Hessian
 """
-function normalEqGN(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
+function normalEqGN(gc::Vector,pMis,pInv::InverseParam,sig::Vector,dsig,d2F,d2R,Active)
 	if all(Active)
 		return 0*gc,[0.0;0.0]
 	end
