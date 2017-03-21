@@ -72,9 +72,9 @@ print("passed! ===")
 
 print("\t== test projGN with direct solver...")
 pInv.maxIter = 5
-x1, = projGN(copy(x0),pInv,pMis,solveGN=normalEqGN)
+x1, = projGN(copy(x0),pInv,pMis,solveGN=projGNexplicit)
 pInv.maxIter = 5
-x2, = projGN(copy(x0),pInv,pMisRefs,solveGN=normalEqGN,out=1)
+x2, = projGN(copy(x0),pInv,pMisRefs,solveGN=projGNexplicit,out=1)
 @test norm(x1-x2)/norm(x1) < 1e-12
 @test norm(x1t-x1)/norm(x1t) < 1e-2
 @test norm(x2t-x2)/norm(x2t) < 1e-2
@@ -82,5 +82,13 @@ x2, = projGN(copy(x0),pInv,pMisRefs,solveGN=normalEqGN,out=1)
 @test all(x2.>=boundsLow)
 @test all(x1.<=boundsHigh)
 @test all(x2.<=boundsHigh)
+
+print("\t== test projGN with singular system...")
+pInv.alpha = 0.
+x2, = projGN(copy(x0),pInv,pMis[1],solveGN=projGNexplicit,out=1)
+@test all(x2.>=boundsLow)
+@test all(x2.<=boundsHigh)
+
+
 print("passed! ===")
 

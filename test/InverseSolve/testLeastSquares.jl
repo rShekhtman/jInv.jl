@@ -81,7 +81,7 @@ targetMisfit = 20.0
 x1,Dc,flag1,     = iteratedTikhonov(x0,pInv,pMis,nAlpha,alphaFac,targetMisfit)
 pInv.alpha = 100.
 pInv.mref  = x0
-x2,Dc,flag2,hist = iteratedTikhonov(x0,pInv,pMisRefs,nAlpha,alphaFac,targetMisfit,solveGN=normalEqGN)
+x2,Dc,flag2,hist = iteratedTikhonov(x0,pInv,pMisRefs,nAlpha,alphaFac,targetMisfit,solveGN=projGNexplicit)
 @test typeof(hist) <: Array{InverseSolve.GNhis}
 @test norm(x1-x2)/norm(x1) < 1e-12
 @test all(x1.>=boundsLow)

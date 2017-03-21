@@ -1,5 +1,4 @@
 export projGN, projGNCG
-export normalEqGN
 
 
 """
@@ -49,7 +48,7 @@ end;
 							- where mc is the recovered model, Dc is the predicted data. 
 							- If dumpResults is not given, nothing is done (dummy() is called).
 		out::Int            - flag for output (-1: no output, 1: final status, 2: residual norm at each iteration)
-		solveGN::Function   - solver for GN system, default: projPCG, other options: normalEqGN
+		solveGN::Function   - solver for GN system, default: projPCG, other options: projGNexplicit
 		                      The interface for this method is: 
 							            dm,his = solveGN(gc,pMis,pInv,sig,dsig,d2F,d2R,Active)
 							
