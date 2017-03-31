@@ -82,10 +82,13 @@ end
 function wdiffusionReg(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
    # Rc = a1*\\Dx(m-mref)||^2 + .. + a3*\\Dz(m-mref)||^2 + a4*|| m -mref ||^2
 
-   if length(C) == 0
+   if (M.dim==3) && (length(C) == 0)
       alpha1 = 1; alpha2 = 1; alpha3 = 1; alpha4 = 1e-4;
       Wt   = sdiag([alpha1*ones(M.nf[1]);alpha2*ones(M.nf[2]);alpha3*ones(M.nf[3])])
-   elseif length(C) == 4
+   elseif (M.dim==2) && (length(C) == 0)
+	  alpha1 = 1; alpha2 = 1;alpha4 = 1e-4;
+	  Wt   = sdiag([alpha1*ones(M.nf[1]);alpha2*ones(M.nf[2])])
+   elseif (M.dim==3) && (length(C) == 4)
       # C = alphax, alphay, alphaz, alphas
       alpha1 = C[1]; alpha2 = C[2]; alpha3 = C[3]; alpha4 = C[4]
       Wt   = sdiag([alpha1*ones(M.nf[1]);alpha2*ones(M.nf[2]);alpha3*ones(M.nf[3])])
@@ -153,7 +156,11 @@ function wTVReg(m::Vector,mref,M::AbstractMesh; Iact=1.0, C=[],eps=1e-3)
 	end
 	dm   = m .- mref
 	Div  = getDivergenceMatrix(M)
-	Wt   = sdiag([alpha1*ones(M.nf[1]);alpha2*ones(M.nf[2]);alpha3*ones(M.nf[3])])
+	if M.dim==3
+		Wt   = sdiag([alpha1*ones(M.nf[1]);alpha2*ones(M.nf[2]);alpha3*ones(M.nf[3])])
+	elseif M.dim==2
+		Wt   = sdiag([alpha1*ones(M.nf[1]);alpha2*ones(M.nf[2])])
+	end
 	Div  = Iact'*(Div*Wt)   # project to the active cells
 	V    = getVolume(M); v = diag(V)
 	Af   = getFaceAverageMatrix(M)
@@ -161,7 +168,7 @@ function wTVReg(m::Vector,mref,M::AbstractMesh; Iact=1.0, C=[],eps=1e-3)
 	wTV  = sqrt(Af*(Div'*dm).^2 .+eps);
 
 	Rc   = dot(v,wTV);
-	d2R  = Div*sdiag(Af'*(v./wTV))*Div'
+	d2R  = Div*(sdiag(Af'*(v./wTV))*Div')
 	dR   = d2R*dm;
 	return Rc,dR,d2R
 end
@@ -192,9 +199,9 @@ function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, 
 		C = [1,1,1,1,1e-5];
 	end
 	if M.dim==3
-		Wt   = [C[1]*ones((M.n[3]+1)*(M.n[2]+1)*(M.n[1]));C[2]*ones((M.n[3]+1)*(M.n[2])*(M.n[1]+1));C[3]*ones((M.n[3])*(M.n[2]+1)*(M.n[1]+1))];
+		Wt   = [C[1]*ones(M.ne[1]);C[2]*ones(M.ne[2]);C[3]*ones(M.ne[3])];
 	else
-		Wt   = [C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))];
+		Wt   = [C[1]*ones(M.ne[1]);C[3]*ones(M.ne[2])];
 	end
 
 	V    = getVolume(M);
@@ -204,8 +211,8 @@ function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, 
 
 	Av = getNodalAverageMatrix(M);
 
-	mass = Iact'*Av'*V*Av*Iact;
-
+	Av = Av*Iact;
+	mass = Av'*V*Av;
 
 	Grad   = getNodalGradientMatrix(M)*Iact;
 
@@ -222,7 +229,6 @@ function wdiffusionRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, 
 end
 
 
-
 function wTVRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 	dm = m.-mref;
 	if isempty(C)
@@ -230,9 +236,9 @@ function wTVRegNodal(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
 	end
 	eps = 1e-3;
 	if M.dim==3
-		Wt   = sdiag([C[1]*ones((M.n[3]+1)*(M.n[2]+1)*(M.n[1]));C[2]*ones((M.n[3]+1)*(M.n[2])*(M.n[1]+1));C[3]*ones((M.n[3])*(M.n[2]+1)*(M.n[1]+1))]);
+		Wt   = sdiag([C[1]*ones(M.ne[1]);C[2]*ones(M.ne[2]);C[3]*ones(M.ne[3])]);
 	else
-		Wt   = sdiag([C[1]*ones((M.n[2]+1)*(M.n[1]));C[3]*ones((M.n[2])*(M.n[1]+1))]);
+		Wt   = sdiag([C[1]*ones(M.ne[1]);C[3]*ones(M.ne[2])]);
 	end
 
 
