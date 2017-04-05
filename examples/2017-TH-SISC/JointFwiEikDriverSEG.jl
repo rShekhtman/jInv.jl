@@ -22,9 +22,7 @@ experiment = "Joint";
 # experiment = "TravelTimeInit"
 # experiment = "OnlyFWI"
 
-BGUserver = false;
 plotting = true;
-useFilesForFields = false;
 
 if plotting
 	using  PyPlot
@@ -37,7 +35,6 @@ dataDir = 0;
 resultsDir = 0;
 
 @everywhere FWIDriversPath = "drivers/";
-modelDir = pwd();
 include(string(FWIDriversPath,"readModelAndGenerateMeshMref.jl"));
 include(string(FWIDriversPath,"prepareFWIDataFiles.jl"));
 include(string(FWIDriversPath,"setupJointInversion.jl"));
@@ -53,14 +50,33 @@ pad     = 30;
 jumpSrc = 5;
 newSize = [600,300];
 
-
 offset  = ceil(Int64,(newSize[1]*(8.0/13.5)));
-println("Offset is: ",offset)
+println("Offset is: ",offset," cells.")
 (m,Minv,mref,boundsHigh,boundsLow) = readModelAndGenerateMeshMref(modelDir,"SEGmodel2Dsalt.dat",dim,pad,[0.0,13.5,0.0,4.2],newSize,1.752,2.9);
 
-maxBatchSize = 128;
+
 omega = [2.0,2.5,3.5,4.5,6.0]*2*pi;
 #omega = [2.0,2.5,3.5]*2*pi;
+maxBatchSize = 128;
+useFilesForFields = false;
+
+
+########################################################################################################
+######################################## for 3D ########################################################
+#######################################################################################################
+
+# dim     	 = 3;
+# pad     	 = 10;
+# newSize 	 = [145,145,70];
+# omega   	 = [1.5,2.0]*2*pi;
+# jumpSrc 	 = 16;
+# maxBatchSize     = 27;
+
+# # calculation for num_sources^2: size = jumpSrc*(num_src-1) + 1 + 2*extraABL
+# offset  = ceil(Int64,(newSize[1]*(8.0/13.5)));
+# println("Offset is: ",offset," cells.")
+# domain = [0.0,13.5,0.0,13.5,0.0,4.2];
+# (m,Minv,mref,boundsHigh,boundsLow) = readModelAndGenerateMeshMref(modelDir,"3Dseg256256128.mat",dim,pad,domain,newSize,1.752,2.9);
 
 
 # ###################################################################################################################
@@ -74,28 +90,30 @@ writedlm(string(resultsFilename,tuple((Minv.n+1)...),"_mtrue.dat"),convert(Array
 writedlm(string(resultsFilename,tuple((Minv.n+1)...),"_mref.dat"),convert(Array{Float16},mref));
 
 ######################## ITERATIVE SOLVER FOR FWI #############################################
-# levels      = 2;
-# numCores 	= 8;
-# if server
-	# numCores = 24;
-# end
-# blas_set_num_threads(numCores);
-# maxIter     = 50;
-# relativeTol = 1e-4;
-# relaxType   = "SPAI";
-# relaxParam  = 1.0;
-# relaxPre 	= 2;
-# relaxPost   = 2;
-# cycleType   ='W';
-# coarseSolveType = "MUMPS";
-# MG = getMGparam(levels,numCores,maxIter,relativeTol,relaxType,relaxParam,relaxPre,relaxPost,cycleType,coarseSolveType,0.0,0.0,Minv);
-# shift = 0.2;
-# Ainv = getShiftedLaplacianMultigridSolver(Minv, MG,shift);
-
-######################## DIRECT SOLVER #################################################
-Ainv = getJuliaSolver();
-# Ainv = getMUMPSsolver([],0,0,2);
-# Ainv = getjInvPardisoSolver([],0,0,2);
+iterativeSolver = false;
+Ainv = 0;
+if iterativeSolver==true
+	levels      = 3;
+	numCores 	= 24;
+	BLAS.set_num_threads(numCores);
+	maxIter     = 50;
+	relativeTol = 1e-4;
+	relaxType   = "SPAI";
+	relaxParam  = 1.0;
+	relaxPre 	= 2;
+	relaxPost   = 2;
+	cycleType   ='W';
+	coarseSolveType = "MUMPS";
+	MG = getMGparam(levels,numCores,maxIter,relativeTol,relaxType,relaxParam,relaxPre,relaxPost,cycleType,coarseSolveType,0.0,0.0);
+	shift 		= 0.15;
+	Hparam = HelmholtzParam(Minv,zeros(0),zeros(0),0.0,true,true);
+	Ainv = getShiftedLaplacianMultigridSolver(Hparam, MG,shift);
+else   ######################## DIRECT SOLVER #################################################
+	numCores 	= 16;
+	BLAS.set_num_threads(numCores);
+	Ainv = getMUMPSsolver([],0,0,2);
+	# Ainv = getJuliaSolver();
+end
 
 ##########################################################################################
 
@@ -103,63 +121,70 @@ println("omega*maximum(h): ",omega*maximum(Minv.h)*sqrt(maximum(1./(boundsLow.^2
 
 ABLpad = pad + 4;
 
-dt = 0.001;
-T  = 18.0;
-fm = 8.0;
-pickTraveltime = true;
-DobsTimeNoisy = prepareFWIDataFilesFromTime(m,Minv,mref,boundsHigh,boundsLow,timeDataFilenamePrefix,omega,pad,ABLpad,jumpSrc,offset,workers(),T,dt,fm,0.01,pickTraveltime);
+if dim==2
+	# Generating frequency data from time tomain simulation - code works only for 2D.
+	dt = 0.001;
+	T  = 18.0;
+	fm = 8.0;
+	pickTraveltime = true;
+	prepareFWIDataFilesFromTime(m,Minv,mref,boundsHigh,boundsLow,timeDataFilenamePrefix,omega,pad,ABLpad,jumpSrc,offset,workers(),T,dt,fm,0.01,pickTraveltime);
+end
 
-workersFWI = BGUserver ? workers() : [workers()[1]];
+workersFWI = [workers()[1]];
 println("The workers that we allocate for FWI are:");
 println(workersFWI)
 calcTravelTime = true;
 prepareFWIDataFiles(m,Minv,mref,boundsHigh,boundsLow,dataFilenamePrefix,omega,ones(Complex128,size(omega)), pad,ABLpad,jumpSrc,offset,workersFWI,maxBatchSize,Ainv,useFilesForFields,calcTravelTime);
 
 ########################################################################################################################
-################### READING AND COMPARING THE DATA #####################################################################
+################### READING AND COMPARING THE DATA - NOT NECESSARY FOR INVERSION #######################################
 ########################################################################################################################
-RCVfile = string(timeDataFilenamePrefix,"_rcvMap.dat");
-SRCfile = string(timeDataFilenamePrefix,"_srcMap.dat");
-srcNodeMap = readSrcRcvLocationFile(SRCfile,Minv);
-rcvNodeMap = readSrcRcvLocationFile(RCVfile,Minv);
+## Data that is generated through time domain (in 2D)
+# if dim==2
+	# RCVfile = string(timeDataFilenamePrefix,"_rcvMap.dat");
+	# SRCfile = string(timeDataFilenamePrefix,"_srcMap.dat");
+	# srcNodeMap = readSrcRcvLocationFile(SRCfile,Minv);
+	# rcvNodeMap = readSrcRcvLocationFile(RCVfile,Minv);
 							
-DobsTD = Array(Array{Complex128,2},length(omega));
-WdTD = Array(Array{Complex128,2},length(omega));
+	# DobsTD = Array(Array{Complex128,2},length(omega));
+	# WdTD = Array(Array{Complex128,2},length(omega));
 
-for k = 1:length(omega)
-	omRound = string(round((omega[k]/(2*pi))*100.0)/100.0);
-	(Dk,Wk) =  readDataFileToDataMat(string(timeDataFilenamePrefix,"_freq",omRound,".dat"),srcNodeMap,rcvNodeMap);
-	DobsTD[k] = Dk;
-	WdTD[k] = Wk;
-end
-DobsTTpicked = readDataFileToDataMat(string(timeDataFilenamePrefix,"_travelTime.dat"),srcNodeMap,rcvNodeMap)[1];
+	# for k = 1:length(omega)
+		# omRound = string(round((omega[k]/(2*pi))*100.0)/100.0);
+		# (Dk,Wk) =  readDataFileToDataMat(string(timeDataFilenamePrefix,"_freq",omRound,".dat"),srcNodeMap,rcvNodeMap);
+		# DobsTD[k] = Dk;
+		# WdTD[k] = Wk;
+	# end
+	# DobsTTpicked = readDataFileToDataMat(string(timeDataFilenamePrefix,"_travelTime.dat"),srcNodeMap,rcvNodeMap)[1];
+# end
 
+## Data that is generated through frequency domain simulation
 ### Read receivers and sources files
-RCVfile = string(dataFilenamePrefix,"_rcvMap.dat");
-SRCfile = string(dataFilenamePrefix,"_srcMap.dat");
-srcNodeMap = readSrcRcvLocationFile(SRCfile,Minv);
-rcvNodeMap = readSrcRcvLocationFile(RCVfile,Minv);
+# RCVfile = string(dataFilenamePrefix,"_rcvMap.dat");
+# SRCfile = string(dataFilenamePrefix,"_srcMap.dat");
+# srcNodeMap = readSrcRcvLocationFile(SRCfile,Minv);
+# rcvNodeMap = readSrcRcvLocationFile(RCVfile,Minv);
 
-DobsFD = Array(Array{Complex128,2},length(omega));
-WdFD = Array(Array{Complex128,2},length(omega));
+# DobsFD = Array(Array{Complex128,2},length(omega));
+# WdFD = Array(Array{Complex128,2},length(omega));
 
-for k = 1:length(omega)
-	omRound = string(round((omega[k]/(2*pi))*100.0)/100.0);
-	(Dk,Wk) =  readDataFileToDataMat(string(dataFilenamePrefix,"_freq",omRound,".dat"),srcNodeMap,rcvNodeMap);
-	DobsFD[k] = Dk;
-	WdFD[k] = Wk;
-end   
+# for k = 1:length(omega)
+	# omRound = string(round((omega[k]/(2*pi))*100.0)/100.0);
+	# (Dk,Wk) =  readDataFileToDataMat(string(dataFilenamePrefix,"_freq",omRound,".dat"),srcNodeMap,rcvNodeMap);
+	# DobsFD[k] = Dk;
+	# WdFD[k] = Wk;
+# end   
 
-DobsTT = readDataFileToDataMat(string(dataFilenamePrefix,"_travelTime.dat"),srcNodeMap,rcvNodeMap)[1];
+# DobsTT = readDataFileToDataMat(string(dataFilenamePrefix,"_travelTime.dat"),srcNodeMap,rcvNodeMap)[1];
 
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
-
+if dim == 2
+	dataFilenamePrefix = timeDataFilenamePrefix;
+end
 (Q,P,pMis,SourcesSubInd,contDiv,Iact,sback,mref,boundsHigh,boundsLow,resultsFilename) = 
-   setupJointInversion(m,timeDataFilenamePrefix,resultsFilename,plotting,workersFWI,maxBatchSize,Ainv,false,SSDFun,1.0,useFilesForFields);
-
-
+   setupJointInversion(m,dataFilenamePrefix,resultsFilename,plotting,workersFWI,maxBatchSize,Ainv,false,SSDFun,1.0,useFilesForFields);
 
 ########################################################################################################
 # Setting up the inversion for slowness instead of velocity:
@@ -181,8 +206,6 @@ function dump(mc,Dc,iter,pInv,PMis,resultsFilename)
 		plotModel(fullMc,false,Minv,pad,[1.5,4.5],splitdir(Temp)[2]);
 	end
 end
-
-
 
 #####################################################################################################
 # Setting up the inversion for velocity:
@@ -257,6 +280,9 @@ pInv.maxIter = 5;
 pInv.pcgMaxIter = 10;
 if dim==3
 	HesPrec = getSSORCGRegularizationPreconditioner(1.0,1e-5,1000);
+	freqContBatch = 2;
+else
+	freqContBatch = 4;
 end
 pInv.HesPrec = HesPrec;
 
@@ -267,12 +293,16 @@ else
 	mode = "1stInit"
 	start = 2
 end
-mc,Dc = freqCont(mc, pInv, pMis,contDiv, 4, resultsFilename,dump,mode,start,2,GN);
+
+
+
+
+mc,Dc = freqCont(mc, pInv, pMis,contDiv, freqContBatch, resultsFilename,dump,mode,start,2,GN);
 pInv.alpha = 1e+2;
 pInv.mref = mc[:]
-mc,Dc = freqCont(mc, pInv, pMis,contDiv, 4, resultsFilename,dump,mode,start+1,3,GN);
+mc,Dc = freqCont(mc, pInv, pMis,contDiv, freqContBatch, resultsFilename,dump,mode,start+1,3,GN);
 pInv.alpha = 1e+1;
 pInv.mref = mc[:]
-mc,Dc = freqCont(mc, pInv, pMis,contDiv, 4, resultsFilename,dump,mode,start+1,4,GN);
+mc,Dc = freqCont(mc, pInv, pMis,contDiv, freqContBatch, resultsFilename,dump,mode,start+1,4,GN);
 
 #############################################################################################
