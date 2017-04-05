@@ -64,6 +64,20 @@ module InverseSolve
 		HesPrec
 	end  # type InverseParam
 
+	function Base.display(pInv::InverseParam)
+		println("---jInv.InverseSolve.InverseParam---")
+		println("inverse mesh type:    $(typeof(pInv.MInv))")
+		println("number of cells:      $(pInv.MInv.nc)")
+		println("model function:       $(pInv.modelfun)")
+		println("maxStep:              $(pInv.maxStep)")
+		println("pcgMaxIter:           $(pInv.pcgMaxIter)")
+		println("pcgTol:               $(pInv.pcgTol)")
+		println("pcgTol:               $(pInv.pcgTol)")
+		println("pcgTol:               $(pInv.pcgTol)")
+		println("minUpdate:            $(pInv.minUpdate)")
+		println("maxIter:              $(pInv.maxIter)")		
+	end
+
 	"""
 	function jInv.InverseSolve.getInverseParam(...)
 
@@ -106,7 +120,9 @@ module InverseSolve
 	include("models.jl")
 	include("misfit.jl")
 	include("regularizers.jl")
-	include("projGNCG.jl")
+	include("GNsolve.jl")
+	include("GNhis.jl")
+	include("projGN.jl")
 	include("projSD.jl")
 	include("projPCG.jl")
 	include("barrierGNCG.jl")
@@ -114,5 +130,5 @@ module InverseSolve
 	include("computeGradMisfit.jl")
 	include("HessMatVec.jl")
 	include("iteratedTikhonov.jl")
-
+	include("getHessian.jl")
 end

@@ -20,7 +20,7 @@ using  PyPlot
 # include("ex2DFWI/readModelAndGenerateMeshMref.jl");
 # include("ex2DFWI/prepareFWIDataFiles.jl");
 
-# m = readdlm("ex2DFWI/SEGmodel2Dsalt.dat");
+# m = readdlm("model/SEGmodel2Dsalt.dat");
 # m = m*1e-3;
 # m = m';
 

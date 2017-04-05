@@ -19,7 +19,7 @@ sPCG   = getIterativeSolver(KrylovMethods.cg,out=1,sym=1);
 x,  = solveLinearSystem(Ar,b,sPCG);
 @test norm(Ar*x-b)/norm(b) < sPCG.tol
 
-IterMethod(A,b;M=M,tol=1e-1,maxIter=10,out=-1) =
+IterMethod = (A,b;M=M,tol=1e-1,maxIter=10,out=-1) ->
                   bicgstb(A,b,M1=M,tol=tol,maxIter=maxIter,out=out)
 sBiCG = getIterativeSolver(IterMethod,out=1);
 x, = solveLinearSystem(Ar,b,sBiCG);

@@ -21,7 +21,7 @@ X,  = solveLinearSystem(Ar,B,sPCG);
 @test vecnorm(Ar*X-B)/vecnorm(B) < sPCG.tol
 
 
-IterMethod(A,B;M=M,X=X,tol=1e-1,maxIter=10,out=-1) =
+IterMethod = (A,B;M=M,X=X,tol=1e-1,maxIter=10,out=-1) ->
                   blockBiCGSTB(A,B,M1=M,tol=tol,x=X,maxIter=maxIter,out=out)
 sBiCG = getBlockIterativeSolver(IterMethod,out=1);
 X, = solveLinearSystem(Ar,B,sBiCG);
