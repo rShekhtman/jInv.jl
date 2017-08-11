@@ -34,25 +34,34 @@ export iteratedTikhonov
 function iteratedTikhonov(mc,pInv::InverseParam,pMis,nAlpha,alphaFac,
                           targetMisfit;indCredit=[],dumpResults::Function=dummy,solveGN=projPCG)
 
+  if alphaFac <= 1 ; error("alphaFac <= 1") ; end
+  changeMref = true  # Should the reference model change after each iteration?
   iter = 0
   tikhonovFlag = -1
   hist = GNhis[]
   Dc = []
+  cm = computeMisfitOutput([],[],[],[],[])  # remember results from previous iteration.
+  
   while iter < nAlpha 
     iter += 1
     println("Starting projGNCG minimization with alpha $iter of $nAlpha")
     println("alpha = $(pInv.alpha)")
-    mc,Dc,GNflag,GNhist = projGN(mc,pInv,pMis,dumpResults=dumpResults)
+    mc,Dc,GNflag,GNhist, cm = projGN(mc,pInv,pMis,dumpResults=dumpResults, outputcm=true, cm=cm)
+
+    dumpResults(mc,Dc,iter+1000,pInv,cm.pMis)
+
     push!(hist,GNhist)
-    pInv.mref  = mc
-    pInv.alpha = pInv.alpha/alphaFac
+    if changeMref
+       pInv.mref  = copy(mc)
+    end
+    pInv.alpha = pInv.alpha / alphaFac
     GNiterIdx  = find(hist[end].F .> 0.0)
     println(hist[end].F)
     if minimum(hist[end].F[GNiterIdx]) <= targetMisfit
       tikhonovFlag = 1
       break
     end
-  end
+  end  # while iter < nAlpha 
   
   if tikhonovFlag < 0 
     println("iteratedTikhonov iterated maximum number of times, using $nAlpha alpha values but reached only a misfit of $(hist[end].F[end]).")

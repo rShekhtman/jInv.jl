@@ -1,11 +1,14 @@
 export uniqueidx, sortunique
 
    
-function uniqueidx( a::Array{Int64,1} )
-# b = sorted unique(a)
-# ii, jj are permutations:
-#    a[ii] = b,  b[jj] = a
+"""
+function b,ii,jj = uniqueidx(a::Vector{Int64})
 
+b = sorted unique(a)
+ii, jj are permutations:
+a[ii] = b,  b[jj] = a
+"""
+function uniqueidx( a::Array{Int64,1} )
    
    const n = length(a)
    
@@ -57,8 +60,14 @@ end # function uniqueidx
 
 #-----------------------------------------------------
 
+"""
+function b = sortunique( a::Array{Int64,1} )
+
+b = sorted unique(a)
+same as uniqueidx but doesn't compute permutation
+vectors 
+"""
 function sortunique( a::Array{Int64,1} )
-# b = sorted unique(a)
 
    const n = length(a)
    

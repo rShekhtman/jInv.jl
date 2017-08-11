@@ -6,6 +6,11 @@ function sortpermFast(A::Vector)
    const n = length(A)
 
    ii = collect(1:n)
+   
+   if issorted(A)
+      return ii, A
+   end
+   
    B = copy(A)
    quicksort!(B,ii, 1,n)
 
@@ -23,10 +28,13 @@ function sortpermFast(A::Vector, D::Vector)
       error("Lengths of A and D must be the same.")
    end
 
-   ii = collect(1:n)
-   quicksort!(A, ii, 1,n)
 
-   D = D[ii]
+   if !issorted(A)
+      ii = collect(1:n)
+      quicksort!(A, ii, 1,n)
+
+      D = D[ii]
+   end
    
    if allunique(A)
       return A, D
@@ -57,21 +65,21 @@ end # function sortpermFast
 
 #----------------------------------------------------
 
-function quicksort!(A, order, i=1,j=length(A))
+function quicksort!(A::Vector, order::Vector{Int}, i=1,j=length(A))
 # modified from:
 # http://rosettacode.org/wiki/Sorting_algorithms/Quicksort#Julia	
 
-	 @inbounds begin
+    @inbounds begin
     if j > i
-    	
-    	  if  j - i <= 10 
-    	  	  # Insertion sort for small groups is faster than Quicksort
-    	     InsertionSort!(A,order, i,j)
-    	     return A
-    	  end
-    	
-        #pivot = A[rand(i:j)] # random element of A
-        pivot = A[ div(i+j,2) ] 
+
+        if  j - i <= 10 
+           # Insertion sort for small groups is faster than Quicksort
+           InsertionSort!(A,order, i,j)
+           return A
+        end
+
+        #pivot = A[ div(i+j,2) ] 
+        pivot = getPivot( A, i,j )
         left, right = i, j
         while left <= right
             while A[left] < pivot
@@ -93,15 +101,42 @@ function quicksort!(A, order, i=1,j=length(A))
         quicksort!(A,order, left,j)
     end  # j > i
     end
-    
+
     return A
 end # function quicksort!
 
 #----------------------------------------------------
 
-function InsertionSort!(A, order, ii=1, jj=length(A))
-	
-	 @inbounds begin
+function getPivot(A::Vector, i,j)
+# pivot is median of values in: i,middle,j
+   m = div(i+j,2)
+
+   if A[i] < A[m]
+      if A[m] < A[j]
+         pivot = A[m]
+      elseif A[j] < A[i]
+         pivot = A[i]
+      else
+         pivot = A[j]
+      end
+   else
+      if A[i] < A[j]
+         pivot = A[i]
+      elseif A[j] < A[m]
+         pivot = A[m]
+      else
+         pivot = A[j]
+      end
+   end
+
+   return pivot
+end  # function getPivot
+
+#----------------------------------------------------
+
+function InsertionSort!(A::Vector, order::Vector{Int}, ii=1, jj=length(A))
+
+    @inbounds begin
     for i = ii+1 : jj
         j = i - 1
         temp  = A[i]

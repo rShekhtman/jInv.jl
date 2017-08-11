@@ -9,7 +9,8 @@ export computeMisfit
 	computeMisfit has several options.
 """
 function computeMisfit(sig,     # conductivity on inv mesh (active cells only)
-                       pMis::MisfitParam,doDerivative::Bool=true, doClear::Bool=false)
+                       pMis::MisfitParam,
+                       doDerivative::Bool=true, doClear::Bool=false)
 	#
 	#	computeMisfit for a single forward problem
 	#

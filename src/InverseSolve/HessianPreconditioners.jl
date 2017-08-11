@@ -1,4 +1,6 @@
-export HessianPreconditioner,getSSORCGRegularizationPreconditioner,getSSORRegularizationPreconditioner,getExactSolveRegularizationPreconditioner
+export HessianPreconditioner,getSSORCGRegularizationPreconditioner,
+       getSSORRegularizationPreconditioner,getExactSolveRegularizationPreconditioner, 
+       getPCGSolveRegularizationPreconditioner
 
 ############ General Hessian Preconditioner:
 type HessianPreconditioner
@@ -72,4 +74,30 @@ end
 
 function setupExactRegSolve(Hs::Function, d2R::SparseMatrixCSC,param)
 	return;
+end
+
+######################################################################################################################
+############ PCGSolveRegularization: A preconditioner that inverts the regularization matrix using PCG
+######################################################################################################################
+
+function getPCGSolveRegularizationPreconditioner()
+	return HessianPreconditioner([],applyPCGRegSolve,setupPCGRegSolve)
+end
+
+function applyPCGRegSolve(Hs::Function, d2R::SparseMatrixCSC,v::Vector,param)
+    AA = d2R + speye(size(d2R,1))*0.1
+    function SSOR(v)
+       # x,=ssor(d2R, v, out=-1)
+        omega = 1.
+        d = omega ./ diag(AA)
+        x = zeros(length(d))
+        x = ssorPrecTrans!(AA,x,v,d)
+        return x
+    end
+	x,flag,err,iter,resvec = cg(AA,v,tol=1e-5,maxIter=200,M=SSOR,x=[],out=0)
+	return x
+end
+
+function setupPCGRegSolve(Hs::Function, d2R::SparseMatrixCSC,param)
+	return
 end

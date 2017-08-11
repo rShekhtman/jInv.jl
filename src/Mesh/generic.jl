@@ -3,6 +3,7 @@ export ndgrid, meshgrid
 export getDivergenceMatrix, getNodalGradientMatrix, getCurlMatrix, getNodalLaplacianMatrix
 export getEdgeMassMatrix, getdEdgeMassMatrix, getFaceMassMatrix,
        getdFaceMassMatrix,getNodalMassMatrix,getdNodalMassMatrix
+export getCellCenterGradientMatrix
 
 function av(n)
 # A = av(n), 1D average operator
@@ -362,4 +363,11 @@ function getNodalLaplacianMatrix(Mesh::AbstractTensorMesh)
 		Mesh.nLap = G'*G
 	end
 	return Mesh.nLap	
+end
+
+
+function getCellCenterGradientMatrix(Mesh::AbstractTensorMesh)
+   # dummy function
+   G = speye(1,1)
+   return G
 end

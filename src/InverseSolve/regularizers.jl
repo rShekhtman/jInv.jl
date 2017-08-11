@@ -79,6 +79,7 @@ function smallnessReg(m::Vector,mref,M::AbstractMesh)
 	return Rc,dR,speye(length(m))
 end
 
+
 function wdiffusionReg(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
    # Rc = a1*\\Dx(m-mref)||^2 + .. + a3*\\Dz(m-mref)||^2 + a4*|| m -mref ||^2
 
@@ -110,16 +111,28 @@ function wdiffusionReg(m::Vector, mref::Vector, M::AbstractMesh; Iact=1.0, C=[])
    end
 
    dm   = m .- mref
-   Div  = getDivergenceMatrix(M)
-
+   
+   use_div = false
+   
    V    = getVolume(M)
-   #Div  = Iact'*(Div*Wt)   # project to the active cells
-   Div  = Iact'*(V*Div*Wt)   # project to the active cells
-
    Af   = getFaceAverageMatrix(M)
 
-   #d2R  = Div * sdiag(Af'*vec(diag(V))) * Div' + alpha4*Iact'*V*Iact
-   d2R  = Div * sdiag(1./(Af'*vec(diag(V)))) * Div' + alpha4*Iact'*V*Iact
+   if use_div
+      Div  = getDivergenceMatrix(M)
+      #Div  = Iact'*(Div*Wt)   # project to the active cells
+      Div  = Iact'*(V*Div*Wt)   # project to the active cells
+
+      #d2R  = Div * sdiag(Af'*vec(diag(V))) * Div' + alpha4*Iact'*V*Iact
+      d2R  = Div * sdiag(1./(Af'*vec(diag(V)))) * Div' + alpha4*Iact'*V*Iact
+
+   else
+      Grad = getCellCenterGradientMatrix(M)
+      Grad = (Wt'*Grad)*Iact
+
+      d2R  = Grad' * sdiag(Af'*vec(diag(V))) * Grad + alpha4*Iact'*V*Iact
+
+   end      
+
 
    dR   = d2R*dm
    Rc   = 0.5*dot(dm,dR)

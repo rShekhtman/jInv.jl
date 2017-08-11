@@ -1,4 +1,4 @@
-export projGN, projGNCG
+export projGN, projGNCG, computeMisfitOutput
 
 
 """
@@ -31,6 +31,15 @@ function dummy(mc,Dc,iter,pInv,pMis)
 end;
 
 
+type computeMisfitOutput
+   # Used to store the output of computeMisfit() for later.
+   Dc
+   F
+   d2F
+   pMis
+   tMis
+end  # type computeMisfitOutput
+
 	
 """
 	mc,Dc,outerFlag = projGN(mc,pInv::InverseParam,pMis, indFor = [], dumpResults::Function = dummy)
@@ -55,13 +64,22 @@ end;
 	Output:
 		mc                  - final model
 		Dc                  - data
-		outerFlag           - flag for convergence
+		outerFlag           - flag for convergence.
+		                        = -1 maximum number of iterations.
+		                        = -2 could not reduce misfit during line search.
+		                        =  1 last step was less than stepTol.
 		His                 - iteration history
 	
 """
-function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
-	dumpResults::Function = dummy,out::Int=2,solveGN::Function=projPCG)
+function projGN(mc, pInv::InverseParam, pMis;
+                indCredit=[],
+                dumpResults::Function = dummy,
+                out::Int=2,
+                solveGN::Function=projPCG,
+                outputcm::Bool=false,  # are we using cm?
+                cm::computeMisfitOutput=computeMisfitOutput([],[],[],[],[])  )
 
+   logfile = "jInv.out"
 	maxIter     = pInv.maxIter      #  Max. no. iterations.
 	pcgMaxIter  = pInv.pcgMaxIter   #  Max cg iters.
 	pcgTol      = pInv.pcgTol       #  CG stopping tolerance.
@@ -69,7 +87,7 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 	maxStep     = pInv.maxStep
 	low         = pInv.boundsLow
 	high        = pInv.boundsHigh
-	alpha       = pInv.alpha
+	alpha       = pInv.alpha        # tradeoff parameter
 	
 	His = getGNhis(maxIter,pcgMaxIter)
 	#---------------------------------------------------------------------------
@@ -80,13 +98,28 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 	
 	
 	## evaluate function and derivatives
-	sig,dsig = pInv.modelfun(mc)
-	if isempty(indCredit)
-		Dc,F,dF,d2F,pMis,tMis = computeMisfit(sig,pMis,true)
-	else
-		Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sig,pMis,true,indCredit)
-	end
-	dF = dsig'*dF
+   sig,dsig = pInv.modelfun(mc)
+   if isempty(cm.Dc) || !outputcm
+      # Initial misfit
+      if isempty(indCredit)
+         Dc,F,dF,d2F,pMis,tMis = computeMisfit(sig,pMis, true)
+      else
+         Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sig,pMis, true,indCredit)
+      end
+      
+   elseif outputcm
+      # Use results from previous iteration.
+      Dc,F,d2F,pMis,tMis = cm.Dc, cm.F, cm.d2F, cm.pMis, cm.tMis
+      
+		if isempty(indCredit)
+			dF = computeGradMisfit(sig,Dc,pMis)
+		else
+			dF = computeGradMisfit(sig,Dc,pMis,indCredit)
+		end
+      
+   end
+   
+   dF = dsig'*dF
 	
 	
 	# compute regularizer
@@ -102,7 +135,8 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 	############################################################################
 	##  Outer iteration.                                                        #
 	############################################################################
-	iter = 0
+	iter = 0   # iteration counter
+	MaxlsIter = 6  # maximum number of line search iterations
 	outerFlag = -1; stepNorm=0.0
 
 	outStr = @sprintf("\n %4s\t%08s\t%08s\t%08s\t%08s\t%08s\n", 
@@ -110,9 +144,8 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 	updateHis!(0,His,Jc,norm(projGrad(gc,mc,low,high)),F,Dc,R,alpha[1],countnz(Active),0.0,-1,tMis,tReg)
 	
 	if out>=2; print(outStr); end
-	f = open("jInv.out", "w")
+	f = open(logfile, "a")
 	write(f, outStr)
-	close(f)
 	
 	while outerFlag == -1
 		
@@ -120,9 +153,7 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 		outStr = @sprintf("%3d.0\t%3.2e\t%3.2e\t%3.2e\t%3.2e\t%3d\n", 
 		         iter, F, R,alpha[1],Jc/J0,countnz(Active))
 		if out>=2; print(outStr); end
-		f = open("jInv.out", "a")
 		write(f, outStr)
-		close(f)
 
 		# solve linear system to find search direction
 		tic()
@@ -149,14 +180,14 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 		muLS = 1; lsIter = 1; mt = zeros(size(mc)); Jt = Jc
 		while true
 			mt = mc + muLS*delm
-			mt[mt.<low]  = low[mt.<low]
+			mt[mt.<low]  = low[ mt.<low]
 			mt[mt.>high] = high[mt.>high]
 			## evaluate function 
 			sigt, = pInv.modelfun(mt)
 			if isempty(indCredit)
-				Dc,F,dF,d2F,pMis,tMis = computeMisfit(sigt,pMis,false)
+				Dc,F,dF,d2F,pMis,tMis = computeMisfit(sigt,pMis, false)
 			else
-				Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sigt,false,indCredit)
+				Dc,F,dF,d2F,pMis,tMis,indDebit = computeMisfit(sigt, false,indCredit)
 			end
 			His.timeMisfit[iter+1,:]+=tMis
 			
@@ -165,16 +196,20 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 			His.timeReg[iter+1] += toq()
 			# objective function
 			Jt  = F  + R
+			
+			outStr = @sprintf( "   .%d\t%3.2e\t%3.2e\t\t\t%3.2e\n",
+			                   lsIter, F,       R,       Jt/J0)
 			if out>=2;
-				println(@sprintf( "   .%d\t%3.2e\t%3.2e\t\t\t%3.2e",
-			           lsIter, F,       R,       Jt/J0))
+				print(outStr)
 			end
+   		write(f, outStr)
+   		flush(f)
 			
 			if Jt < Jc
 			    break
 			end
 			muLS /=2; lsIter += 1
-			if lsIter > 6
+			if lsIter > MaxlsIter
 			    outerFlag = -2
 				break
 			end
@@ -215,20 +250,33 @@ function  projGN(mc,pInv::InverseParam,pMis;indCredit=[],
 		
 		His.dJ[iter+1] = norm(projGrad(gc,mc,low,high))
 		
-	end # while outer_flag == 0
-	
+	end # while outer_flag == -1
+
+
 	if out>=1
 		if outerFlag==-1
-			println("projGN iterated maxIter=$maxIter times but reached only stepNorm of $(stepNorm) instead $(stepTol)." )
+         outStr = @sprintf("projGN iterated maxIter=%i times but reached only stepNorm of %.2e instead %.2e.",
+                            maxIter, stepNorm, stepTol)
 		elseif outerFlag==-2
-			println("projGN stopped at iteration $iter with a line search fail.")
+			outStr = "projGN stopped at iteration $iter with a line search fail."
 		elseif outerFlag==1
-			println("projGN reached desired accuracy at iteration $iter.")
+			outStr = "projGN reached desired accuracy at iteration $iter."
 		end
-	end
-		
-	return mc,Dc,outerFlag,His
-end  # Optimization code
+		println(outStr)
+		println(f, outStr)
+	end  # out>=1
+
+	close(f)
+
+   if outputcm
+      cm = computeMisfitOutput( Dc,F,d2F,pMis,tMis )  # save for next tradeoff parameter
+         
+      return mc,Dc,outerFlag,His, cm
+
+   else
+      return mc,Dc,outerFlag,His
+   end
+end  # function projGN  Optimization code
 
 
 projGNCG = projGN
